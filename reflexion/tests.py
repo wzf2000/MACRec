@@ -1,6 +1,6 @@
 
 import joblib
-from react_cls import ReactReflectAgent
+from agents import ReactReflectAgent
 from mocks import DocStoreExplorerMock, LLMMock
 
 test_q = "What is the elevation range for the area that the eastern sector of the Colorado orogeny extends into?"
