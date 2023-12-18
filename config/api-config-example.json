@@ -1,1 +1,8 @@
-{}
+{
+    "api_base": "https://XXX",
+    "api_key": "sk_XXXX",
+    "model": "gptXXX",
+    "temperature": 0,
+    "top_p": 1,
+    "max_tokens": 100
+}

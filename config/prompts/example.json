@@ -1,0 +1,6 @@
+{
+    "template_name": {
+        "template": "template content",
+        "input_variables": "(optional) input variables for template"
+    }
+}
