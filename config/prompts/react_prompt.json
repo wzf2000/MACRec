@@ -1,6 +1,6 @@
 {
     "test_react_prompt": {
-        "template": "Solve a rating prediction task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Finish[answer] returns the answer and finishes the task.{examples}\n Input: {input}{scratchpad}",
+        "template": "Solve a rating prediction task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Finish[answer] returns the answer and finishes the task.{examples}\nInput: {input}{scratchpad}",
         "input_variables": ["examples", "input", "scratchpad"]
     }
 }
