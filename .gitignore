@@ -21,5 +21,6 @@ __pycache__/
 .DS_Store
 
 # Others
+data/
 log/
 config/api-config.json

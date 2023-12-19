@@ -1,7 +1,9 @@
 import os
 import joblib
 from typing import List, Tuple
-from ..agents import BaseAgent, ReactAgent
+from . import BaseAgent, ReactAgent
+# from ..agents.base_agent import BaseAgent
+# from ..agents.react_agent import ReactAgent
 
 def summarize_trial(agents: List[BaseAgent]) -> Tuple[List[BaseAgent], List[BaseAgent]]:
     correct = [a for a in agents if a.is_correct()]

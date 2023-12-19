@@ -1,6 +1,6 @@
 from typing import List
-from . import summarize_trial, summarize_react_trial
-from ..agents import BaseAgent, ReactAgent
+from .utils import summarize_trial, summarize_react_trial
+from . import BaseAgent, ReactAgent
 
 def log_trial(agents: List[BaseAgent], trial_n: int) -> str:
     correct, incorrect = summarize_trial(agents)

@@ -1,6 +1,6 @@
 import tiktoken
 from langchain.prompts import PromptTemplate
-from . import parse_action, format_step
+from ..utils import parse_action, format_step
 from .base_agent import BaseAgent
 from ..llms import BaseLLM
 

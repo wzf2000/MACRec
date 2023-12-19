@@ -1,0 +1,6 @@
+{
+    "template_name": {
+        "template": "[user_id]: user_{user_id}\n [user_profile]:\n{user_profile}\n [historical interactions]:\n{history} \n Which star rating will user_{user_id} give item_{target_item_id} with attributes {target_item_attributes} (1 being lowest and 5 being highest)",
+        "input_variables": ["user_id", "user_profile", "history", "target_item_id", "target_item_attributes"]
+    }
+}

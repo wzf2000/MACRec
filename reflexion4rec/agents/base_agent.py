@@ -1,5 +1,5 @@
 from langchain.prompts import PromptTemplate
-from . import format_step
+from ..utils import format_step
 from ..llms import BaseLLM
 from ..utils import EM
 

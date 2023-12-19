@@ -1,8 +1,10 @@
 from typing import List
 from langchain.prompts import PromptTemplate
-from . import ReflexionStrategy, format_last_attempt, format_reflections, format_step, parse_action
+from ..utils import format_last_attempt, format_reflections, format_step, parse_action
+from .strategy import ReflexionStrategy
 from .reflect_agent import ReflectAgent
 from ..llms import BaseLLM
+
 
 class CoTAgent(ReflectAgent):
     def __init__(

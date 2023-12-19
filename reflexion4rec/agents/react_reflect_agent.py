@@ -1,6 +1,7 @@
 from typing import List
 from langchain.prompts import PromptTemplate
-from . import ReflexionStrategy, format_last_attempt, format_reflections
+from ..utils import format_last_attempt, format_reflections
+from .strategy import ReflexionStrategy
 from .reflect_agent import ReflectAgent
 from .react_agent import ReactAgent
 from ..llms import BaseLLM
