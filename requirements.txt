@@ -10,3 +10,4 @@ transformers==4.28.1
 pandas==1.5.3
 scikit-learn
 wikipedia
+loguru
