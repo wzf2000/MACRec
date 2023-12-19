@@ -1,5 +1,6 @@
 import re
 import gym
+from loguru import logger
 from typing import Tuple
 from langchain import Wikipedia
 from langchain.agents.react.base import DocstoreExplorer
@@ -42,7 +43,7 @@ class QAEnv(gym.Env):
             try:
                 observation = self.explorer.search(argument).strip('\n').strip()
             except Exception as e:
-                print(e)
+                logger.error(e)
                 observation = f'Could not find that page, please try again.'
                     
         elif action_type == 'Lookup':

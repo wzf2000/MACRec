@@ -1,8 +1,9 @@
 import tiktoken
+from loguru import logger
 from langchain.prompts import PromptTemplate
-from ..utils import parse_action, format_step
 from .base_agent import BaseAgent
 from ..llms import BaseLLM
+from ..utils import parse_action, format_step
 
 class ReactAgent(BaseAgent):
     def __init__(
@@ -36,14 +37,14 @@ class ReactAgent(BaseAgent):
         # Think
         self.scratchpad += f'\nThought {self.step_n}:'
         self.scratchpad += ' ' + self.prompt_agent()
-        print(self.scratchpad.split('\n')[-1])
+        logger.info(self.scratchpad.split('\n')[-1])
 
         # Act
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action)
-        print(self.scratchpad.split('\n')[-1])
+        logger.info(self.scratchpad.split('\n')[-1])
 
         # Observe
         self.scratchpad += f'\nObservation {self.step_n}: '
@@ -54,7 +55,7 @@ class ReactAgent(BaseAgent):
         else:
             self.scratchpad += 'Invalid Action. Valid Actions are Finish[<answer>].'
 
-        print(self.scratchpad.split('\n')[-1])
+        logger.info(self.scratchpad.split('\n')[-1])
 
         self.step_n += 1
         

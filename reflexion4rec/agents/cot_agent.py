@@ -1,9 +1,10 @@
+from loguru import logger
 from typing import List
 from langchain.prompts import PromptTemplate
-from ..utils import format_last_attempt, format_reflections, format_step, parse_action
 from .strategy import ReflexionStrategy
 from .reflect_agent import ReflectAgent
 from ..llms import BaseLLM
+from ..utils import parse_action
 
 
 class CoTAgent(ReflectAgent):
@@ -42,20 +43,20 @@ class CoTAgent(ReflectAgent):
         # Think
         self.scratchpad += f'\nThought:'
         self.scratchpad += ' ' + self.prompt_agent()
-        print(self.scratchpad.split('\n')[-1])
+        logger.info(self.scratchpad.split('\n')[-1])
 
         # Act
         self.scratchpad += f'\nAction:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action)
-        print(self.scratchpad.split('\n')[-1])  
+        logger.info(self.scratchpad.split('\n')[-1])  
 
         self.scratchpad += f'\nObservation: '
         if action_type == 'Finish':
             self.finish(argument)
         else:
-            print('Invalid action type, please try again.')
+            logger.error('Invalid action type, please try again.')
     
     def run(self, reflexion_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> str:
         if self.step_n > 0 and not self.is_correct() and reflexion_strategy != ReflexionStrategy.NONE:

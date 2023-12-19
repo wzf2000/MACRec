@@ -1,9 +1,10 @@
+from loguru import logger
 from typing import List
 from langchain.prompts import PromptTemplate
-from ..utils import format_last_attempt, format_reflections, format_step
 from .strategy import ReflexionStrategy
 from .base_agent import BaseAgent
 from ..llms import BaseLLM
+from ..utils import format_last_attempt, format_reflections, format_step
 
 class ReflectAgent(BaseAgent):
     def __init__(
@@ -26,7 +27,7 @@ class ReflectAgent(BaseAgent):
         return format_step(self.reflect_llm(self._build_reflection_prompt()))
         
     def reflect(self, reflexion_strategy: ReflexionStrategy) -> None:
-        print('Running Reflexion strategy...')
+        logger.info('Running Reflexion strategy...')
         if reflexion_strategy == ReflexionStrategy.LAST_ATTEMPT:
             self.reflections = [self.scratchpad]
             self.reflections_str = format_last_attempt(self.input, self.scratchpad, self.last_trial_header)
@@ -39,4 +40,4 @@ class ReflectAgent(BaseAgent):
             self.reflections_str += format_reflections(self.reflections, header=self.reflection_after_last_trial_header)
         else:
             raise ValueError(f'Unknown reflexion strategy: {reflexion_strategy}')
-        print(self.reflections_str)
+        logger.info(self.reflections_str)
