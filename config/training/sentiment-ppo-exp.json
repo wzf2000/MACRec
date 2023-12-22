@@ -17,11 +17,11 @@
         "save_best": false
     },
     "model_kwargs": {
-        "model_path": "/mnt/shared/official_pretrains/hf_home/Llama-2-7b-hf",
+        "model_path": "meta-llama/Llama-2-7b-hf",
         "num_layers_unfrozen": 2
     },
     "tokenizer_kwargs": {
-        "tokenizer_path": "/mnt/shared/official_pretrains/hf_home/Llama-2-7b-hf",
+        "tokenizer_path": "meta-llama/Llama-2-7b-hf",
         "truncation_side": "right"
     },
     "optimizer_kwargs": {
