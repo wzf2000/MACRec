@@ -4,16 +4,16 @@
         "input_variables": ["examples", "reflections", "input", "scratchpad"]
     },
     "test_reflect_prompt": {
-        "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a question to answer. You were unsuccessful in answering the question either because you guessed the wrong answer with `Finish[<answer>]`, or you used up your set number of reasoning steps. In a few sentences, Diagnose a possible reason for failure and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput: {input}{scratchpad}\n\nReflection:",
+        "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a question to answer. Your first task is to determine if the given answer is correct. Possible reasons for failure include guessing the wrong answer using Finish[<answer>] or exhausting your allotted number of reasoning steps. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput: {input}{scratchpad}\n\nReflection:",
         "input_variables": ["examples", "input", "scratchpad"]
     },
     "reflection_header": {
-        "template": "You have attempted to answer following question before and failed. The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n"
+        "template": "You have attempted to answer following question before. The following reflection(s) give a new plan to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n"
     },
     "last_trial_header": {
-        "template": "You have attempted to answer the following question before and failed. Below is the last trial you attempted to answer the question.\n"
+        "template": "You have attempted to answer the following question before. Below is the last trial you attempted to answer the question.\n"
     },
     "reflection_last_trial_header": {
-        "template": "The following reflection(s) give a plan to avoid failing to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n"
+        "template": "The following reflection(s) give a new plan to answer the question in the same way you did previously. Use them to improve your strategy of correctly answering the given question.\n"
     }
 }
