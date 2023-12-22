@@ -4,10 +4,11 @@ from ..llms import BaseLLM
 from ..utils import EM
 
 class BaseAgent:
-    def __init__(self, agent_prompt: PromptTemplate, actor_llm: BaseLLM, *args, **kwargs) -> None:
+    def __init__(self, agent_prompt: PromptTemplate, actor_llm: BaseLLM, prompts: dict = dict(), *args, **kwargs) -> None:
         self.agent_prompt = agent_prompt
         self.answer = ''
         self.actor_llm = actor_llm
+        self.prompts = prompts
         self.reset()
     
     def run(self, *args, **kwargs) -> str:
