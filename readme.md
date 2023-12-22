@@ -17,6 +17,34 @@
 - `data/`: The data folder.
 - `log/`: The log folder.
 
+### Requirements
+
+1. Run following commands to install dependencies:
+    ```shell
+    pip install -r requirements.txt
+    ```
+2. Run following commands to install PyTorch (Note: change the url setting if using another version of CUDA):
+    ```shell
+    pip install torch --extra-index-url https://download.pytorch.org/whl/cu118
+    ```
+3. Run following commands to install `trlx` (Run it where you want to place it):
+    ```shell
+    git clone https://github.com/CarperAI/trlx.git
+    cd trlx
+    pip install -e .
+    ```
+
+#### VSCode
+
+For VSCode programmer, add the following settings to `.vscode/settings.json` in this repositoriy's folder:
+```json
+{
+    "python.analysis.extraPaths": [
+        "/path/to/trlx/repo/directory"
+    ]
+}
+```
+
 ### Run
 
 Use following to run specific task:
