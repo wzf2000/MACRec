@@ -1,3 +1,4 @@
+import os
 import sys
 from loguru import logger
 from argparse import ArgumentParser
@@ -8,8 +9,13 @@ def main():
     init_parser.add_argument('-m', '--mode', type=str, required=True, help='The main function to run')
     init_parser.add_argument('--verbose', type=str, default='INFO', choices=['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'], help='The log level')
     init_args, init_extras = init_parser.parse_known_args()
+
     logger.remove()
     logger.add(sys.stderr, level=init_args.verbose)
+    os.makedirs('logs', exist_ok=True)
+    # log name use the time when the program starts, level is INFO
+    logger.add('logs/{time:YYYY-MM-DD:HH:mm:ss}.log', level='INFO')
+
     try:
         task = eval(init_args.mode + 'Task')()
     except NameError:
