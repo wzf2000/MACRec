@@ -101,7 +101,7 @@ def process_data(dir: str):
     train_df, dev_df, test_df = process_interaction_data(data_df)
     logger.info(f'Number of train interactions: {train_df.shape[0]}')
     dfs = append_his_info([train_df, dev_df, test_df])
-    logger.success(f'Completed append history information to interactions')
+    logger.info(f'Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
         df['history'] = df['history_item_id'].apply(lambda x: item_df.loc[x]['item_attributes'].values.tolist())
