@@ -84,7 +84,6 @@ class ToyEvaluateTask(Task):
             if agent_model.is_correct():
                 logger.success(f'Answer is correct!')
                 logger.success(f'Answer: {agent_model.answer}, Ground Truth: {df["rating"][0]}')
-                break
             else:
                 logger.warning(f'Answer is incorrect!')
                 logger.warning(f'Answer: {agent_model.answer}, Ground Truth: {df["rating"][0]}')

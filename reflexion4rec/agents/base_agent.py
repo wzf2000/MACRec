@@ -4,11 +4,12 @@ from ..llms import BaseLLM
 from ..utils import EM
 
 class BaseAgent:
-    def __init__(self, agent_prompt: PromptTemplate, actor_llm: BaseLLM, prompts: dict = dict(), *args, **kwargs) -> None:
+    def __init__(self, agent_prompt: PromptTemplate, actor_llm: BaseLLM, prompts: dict = dict(), leak: bool = True, *args, **kwargs) -> None:
         self.agent_prompt = agent_prompt
         self.answer = ''
         self.actor_llm = actor_llm
         self.prompts = prompts
+        self.leak = leak
         self.reset()
     
     def run(self, *args, **kwargs) -> str:
@@ -27,7 +28,9 @@ class BaseAgent:
     
     def finish(self, answer) -> None:
         self.answer = answer
-        if self.is_correct():
+        if not self.leak:
+            self.scratchpad += f'The answer you give (may be INCORRECT): {self.answer}'
+        elif self.is_correct():
             self.scratchpad += 'Answer is CORRECT'
         else: 
             self.scratchpad += 'Answer is INCORRECT'

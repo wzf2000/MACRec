@@ -22,6 +22,7 @@ class ReactAgent(BaseAgent):
         self.step_n: int = 1
         self.finished: bool = False
         self.scratchpad: str = ''
+        self.answer = ''
         
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(

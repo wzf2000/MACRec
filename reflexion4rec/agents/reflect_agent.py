@@ -11,12 +11,14 @@ class ReflectAgent(BaseAgent):
         self, agent_prompt: PromptTemplate, reflect_prompt: PromptTemplate,
         reflect_examples: str,
         actor_llm: BaseLLM, reflect_llm: BaseLLM,
+        keep_reflections: bool = False,
         *args, **kwargs
     ) -> None:
         super().__init__(agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
         self.reflect_prompt = reflect_prompt
         self.reflect_examples = reflect_examples
         self.reflect_llm = reflect_llm
+        self.keep_reflections = keep_reflections
         self.reflections: List[str] = []
         self.reflections_str: str = ''
         
@@ -24,7 +26,12 @@ class ReflectAgent(BaseAgent):
         raise NotImplementedError("ReflexionAgent._build_reflection_prompt() not implemented")
         
     def prompt_reflection(self) -> str:
-        return format_step(self.reflect_llm(self._build_reflection_prompt()))
+        reflection_prompt = self._build_reflection_prompt()
+        reflection_response = self.reflect_llm(reflection_prompt)
+        if self.keep_reflections:
+            self.reflection_input = reflection_prompt
+            self.reflection_output = reflection_response
+        return format_step(reflection_response)
         
     def reflect(self, reflexion_strategy: ReflexionStrategy) -> None:
         logger.debug('Running Reflexion strategy...')
