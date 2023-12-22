@@ -3,3 +3,4 @@ from .evaluate_toy import ToyEvaluateTask
 from .evaluate import EvaluateTask
 from .preprocess import PreprocessTask
 from .rlhf import RLHFTrainingTask
+from .feedback_toy import ToyFeedbackTask
