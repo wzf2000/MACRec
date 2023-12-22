@@ -32,6 +32,6 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
         )
         
     def run(self, reset: bool = True, reflexion_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> str:
-        if (self.is_finished or self.is_halted) and not self.is_correct():
+        if (self.is_finished() or self.is_halted()) and not self.is_correct():
             self.reflect(reflexion_strategy)
         return super().run(reset)
