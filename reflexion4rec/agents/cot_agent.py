@@ -14,7 +14,7 @@ class CoTAgent(ReflectAgent):
         reflect_llm: BaseLLM, actor_llm: BaseLLM,
         *args, **kwargs
     ) -> None:
-        super().__init__(agent_prompt, reflect_prompt, reflect_examples, actor_llm, reflect_llm)
+        super().__init__(agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, *args, **kwargs)
         self.cot_examples = cot_examples
         self.step_n: int = 0
         

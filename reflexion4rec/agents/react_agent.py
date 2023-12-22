@@ -13,7 +13,7 @@ class ReactAgent(BaseAgent):
         max_steps: int = 6,
         *args, **kwargs
     ) -> None:
-        super().__init__(agent_prompt, actor_llm)
+        super().__init__(agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
         self.react_examples = react_examples
         self.max_steps = max_steps
         self.enc = tiktoken.encoding_for_model('text-davinci-003')

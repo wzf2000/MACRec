@@ -14,7 +14,7 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
         max_steps: int = 6,
         *args, **kwargs
     ) -> None:
-        super().__init__(agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, react_examples=react_examples, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, max_steps=max_steps)
+        super().__init__(agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, react_examples=react_examples, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, max_steps=max_steps, *args, **kwargs)
         
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
