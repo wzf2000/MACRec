@@ -29,17 +29,19 @@ class RLHFTrainingTask(Task):
 
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
-        parser.add_argument('--config_path', type=str, default=None)
+        parser.add_argument('--config_path', type=str, required=True, help='Path to the config file')
+        parser.add_argument('--gpu', type=int, default=0, help='GPU ID to use')
+        parser.add_argument('--batch_size', type=int, default=256, help='Batch size')
         return parser
     
-    def run(self, config_path):
+    def run(self, config_path: str, gpu: int, batch_size: int):
         with open(config_path, 'r') as config_f:
             config = json.load(config_f)
         
         reward_config = config.get('reward', {})
         data_config = config.get('data', {})
 
-        device = 0
+        device = gpu
 
         if reward_config.get('type', 'sentiment') == 'sentiment':
             sentiment_fn = pipeline(
@@ -47,7 +49,7 @@ class RLHFTrainingTask(Task):
                 "lvwerra/distilbert-imdb",
                 top_k=2,
                 truncation=True,
-                batch_size=256,
+                batch_size=batch_size,
                 device=device,
             )
 
