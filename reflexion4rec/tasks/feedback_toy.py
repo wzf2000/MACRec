@@ -47,6 +47,10 @@ class ToyFeedbackTask(Task):
         logger.info(f"Test data: {test_data}")
         
         # test one step
+        if task == 'rp':
+            task_type = 'rating prediction'
+        else:
+            raise NotImplementedError
 
         if agent == 'react_reflect':
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
@@ -57,6 +61,7 @@ class ToyFeedbackTask(Task):
                 device=device
             )
             agent_model = ReactReflectAgent(
+                task_type=task_type,
                 agent_prompt=agent_prompt,
                 reflect_prompt=reflect_prompt,
                 react_examples="",

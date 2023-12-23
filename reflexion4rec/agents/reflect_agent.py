@@ -8,13 +8,13 @@ from ..utils import format_last_attempt, format_reflections, format_step
 
 class ReflectAgent(BaseAgent):
     def __init__(
-        self, agent_prompt: PromptTemplate, reflect_prompt: PromptTemplate,
+        self, task_type: str, agent_prompt: PromptTemplate, reflect_prompt: PromptTemplate,
         reflect_examples: str,
         actor_llm: BaseLLM, reflect_llm: BaseLLM,
         keep_reflections: bool = False,
         *args, **kwargs
     ) -> None:
-        super().__init__(agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
+        super().__init__(task_type=task_type, agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
         self.reflect_prompt = reflect_prompt
         self.reflect_examples = reflect_examples
         self.reflect_llm = reflect_llm

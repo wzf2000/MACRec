@@ -46,10 +46,16 @@ class EvaluateTask(Task):
         ), df['rating'][i]) for i in tqdm(range(len(df)))]
         logger.info(f"Test data sample: {test_datas[0][0]}\nRating: {test_datas[0][1]}")
         
+        if task == 'rp':
+            task_type = 'rating prediction'
+        else:
+            raise NotImplementedError
+
         if agent == 'react':
             prompt = read_template(f"config/prompts/{agent}_prompt.json")[f'test_{agent}_prompt']
             # TODO: Add examples
             agent_model = ReactAgent(
+                task_type=task_type,
                 agent_prompt=prompt,
                 react_examples="",
                 actor_llm=react_llm
@@ -66,6 +72,7 @@ class EvaluateTask(Task):
                 openai_api_key=api_config['api_key'],
             )
             agent_model = ReactReflectAgent(
+                task_type=task_type,
                 agent_prompt=agent_prompt,
                 reflect_prompt=reflect_prompt,
                 react_examples="",

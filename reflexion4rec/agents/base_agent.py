@@ -4,7 +4,8 @@ from ..llms import BaseLLM
 from ..utils import EM
 
 class BaseAgent:
-    def __init__(self, agent_prompt: PromptTemplate, actor_llm: BaseLLM, prompts: dict = dict(), leak: bool = True, *args, **kwargs) -> None:
+    def __init__(self, task_type: str, agent_prompt: PromptTemplate, actor_llm: BaseLLM, prompts: dict = dict(), leak: bool = True, *args, **kwargs) -> None:
+        self.task_type = task_type
         self.agent_prompt = agent_prompt
         self.answer = ''
         self.actor_llm = actor_llm

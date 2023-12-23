@@ -46,9 +46,15 @@ class ToyEvaluateTask(Task):
         
         # test one step
 
+        if task == 'rp':
+            task_type = 'rating prediction'
+        else:
+            raise NotImplementedError
+
         if agent == 'react':
             prompt = read_template(f"config/prompts/{agent}_prompt.json")[f'test_{agent}_prompt']
             agent_model = ReactAgent(
+                task_type=task_type,
                 agent_prompt=prompt,
                 react_examples="",
                 actor_llm=react_llm
@@ -65,6 +71,7 @@ class ToyEvaluateTask(Task):
                 openai_api_key=api_config['api_key'],
             )
             agent_model = ReactReflectAgent(
+                task_type=task_type,
                 agent_prompt=agent_prompt,
                 reflect_prompt=reflect_prompt,
                 react_examples="",

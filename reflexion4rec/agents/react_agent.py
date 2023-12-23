@@ -7,13 +7,15 @@ from ..utils import parse_action, format_step
 
 class ReactAgent(BaseAgent):
     def __init__(
-        self, agent_prompt: PromptTemplate,
+        self,
+        task_type: str,
+        agent_prompt: PromptTemplate,
         react_examples: str,
         actor_llm: BaseLLM = None,
         max_steps: int = 6,
         *args, **kwargs
     ) -> None:
-        super().__init__(agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
+        super().__init__(task_type=task_type, agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
         self.react_examples = react_examples
         self.max_steps = max_steps
         self.enc = tiktoken.encoding_for_model('text-davinci-003')
@@ -26,6 +28,7 @@ class ReactAgent(BaseAgent):
         
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
+            task_type = self.task_type,
             examples=self.react_examples,
             input=self.input,
             scratchpad=self.scratchpad
