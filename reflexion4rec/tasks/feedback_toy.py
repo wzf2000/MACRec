@@ -1,4 +1,5 @@
 import json
+import torch
 import openai
 import pandas as pd
 from loguru import logger
@@ -16,9 +17,10 @@ class ToyFeedbackTask(Task):
         parser.add_argument('--agent', type=str, default='react_reflect', choices=['react_reflect'], help='Agent name')
         parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
         parser.add_argument('--reflection_model', type=str, default='meta-llama/Llama-2-7b-hf', help='Reflection method')
+        parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device')
         return parser
     
-    def run(self, api_config: str, toy_data: str, agent: str, task: str, reflection_model: str):
+    def run(self, api_config: str, toy_data: str, agent: str, task: str, reflection_model: str, device: str):
         with open(api_config, 'r') as f:
             api_config = json.load(f)
         openai.api_base = api_config['api_base']
@@ -52,6 +54,7 @@ class ToyFeedbackTask(Task):
             reflect_prompt = prompts[f'test_reflect_prompt']
             reflect_llm = LLaMA(
                 model_path=reflection_model,
+                device=device
             )
             agent_model = ReactReflectAgent(
                 agent_prompt=agent_prompt,

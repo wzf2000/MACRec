@@ -24,5 +24,7 @@ __pycache__/
 data/
 log/
 config/api-config.json
+test*
 
 wandb/
+trlx/
