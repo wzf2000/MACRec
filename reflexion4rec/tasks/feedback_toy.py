@@ -5,7 +5,7 @@ import pandas as pd
 from loguru import logger
 from argparse import ArgumentParser
 from .base import Task
-from ..llms import AnyOpenAILLM, LLaMA
+from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..prompts import read_template
 from ..agents import ReactAgent, ReactReflectAgent
 
@@ -56,7 +56,7 @@ class ToyFeedbackTask(Task):
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
             agent_prompt = prompts[f'test_{agent}_prompt']
             reflect_prompt = prompts[f'test_reflect_prompt']
-            reflect_llm = LLaMA(
+            reflect_llm = OpenSourceLLM(
                 model_path=reflection_model,
                 device=device
             )
