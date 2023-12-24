@@ -7,4 +7,4 @@ class OpenSourceLLM(BaseLLM):
         self.pipe = pipeline("text-generation", model=model_path, max_length=max_length, device=device)
     
     def __call__(self, prompt: str):
-        return self.pipe(prompt)[0]['generated_text']
+        return self.pipe(prompt, return_full_text=False)[0]['generated_text']

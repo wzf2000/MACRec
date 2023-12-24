@@ -57,7 +57,8 @@ class ToyEvaluateTask(Task):
                 task_type=task_type,
                 agent_prompt=prompt,
                 react_examples="",
-                actor_llm=react_llm
+                actor_llm=react_llm,
+                leak=False,
             )
         elif agent == 'react_reflect':
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
@@ -79,6 +80,7 @@ class ToyEvaluateTask(Task):
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
                 prompts=prompts,
+                leak=False,
             )
         else:
             raise NotImplementedError

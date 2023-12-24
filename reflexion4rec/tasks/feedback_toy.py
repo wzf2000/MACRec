@@ -70,6 +70,7 @@ class ToyFeedbackTask(Task):
                 reflect_llm=reflect_llm,
                 prompts=prompts,
                 keep_reflections=True,
+                leak=False,
             )
         else:
             raise NotImplementedError
