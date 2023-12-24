@@ -43,8 +43,8 @@ class EvaluateTask(Task):
         with tqdm(total=len(test_datas)) as pbar:
             for test_data, gt_answer in test_datas:
                 self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
-                # test one step
                 for i in range(steps):
+                    logger.debug(f'Running step {i}...')
                     self.model.run()
                     if hasattr(self.model, 'reflected') and self.model.reflected:
                         logger.debug(f"Reflection input: {self.model.reflection_input}")
@@ -136,7 +136,7 @@ class EvaluateTask(Task):
     def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int):
         self.task = task
         test_datas = self.get_data(test_data, max_his)
-        logger.info(f"Test data sample: {test_datas[0][0]}\nRating: {test_datas[0][1]}")
+        logger.info(f"Test data sample: {test_datas[0][0][:100]}\nRating: {test_datas[0][1]}")
         react_llm = self.get_LLM(api_config=api_config)
         self.get_model(agent, react_llm, model, device)
         
