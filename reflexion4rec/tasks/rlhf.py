@@ -42,7 +42,10 @@ class RLHFTrainingTask(Task):
 
         device = gpu
 
-        if reward_config.get('type', 'sentiment') == 'sentiment':
+        reward_type = reward_config.get('type', 'sentiment')
+        data_type = data_config.get('type', 'imdb')
+
+        if reward_type == 'sentiment':
             sentiment_fn = pipeline(
                 "sentiment-analysis",
                 "lvwerra/distilbert-imdb",
@@ -59,12 +62,23 @@ class RLHFTrainingTask(Task):
             def reward_fn(samples: List[str], **kwargs) -> List[float]:
                 sentiments = list(map(get_positive_score, sentiment_fn(samples)))
                 return sentiments
+        elif reward_type == 'data':
+            pass
         else:
             raise NotImplementedError
 
-        if data_config.get('type', 'imdb') == 'imdb':
+        if data_type == 'imdb':
             imdb = load_dataset("imdb", split="train+test")
             prompts = [" ".join(review.split()[:4]) for review in imdb["text"]]
+        elif data_type == 'jsonl':
+            path = data_config['path']
+            samples, rewards = [], []
+            with open(path, 'r') as f:
+                for line in f:
+                    item = json.loads(line)
+                    samples.append((item['input'], item['output']))
+                    # samples.append(item['output'])
+                    rewards.append(item['reward'])
         else:
             raise NotImplementedError
         
@@ -78,12 +92,19 @@ class RLHFTrainingTask(Task):
             method=PPOConfig(**config.get('ppo_kwargs', {})),
         )
         
-        trlx.train(
-            reward_fn=reward_fn,
-            prompts=prompts,
-            eval_prompts=["I don't know much about Hungarian underground"] * 64,
-            config=config,
-        )
+        if reward_type == 'data':
+            trlx.train(
+                samples=samples,
+                rewards=rewards,
+                config=config,
+            )
+        else:
+            trlx.train(
+                reward_fn=reward_fn,
+                prompts=prompts,
+                eval_prompts=["I don't know much about Hungarian underground"] * 64,
+                config=config,
+            )
 
 if __name__ == '__main__':
     RLHFTrainingTask().launch()
