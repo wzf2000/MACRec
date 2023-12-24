@@ -34,7 +34,7 @@ class ReflectAgent(BaseAgent):
         return format_step(reflection_response)
         
     def reflect(self, reflexion_strategy: ReflexionStrategy) -> None:
-        logger.debug('Running Reflexion strategy...')
+        logger.trace('Running Reflexion strategy...')
         if reflexion_strategy == ReflexionStrategy.LAST_ATTEMPT:
             self.reflections = [self.scratchpad]
             self.reflections_str = format_last_attempt(self.input, self.scratchpad, self.prompts['last_trial_header'])
@@ -47,4 +47,4 @@ class ReflectAgent(BaseAgent):
             self.reflections_str += format_reflections(self.reflections, header=self.prompts['reflection_last_trial_header'])
         else:
             raise ValueError(f'Unknown reflexion strategy: {reflexion_strategy}')
-        logger.debug(self.reflections_str)
+        logger.trace(self.reflections_str)

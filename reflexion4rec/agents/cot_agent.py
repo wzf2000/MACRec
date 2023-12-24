@@ -43,14 +43,14 @@ class CoTAgent(ReflectAgent):
         # Think
         self.scratchpad += f'\nThought:'
         self.scratchpad += ' ' + self.prompt_agent()
-        logger.debug(self.scratchpad.split('\n')[-1])
+        logger.trace(self.scratchpad.split('\n')[-1])
 
         # Act
         self.scratchpad += f'\nAction:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action)
-        logger.debug(self.scratchpad.split('\n')[-1])  
+        logger.trace(self.scratchpad.split('\n')[-1])  
 
         self.scratchpad += f'\nObservation: '
         if action_type == 'Finish':

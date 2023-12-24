@@ -87,26 +87,28 @@ class EvaluateTask(Task):
         
         answers = []
         gt_answers = []
-        for test_data, gt_answer in tqdm(test_datas):
-            agent_model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
-            # test one step
-            for i in range(steps):
-                agent_model.run()
-            try:
-                answers.append(int(agent_model.answer))
-            except ValueError:
-                answers.append(0)
-            gt_answers.append(gt_answer)
+        sum_squared_errors = 0.
+        with tqdm(total=len(test_datas)) as pbar:
+            for test_data, gt_answer in test_datas:
+                agent_model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
+                # test one step
+                for i in range(steps):
+                    agent_model.run()
+                try:
+                    answers.append(int(agent_model.answer))
+                except ValueError:
+                    answers.append(0)
+                gt_answers.append(gt_answer)
+                sum_squared_errors += (answers[-1] - gt_answer) ** 2
+                logger.debug(f"Answer: {agent_model.answer}, Ground Truth Answer: {gt_answer}")
+                pbar.set_description(f"RMSE: {(sum_squared_errors / len(answers)) ** 0.5:.4f}")
+                pbar.update(1)
         # TODO: call evaluation methods
         if task == 'rp':
-            logger.success(f"Accuracy: {sum([1 if answers[i] == gt_answers[i] else 0 for i in range(len(answers))]) / len(answers)}")
+            logger.success(f"Accuracy: {sum([1 if answers[i] == gt_answers[i] else 0 for i in range(len(answers))]) / len(answers):.4f}")
             # compute rmse
-            rmse = 0
-            for i in range(len(answers)):
-                rmse += (answers[i] - gt_answers[i]) ** 2
-            rmse /= len(answers)
-            rmse = rmse ** 0.5
-            logger.success(f"RMSE: {rmse}")
+            rmse = (sum_squared_errors / len(answers)) ** 0.5
+            logger.success(f"RMSE: {rmse:.4f}")
         else:
             # TODO: Add other tasks
             raise NotImplementedError

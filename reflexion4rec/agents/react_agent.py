@@ -41,14 +41,14 @@ class ReactAgent(BaseAgent):
         # Think
         self.scratchpad += f'\nThought {self.step_n}:'
         self.scratchpad += ' ' + self.prompt_agent()
-        logger.debug(self.scratchpad.split('\n')[-1])
+        logger.trace(self.scratchpad.split('\n')[-1])
 
         # Act
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        logger.trace(self.scratchpad.split('\n')[-1])
 
         # Observe
         self.scratchpad += f'\nObservation {self.step_n}: '
@@ -57,7 +57,7 @@ class ReactAgent(BaseAgent):
             self.finish(argument)
         # TODO: Add other actions
         else:
-            self.scratchpad += 'Invalid Action. Valid Actions are Finish[<answer>].'
+            self.scratchpad += 'Invalid Action. Valid Actions are `Finish[<answer>]`.'
 
         logger.debug(self.scratchpad.split('\n')[-1])
 
