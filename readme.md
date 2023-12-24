@@ -8,12 +8,13 @@
     - `evaluation/`: The pipeline and basic function for evaluation the model.
     - `llms/`: The wrapper for LLMs (both API and open source LLMs).
     - `prompts/`: Some functions for getting the prompts.
-    - `rl/`: The algorithms and pipelines for the RLHF are defined here.
+    - `rl/`: The datasets for the RLHF are defined here.
     - `tasks/`: For external function call (e.g. main.py).
     - `utils/`: Some useful functions are defined here.
 - `config/`: The config folder.
     - `api-config.json`: Used for OpenAI-like APIs' configuration.
     - `prompts/`: All the prompts used in the experiments.
+    - `training/`: Some configuration for the PPO or other RL algorithms training.
 - `data/`: The data folder.
 - `log/`: The log folder.
 
@@ -27,14 +28,14 @@
     ```shell
     pip install torch --extra-index-url https://download.pytorch.org/whl/cu118
     ```
-3. Run following commands to install `trlx` (Run it where you want to place it):
+3. (Optional) Run following commands to install `trlx` (Run it where you want to place it):
     ```shell
     git clone https://github.com/CarperAI/trlx.git
     cd trlx
     pip install -e .
     ```
 
-#### VSCode
+#### VSCode configuration for `trlx` (Optional)
 
 For VSCode programmer, add the following settings to `.vscode/settings.json` in this repositoriy's folder:
 ```json
