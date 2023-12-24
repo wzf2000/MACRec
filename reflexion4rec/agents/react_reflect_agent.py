@@ -15,6 +15,7 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
         *args, **kwargs
     ) -> None:
         super().__init__(task_type=task_type, agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, react_examples=react_examples, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, max_steps=max_steps, *args, **kwargs)
+        self.reflected: bool = False
         
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
@@ -35,4 +36,7 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
     def run(self, reset: bool = True, reflexion_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> str:
         if self.is_finished() or self.is_halted():
             self.reflect(reflexion_strategy)
+            self.reflected = True
+        else:
+            self.reflected = False
         return super().run(reset)
