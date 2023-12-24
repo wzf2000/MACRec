@@ -12,3 +12,5 @@ scikit-learn
 wikipedia
 loguru
 datasets
+trl
+peft

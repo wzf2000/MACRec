@@ -16,63 +16,46 @@ from transformers import AutoTokenizer
 
 
 from .base import Task
-
-class OfflinePPODataset(Dataset):
-    def __init__(self, prompts, responses, rewards, tokenizer):
-        assert len(prompts) == len(responses) ==len(rewards)
-        self.prompts = prompts
-        self.reponses = responses
-        self.rewards = rewards
-
-        self.tokenizer = tokenizer
-
-    def __len__(self):
-        return len(self.prompts)
-    
-    def __getitem__(self, index):
-        prompt = self.prompts[index]
-        response = self.reponses[index]
-        reward = self.rewards[index]
-
-        sample = {
-            'input_ids': self.tokenizer.encode(prompt, return_tensors='pt').squeeze(0),
-            'output_ids': self.tokenizer.encode(response, return_tensors='pt').squeeze(0),
-            'rewards': torch.tensor(reward, dtype=torch.float16)
-        }
-        return sample
-
-def collator(data):
-    return dict((key, [d[key] for d in data]) for key in data[0])
+from ..rl import OfflinePPODataset
+from ..utils import collator
         
 class RLHFTrainingTask(Task):
-
     @staticmethod
     def parse_task_args(parser: ArgumentParser):
         parser.add_argument('--config_path', type=str, required=True, help='Path to the config file')
         return parser
+    
+    def train(self, epochs: int = 1):
+        for epoch in range(epochs):
+            for batch_id, batch in tqdm(enumerate(self.trainer.dataloader)):
+                query_tensors, response_tensors = batch['input_ids'], batch['output_ids']
+                rewards = batch['rewards']
+
+                stats = self.trainer.step(query_tensors, response_tensors, rewards)
+                self.trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response"])
+    
+    def get_jsonl_dataset(self, path: str):
+        prompts, responses, rewards = [], [], []
+        with open(path, 'r') as f:
+            for line in f:
+                item = json.loads(line)
+                prompts.append(item['input'])
+                responses.append(item['output'])
+                rewards.append(item['reward'])
+        return OfflinePPODataset(prompts, responses, rewards, self.tokenizer)
 
     def run(self, config_path: str):
         with open(config_path, 'r') as config_f:
             config = json.load(config_f)
 
-        model_path = config.get('model_path', 'meta-llama/Llama-2-7b-hf')
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        model_path = config.get('model_path', 'lmsys/vicuna-7b-v1.5-16k')
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path)
 
         data_kwargs = config.get('data_kwargs', {})
         data_type = data_kwargs.get('type', 'jsonl')
         if data_type == 'jsonl':
-            
-            prompts, responses, rewards = [], [], []
             path = data_kwargs.get('path', None)
-            with open(path, 'r') as f:
-                for line in f:
-                    item = json.loads(line)
-                    prompts.append(item['input'])
-                    responses.append(item['output'])
-                    rewards.append(item['reward'])
-
-            dataset = OfflinePPODataset(prompts, responses, rewards, tokenizer)
-
+            dataset = self.get_jsonl_dataset(path)
         else:
             raise NotImplementedError
 
@@ -83,14 +66,10 @@ class RLHFTrainingTask(Task):
         peft_config = LoraConfig(**peft_kwargs)
 
         device_map = {"": Accelerator().local_process_index}
-        model = AutoModelForCausalLMWithValueHead.from_pretrained(model_path, device_map=device_map, peft_config=peft_config)
-        model = model.to(torch.float16)
+        # TODO: add more Model support
+        self.model = AutoModelForCausalLMWithValueHead.from_pretrained(model_path, device_map=device_map, peft_config=peft_config)
+        self.model = self.model.to(torch.float16)
 
-        ppo_trainer = PPOTrainer(ppo_config, model, tokenizer=tokenizer, dataset=dataset, data_collator=collator)
-
-        for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
-            query_tensors, response_tensors = batch['input_ids'], batch['output_ids']
-            rewards = batch['rewards']
-
-            stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
-            ppo_trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response"])
+        self.trainer = PPOTrainer(ppo_config, self.model, tokenizer=self.tokenizer, dataset=dataset, data_collator=collator)
+        
+        self.train()
