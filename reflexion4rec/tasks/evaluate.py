@@ -6,7 +6,7 @@ from loguru import logger
 from typing import List, Tuple
 from argparse import ArgumentParser
 from .base import Task
-from ..llms import AnyOpenAILLM
+from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..prompts import read_template
 
@@ -16,6 +16,8 @@ class EvaluateTask(Task):
         parser.add_argument('--api_config', type=str, default='config/api-config.json', help='Api configuration file')
         parser.add_argument('--test_data', type=str, required=True, help='Test data file')
         parser.add_argument('--agent', type=str, default='react', choices=['react', 'react_reflect'], help='Agent name')
+        parser.add_argument('--model', type=str, default='openai', help='Reflection model name, set openai to use OpenAI API')
+        parser.add_argument('--device', type=int, default=0, help='Device number')
         parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
@@ -65,7 +67,9 @@ class EvaluateTask(Task):
             # TODO: Add other tasks
             raise NotImplementedError
         
-    def get_LLM(self, api_config: str = None):
+    def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: int = 0):
+        if model_path != 'openai':
+            return OpenSourceLLM(model_path=model_path, device=device)
         if api_config is not None and not hasattr(self, 'api_config'):
             with open(api_config, 'r') as f:
                 self.api_config = json.load(f)
@@ -92,7 +96,7 @@ class EvaluateTask(Task):
             target_item_attributes=df['target_item_attributes'][i]
         ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
         
-    def get_model(self, agent: str, react_llm: AnyOpenAILLM):
+    def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: int):
         if self.task == 'rp':
             task_type = 'rating prediction'
         else:
@@ -111,7 +115,7 @@ class EvaluateTask(Task):
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
             agent_prompt = prompts[f'test_{agent}_prompt']
             reflect_prompt = prompts[f'test_reflect_prompt']
-            reflect_llm = self.get_LLM()
+            reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
             self.model = ReactReflectAgent(
                 task_type=task_type,
                 agent_prompt=agent_prompt,
@@ -127,12 +131,12 @@ class EvaluateTask(Task):
             # TODO: Add other agents
             raise NotImplementedError
     
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int):
         self.task = task
         test_datas = self.get_data(test_data, max_his)
         logger.info(f"Test data sample: {test_datas[0][0]}\nRating: {test_datas[0][1]}")
-        react_llm = self.get_LLM(api_config)
-        self.get_model(agent, react_llm)
+        react_llm = self.get_LLM(api_config=api_config)
+        self.get_model(agent, react_llm, model, device)
         
         self.evaluate(test_datas, steps)
         self.report()
