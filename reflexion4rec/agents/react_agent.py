@@ -1,4 +1,3 @@
-import tiktoken
 from loguru import logger
 from langchain.prompts import PromptTemplate
 from .base_agent import BaseAgent
@@ -18,7 +17,6 @@ class ReactAgent(BaseAgent):
         super().__init__(task_type=task_type, agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
         self.react_examples = react_examples
         self.max_steps = max_steps
-        self.enc = tiktoken.encoding_for_model('text-davinci-003')
         
     def reset(self) -> None:
         self.step_n: int = 1
@@ -35,7 +33,7 @@ class ReactAgent(BaseAgent):
         )
         
     def is_halted(self) -> bool:
-        return ((self.step_n > self.max_steps) or (len(self.enc.encode(self._build_agent_prompt())) > 3896)) and not self.finished
+        return ((self.step_n > self.max_steps) or (len(self.enc.encode(self._build_agent_prompt())) > self.actor_llm.tokens_limit)) and not self.finished
     
     def step(self) -> None:
         # Think

@@ -1,3 +1,5 @@
+import tiktoken
+from loguru import logger
 from langchain.prompts import PromptTemplate
 from ..utils import format_step
 from ..llms import BaseLLM
@@ -11,6 +13,7 @@ class BaseAgent:
         self.actor_llm = actor_llm
         self.prompts = prompts
         self.leak = leak
+        self.enc = tiktoken.encoding_for_model(self.actor_llm.model_name)
         self.reset()
     
     def run(self, *args, **kwargs) -> str:
@@ -41,7 +44,11 @@ class BaseAgent:
         raise NotImplementedError("BaseAgent._build_agent_prompt() not implemented")
     
     def prompt_agent(self) -> str:
-        return format_step(self.actor_llm(self._build_agent_prompt()))
+        agent_input = self._build_agent_prompt()
+        agent_response = self.actor_llm(agent_input)
+        logger.debug(f'Agent input length: {len(self.enc.encode(agent_input))}')
+        logger.debug(f'Agent output length: {len(self.enc.encode(agent_response))}')
+        return format_step(agent_response)
     
     def reset(self) -> None:
         raise NotImplementedError("BaseAgent.reset() not implemented")

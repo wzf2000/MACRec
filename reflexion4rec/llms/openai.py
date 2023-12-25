@@ -7,14 +7,16 @@ from langchain.schema import (
 from .basellm import BaseLLM
 
 class AnyOpenAILLM(BaseLLM):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, model_name: str = 'gpt-3.5-turbo', *args, **kwargs):
         # Determine model type from the kwargs
-        model_name = kwargs.get('model_name', 'gpt-3.5-turbo') 
+        self.model_name = model_name
+        self.max_tokens: int = kwargs.get('max_tokens', 256)
+        self.max_context_length: int = 16384 if '16k' in model_name else 32768 if '32k' in model_name else 4096
         if model_name.split('-')[0] == 'text':
-            self.model = OpenAI(*args, **kwargs)
+            self.model = OpenAI(model_name=model_name, *args, **kwargs)
             self.model_type = 'completion'
         else:
-            self.model = ChatOpenAI(*args, **kwargs)
+            self.model = ChatOpenAI(model_name=model_name, *args, **kwargs)
             self.model_type = 'chat'
     
     def __call__(self, prompt: str):
