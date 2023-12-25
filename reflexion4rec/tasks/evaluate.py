@@ -43,12 +43,13 @@ class EvaluateTask(Task):
         with tqdm(total=len(test_datas)) as pbar:
             for test_data, gt_answer in test_datas:
                 self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
+                self.model.reset()
                 for i in range(steps):
                     logger.debug(f'Running step {i}...')
                     self.model.run()
                     if hasattr(self.model, 'reflected') and self.model.reflected:
-                        logger.debug(f"Reflection input: {self.model.reflection_input}")
-                        logger.debug(f"Reflection output: {self.model.reflection_output}")
+                        logger.trace(f"Reflection input: {self.model.reflection_input}")
+                        logger.trace(f"Reflection output: {self.model.reflection_output}")
                 try:
                     answer = int(self.model.answer)
                 except ValueError:

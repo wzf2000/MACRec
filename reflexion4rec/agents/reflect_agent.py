@@ -31,6 +31,7 @@ class ReflectAgent(BaseAgent):
         if self.keep_reflections:
             self.reflection_input = reflection_prompt
             self.reflection_output = reflection_response
+            logger.debug(f"Reflection output: {self.reflection_output}")
         return format_step(reflection_response)
         
     def reflect(self, reflexion_strategy: ReflexionStrategy) -> None:

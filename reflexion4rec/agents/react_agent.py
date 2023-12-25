@@ -61,7 +61,7 @@ class ReactAgent(BaseAgent):
         else:
             self.scratchpad += 'Invalid Action. Valid Actions are `Finish[<answer>]`.'
 
-        logger.debug(f'Answer: {self.answer}')
+        logger.trace(f'Answer: {self.answer}')
         logger.debug(self.scratchpad.split('\n')[-1])
 
         self.step_n += 1
