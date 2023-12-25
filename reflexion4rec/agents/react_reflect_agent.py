@@ -17,6 +17,12 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
         super().__init__(task_type=task_type, agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, react_examples=react_examples, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, max_steps=max_steps, *args, **kwargs)
         self.reflected: bool = False
         
+    def reset(self, remove_reflections: bool = False, *args, **kwargs) -> None:
+        super().reset(remove_reflections=remove_reflections, *args, **kwargs)
+        if remove_reflections:
+            self.reflections: List[str] = []
+            self.reflections_str: str = ''
+        
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
             task_type = self.task_type,

@@ -43,7 +43,7 @@ class EvaluateTask(Task):
         with tqdm(total=len(test_datas)) as pbar:
             for test_data, gt_answer in test_datas:
                 self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
-                self.model.reset()
+                self.model.reset(remove_reflections=True)
                 for i in range(steps):
                     logger.debug(f'Running step {i}...')
                     self.model.run()

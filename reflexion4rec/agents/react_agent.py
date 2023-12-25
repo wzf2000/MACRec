@@ -18,7 +18,7 @@ class ReactAgent(BaseAgent):
         self.react_examples = react_examples
         self.max_steps = max_steps
         
-    def reset(self) -> None:
+    def reset(self, *args, **kwargs) -> None:
         self.step_n: int = 1
         self.finished: bool = False
         self.scratchpad: str = ''

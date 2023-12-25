@@ -25,6 +25,7 @@ data/
 log/
 config/api-config.json
 test*
+!reflexion4rec/*/test*
 
 wandb/
 trlx/
