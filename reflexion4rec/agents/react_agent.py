@@ -45,6 +45,7 @@ class ReactAgent(BaseAgent):
         logger.debug(self.scratchpad.split('\n')[-1])
 
         # Act
+        self.scratchpad += f'\nHint: {self.prompts["hint"]}'
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent()
         self.scratchpad += ' ' + action

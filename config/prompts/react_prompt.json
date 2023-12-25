@@ -1,6 +1,9 @@
 {
     "test_react_prompt": {
-        "template": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. `Finish[answer]` returns the answer and finishes the task.{examples}\nInput: {input}\nRemember: use `Finish[answer]` returns the answer and finishes the task. Please do not reply with anything other than `Finish[answer]` in the Action phase. {scratchpad}",
+        "template": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. `Finish[answer]` returns the answer and finishes the task.{examples}\nInput: {input}\n{scratchpad}",
         "input_variables": ["task_type", "examples", "input", "scratchpad"]
+    },
+    "hint": {
+        "template": "Use `Finish[answer]` to return the answer and finish the task. Please do not reply with anything other than `Finish[answer]` in the Action phase."
     }
 }
