@@ -29,6 +29,9 @@ def process_user_data(user_df: pd.DataFrame) -> pd.DataFrame:
         input_variables=input_variables,
     )
     user_df['user_profile'] = user_df[input_variables].apply(lambda x: template.format(**x), axis=1)
+
+    for col in user_df.columns.to_list():
+        user_df[col] = user_df[col].apply(lambda x: 'None' if x == '' else x)
     return user_df
 
 def process_item_data(item_df: pd.DataFrame) -> pd.DataFrame:
@@ -112,6 +115,9 @@ def process_data(dir: str):
         # add user profile for this interaction
         df['user_profile'] = df['user_id'].apply(lambda x: user_df.loc[x]['user_profile'])
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        for col in df.columns.to_list():
+            df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
+
     train_df = dfs[0]
     dev_df = dfs[1]
     test_df = dfs[2]
