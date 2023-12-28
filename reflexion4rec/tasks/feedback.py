@@ -88,7 +88,7 @@ class FeedbackTask(Task):
         # collect feedback dataset
         self.get_model(agent, react_llm, reflection_model, device)
 
-        with jsonlines.open(feedback_file, mode="a") as feedback_file:
+        with jsonlines.open(feedback_file, mode="w") as feedback_file:
             with tqdm(total=len(test_datas)) as pbar:
                 for test_data, gt_answer in test_datas:
                     ret = {}
@@ -111,7 +111,11 @@ class FeedbackTask(Task):
                             answer = 0
                         answers.append(answer)
                     pbar.update(1)
+                    ret["Answer_1"] = str(answers[0])
+                    ret["Answer_2"] = str(answers[1])
+                    ret["Answer_GT"] = str(gt_answer)
                     ret['reward'] = str((gt_answer - answers[0]) ** 2 - (gt_answer - answers[1]) ** 2)
+
                     logger.debug(f"Answer_1: {answers[0]}, Answer_2: {answers[1]}, Ground Truth Answer: {gt_answer}")
                     logger.debug(f'Reward: {ret["reward"]}')  # logger.success
 
