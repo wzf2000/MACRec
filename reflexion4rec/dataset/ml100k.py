@@ -3,7 +3,7 @@ import pandas as pd
 from loguru import logger
 from typing import Tuple, List, Dict, Union
 from langchain.prompts import PromptTemplate
-from .utils import append_his_info
+from utils import append_his_info
 
 def read_data(dir: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(os.path.join(dir, 'u.data'), 'r') as f:
@@ -93,7 +93,7 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     return train_df, dev_df, test_df
 
 def process_data(dir: str):
-    data_df, item_df, user_df, genre_df = read_data(dir)
+    data_df, item_df, user_df, genre_df = read_data(os.path.join(dir, "raw_data"))
     user_df = process_user_data(user_df)
     logger.info(f'Number of users: {user_df.shape[0]}')
     item_df = process_item_data(item_df)

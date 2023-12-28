@@ -50,7 +50,7 @@ def append_his_info(dfs: List[pd.DataFrame]):
         history_item_id.append(user_his[uid].copy())
         history_rating.append(user_his_rating[uid].copy())
         user_his[uid].append(iid)
-        user_his_rating[uid].append(r)
+        user_his_rating[uid].append(float(r))
     sort_df['position'] = position
     sort_df['history_item_id'] = history_item_id
     sort_df['history_rating'] = history_rating
