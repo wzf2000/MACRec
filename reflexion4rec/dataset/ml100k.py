@@ -3,7 +3,7 @@ import pandas as pd
 from loguru import logger
 from typing import Tuple, List, Dict, Union
 from langchain.prompts import PromptTemplate
-from utils import append_his_info
+from .utils import append_his_info
 
 def read_data(dir: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(os.path.join(dir, 'u.data'), 'r') as f:
