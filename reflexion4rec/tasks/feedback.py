@@ -106,7 +106,7 @@ class FeedbackTask(Task):
                             ret["output"] = self.model.reflection_output 
                         
                         try:
-                            answer = int(self.model.answer)
+                            answer = float(self.model.answer)
                         except ValueError:
                             answer = 0
                         answers.append(answer)

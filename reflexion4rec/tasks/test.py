@@ -34,7 +34,7 @@ class TestTask(EvaluateTask):
                         logger.trace(f"Reflection input: {self.model.reflection_input}")
                         logger.trace(f"Reflection output: {self.model.reflection_output}")
                 try:
-                    answer = int(self.model.answer)
+                    answer = float(self.model.answer)
                 except ValueError:
                     answer = 0
                 pbar.set_description(self.update_evaluation(answer, gt_answer))
