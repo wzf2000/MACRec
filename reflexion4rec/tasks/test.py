@@ -28,7 +28,7 @@ class TestTask(EvaluateTask):
                 else:
                     logger.debug(f'Agent prompt length {agent_prompt_length} <= {self.model.actor_llm.tokens_limit}.')
                 for i in range(steps):
-                    logger.debug(f'Running step {i}...')
+                    logger.debug(f'===================================Running step {i}...===================================')
                     self.model.run()
                     if hasattr(self.model, 'reflected') and self.model.reflected:
                         logger.trace(f"Reflection input: {self.model.reflection_input}")

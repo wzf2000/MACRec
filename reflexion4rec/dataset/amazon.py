@@ -163,7 +163,7 @@ def process_data(dir: str):
         # Separate each item attributes by a newline
         df['history'] = df['history'].apply(lambda x: '\n'.join(x))
         # add user profile for this interaction
-        df['user_profile'] = df['user_id'].apply(lambda x: '')
+        df['user_profile'] = df['user_id'].apply(lambda x: 'unknown')
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
     
     train_df = dfs[0]

@@ -45,7 +45,7 @@ class EvaluateTask(Task):
                 self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
                 self.model.reset(remove_reflections=True)
                 for i in range(steps):
-                    logger.debug(f'Running step {i}...')
+                    logger.debug(f'===================================Running step {i}...===================================')
                     self.model.run()
                     if hasattr(self.model, 'reflected') and self.model.reflected:
                         logger.trace(f"Reflection input: {self.model.reflection_input}")

@@ -97,7 +97,7 @@ class FeedbackTask(Task):
                     self.model.reset(remove_reflections=True)
                     # run 2 steps
                     for i in range(2):
-                        logger.debug(f'Running step {i}...')
+                        logger.debug(f'===================================Running step {i}...===================================')
                         self.model.run()
                         if hasattr(self.model, 'reflected') and self.model.reflected:
                             logger.trace(f"Reflection input: {self.model.reflection_input}")
