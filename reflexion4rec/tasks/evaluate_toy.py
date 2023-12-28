@@ -52,12 +52,14 @@ class ToyEvaluateTask(Task):
             raise NotImplementedError
 
         if agent == 'react':
-            prompt = read_template(f"config/prompts/{agent}_prompt.json")[f'test_{agent}_prompt']
+            prompts = read_template(f"config/prompts/{agent}_prompt.json")
+            agent_prompt = prompts[f'test_{agent}_prompt']
             agent_model = ReactAgent(
                 task_type=task_type,
-                agent_prompt=prompt,
+                agent_prompt=agent_prompt,
                 react_examples="",
                 actor_llm=react_llm,
+                prompts=prompts,
                 leak=False,
             )
         elif agent == 'react_reflect':
