@@ -5,4 +5,5 @@ from .preprocess import PreprocessTask
 from .rlhf import RLHFTrainingTask
 from .trl_rlhf import RLHFTrainingTask as TRLTrainingTask
 from .feedback_toy import ToyFeedbackTask
+from .feedback import FeedbackTask
 from .test import TestTask

@@ -6,7 +6,7 @@ import subprocess
 from loguru import logger
 from typing import Tuple
 from langchain.prompts import PromptTemplate
-from utils import append_his_info_beauty
+from .utils import append_his_info_beauty
 
 DATASET = 'Beauty'
 RAW_PATH = os.path.join('../../data', DATASET, 'raw_data')
