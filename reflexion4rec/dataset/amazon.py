@@ -6,19 +6,14 @@ import subprocess
 from loguru import logger
 from typing import Tuple
 from langchain.prompts import PromptTemplate
-from .utils import append_his_info_beauty
+from .utils import append_his_info
 
-DATASET = 'Beauty'
-RAW_PATH = os.path.join('../../data', DATASET, 'raw_data')
-DATA_FILE = 'reviews_{}_5.json.gz'.format(DATASET)
-META_FILE = 'meta_{}.json.gz'.format(DATASET)
-
-def parse(path):
+def parse(path: str) -> dict:
     g = gzip.open(path, 'rb')
     for l in g:
         yield eval(l)
 
-def get_df(path):
+def get_df(path: str) -> pd.DataFrame:
     i = 0
     df = {}
     for d in parse(path):
@@ -27,30 +22,38 @@ def get_df(path):
     return pd.DataFrame.from_dict(df, orient='index')
 
 # download data if not exists
-def download_data():
-    if not os.path.exists(RAW_PATH):
-        subprocess.call('mkdir ' + RAW_PATH, shell=True)
-    if not os.path.exists(os.path.join(RAW_PATH, DATA_FILE)):
-        print('Downloading interaction data into ' + RAW_PATH)
+def download_data(dir: str, dataset: str):
+    if not os.path.exists(dir):
+        subprocess.call('mkdir ' + dir, shell=True)
+    raw_path = os.path.join(dir, 'raw_data')
+    data_file = 'reviews_{}_5.json.gz'.format(dataset)
+    meta_file = 'meta_{}.json.gz'.format(dataset)
+    if not os.path.exists(raw_path):
+        subprocess.call('mkdir ' + raw_path, shell=True)
+    if not os.path.exists(os.path.join(raw_path, data_file)):
+        logger.info('Downloading interaction data into ' + raw_path)
         subprocess.call(
             'cd {} && curl -O http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/reviews_{}_5.json.gz'
-            .format(RAW_PATH, DATASET), shell=True)
-    if not os.path.exists(os.path.join(RAW_PATH, META_FILE)):
-        print('Downloading item metadata into ' + RAW_PATH)
+            .format(raw_path, dataset), shell=True)
+    if not os.path.exists(os.path.join(raw_path, meta_file)):
+        logger.info('Downloading item metadata into ' + raw_path)
         subprocess.call(
             'cd {} && curl -O http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/meta_{}.json.gz'
-            .format(RAW_PATH, DATASET), shell=True)
+            .format(raw_path, dataset), shell=True)
 
-def read_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    data_df = get_df(os.path.join(RAW_PATH, DATA_FILE))
-    meta_df = get_df(os.path.join(RAW_PATH, META_FILE))
+def read_data(dir: str, dataset: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    raw_path = os.path.join(dir, 'raw_data')
+    data_file = 'reviews_{}_5.json.gz'.format(dataset)
+    meta_file = 'meta_{}.json.gz'.format(dataset)
+    data_df = get_df(os.path.join(raw_path, data_file))
+    meta_df = get_df(os.path.join(raw_path, meta_file))
     return data_df, meta_df
 
 
 def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFrame:
     # Only retain items that appear in interaction data
     useful_meta_df = meta_df[meta_df['asin'].isin(data_df['asin'])].reset_index(drop=True)
-    print("len(useful_meta_df): ", len(useful_meta_df))
+    logger.info("len(useful_meta_df): ", len(useful_meta_df))
 
     item_df = useful_meta_df.rename(columns={'asin': 'item_id'})
     item_df = item_df[['item_id', 'title', 'brand', 'price', 'categories']]
@@ -84,7 +87,7 @@ def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFr
     
     return item_df
 
-def reindex(data_df: pd.DataFrame, out_df = None) -> Tuple[dict, dict]:
+def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> Tuple[dict, dict]:
     if out_df is None:
         out_df = data_df.rename(columns={'asin': 'item_id', 'reviewerID': 'user_id', 'overall': 'rating', 'unixReviewTime': 'timestamp'})
         out_df = out_df[['user_id', 'item_id', 'rating', 'summary', 'timestamp']]
@@ -140,9 +143,15 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     return train_df, dev_df, test_df, out_df
 
 def process_data(dir: str):
+    """Process the amazon raw data and output the processed data to `dir`.
 
-    # download_data()
-    data_df, meta_df = read_data()
+    Args:
+        `dir (str)`: the directory of the dataset, e.g. `'data/Beauty'`. The raw dataset will be downloaded into `'{dir}/raw_data'` if not exists. We supppose the base name of dir is the category name.
+    """
+    dataset = os.path.basename(dir)
+
+    download_data(dir, dataset)
+    data_df, meta_df = read_data(dir, dataset)
 
     train_df, dev_df, test_df, out_df = process_interaction_data(data_df)
     logger.info(f'Number of interactions: {out_df.shape[0]}')
@@ -153,7 +162,7 @@ def process_data(dir: str):
     item_df = process_item_data(data_df, meta_df)
     logger.info(f'Number of items: {item_df.shape[0]}')
 
-    dfs = append_his_info_beauty([train_df, dev_df, test_df])
+    dfs = append_his_info([train_df, dev_df, test_df], summary=True)
     logger.info(f'Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
@@ -177,4 +186,4 @@ def process_data(dir: str):
     test_df.to_csv(os.path.join(dir, 'test.csv'))
 
 if __name__ == '__main__':
-    process_data(os.path.join('../../data', DATASET))
+    process_data(process_data(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'Beauty')))

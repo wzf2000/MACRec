@@ -13,6 +13,7 @@ class PreprocessTask(Task):
         if dataset == 'ml-100k':
             ml100k_process_data(data_dir)
         elif dataset == 'amazon':
+            # suppose the base name of data_dir is the category name
             amazon_process_data(data_dir)
         else:
             raise NotImplementedError

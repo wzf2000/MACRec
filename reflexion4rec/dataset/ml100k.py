@@ -96,6 +96,11 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     return train_df, dev_df, test_df
 
 def process_data(dir: str):
+    """Process the ml-100k raw data and output the processed data to `dir`.
+
+    Args:
+        `dir (str)`: the directory of the dataset. We suppose the raw data is in `dir/raw_data` and the processed data will be output to `dir`.
+    """
     data_df, item_df, user_df, genre_df = read_data(os.path.join(dir, "raw_data"))
     user_df = process_user_data(user_df)
     logger.info(f'Number of users: {user_df.shape[0]}')
@@ -129,4 +134,4 @@ def process_data(dir: str):
     test_df.to_csv(os.path.join(dir, 'test.csv'))
 
 if __name__ == '__main__':
-    process_data('data/ml-100k')
+    process_data(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'ml-100k'))
