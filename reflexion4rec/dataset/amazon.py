@@ -174,6 +174,8 @@ def process_data(dir: str):
         # add user profile for this interaction
         df['user_profile'] = df['user_id'].apply(lambda x: 'unknown')
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        for col in df.columns.to_list():
+            df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
     
     train_df = dfs[0]
     dev_df = dfs[1]
