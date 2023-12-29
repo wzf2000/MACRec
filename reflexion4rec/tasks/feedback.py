@@ -10,6 +10,7 @@ from .base import Task
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..prompts import read_template
+from ..rl.reward import RatingPredictionRewardV1, RatingPredictionRewardV2
 
 class FeedbackTask(Task):
     @staticmethod
@@ -23,6 +24,7 @@ class FeedbackTask(Task):
         parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--feedback_file', type=str, default='data/ml-100k/data_exp.jsonl', help='Output Feedback File')
+        parser.add_argument('--reward_version', type=str, default='v1', choices=['v1', 'v2'], help='Reward version')
         return parser
 
     def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: int = 0):
@@ -80,13 +82,23 @@ class FeedbackTask(Task):
         else: # Feedback only for react_reflect
             raise NotImplementedError
 
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, reflection_model: str, device: str, feedback_file: str):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, reflection_model: str, device: str, feedback_file: str, reward_version: str):
         self.task = task
         test_datas = self.get_data(test_data, max_his)
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nRating: {test_datas[0][1]}")
         react_llm = self.get_LLM(api_config=api_config)
         # collect feedback dataset
         self.get_model(agent, react_llm, reflection_model, device)
+        
+        if task == 'rp':
+            if reward_version == 'v1':
+                self.reward_model = RatingPredictionRewardV1()
+            elif reward_version == 'v2':
+                self.reward_model = RatingPredictionRewardV2()
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
 
         with jsonlines.open(feedback_file, mode="w") as feedback_file:
             with tqdm(total=len(test_datas)) as pbar:
@@ -116,7 +128,7 @@ class FeedbackTask(Task):
                     ret["Answer_1"] = origin_answers[0]
                     ret["Answer_2"] = origin_answers[1]
                     ret["Answer_GT"] = str(gt_answer)
-                    ret['reward'] = str((gt_answer - answers[0]) ** 2 - (gt_answer - answers[1]) ** 2)
+                    ret['reward'] = self.reward_model.reward(origin_answers[0], origin_answers[1], str(gt_answer))
 
                     logger.debug(f"Answer_1: {answers[0]}, Answer_2: {answers[1]}, Ground Truth Answer: {gt_answer}")
                     logger.debug(f'Reward: {ret["reward"]}')  # logger.success
