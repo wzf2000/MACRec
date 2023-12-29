@@ -93,6 +93,7 @@ class FeedbackTask(Task):
                 for test_data, gt_answer in test_datas:
                     ret = {}
                     answers = []
+                    origin_answers = []
                     self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
                     self.model.reset(remove_reflections=True)
                     # run 2 steps
@@ -110,9 +111,10 @@ class FeedbackTask(Task):
                         except ValueError:
                             answer = 0
                         answers.append(answer)
+                        origin_answers.append(self.model.answer)
                     pbar.update(1)
-                    ret["Answer_1"] = str(answers[0])
-                    ret["Answer_2"] = str(answers[1])
+                    ret["Answer_1"] = origin_answers[0]
+                    ret["Answer_2"] = origin_answers[1]
                     ret["Answer_GT"] = str(gt_answer)
                     ret['reward'] = str((gt_answer - answers[0]) ** 2 - (gt_answer - answers[1]) ** 2)
 
