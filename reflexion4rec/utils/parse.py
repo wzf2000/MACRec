@@ -23,7 +23,7 @@ def parse_rating_answer(string: str, *args, **kwargs) -> Tuple[bool, float]:
     return True, answer
     
 def parse_ranking_answer(string: str, gt_answer: int, n_candidate: str, *args, **kwargs) -> Tuple[bool, List[int]]:
-    candidates = string.split('\n')
+    candidates = string.split(',')
     if len(candidates) != n_candidate:
         return False, []
     else:
