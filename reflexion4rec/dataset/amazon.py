@@ -53,7 +53,7 @@ def read_data(dir: str, dataset: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
 def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFrame:
     # Only retain items that appear in interaction data
     useful_meta_df = meta_df[meta_df['asin'].isin(data_df['asin'])].reset_index(drop=True)
-    logger.info("len(useful_meta_df): ", len(useful_meta_df))
+    logger.info(f"Length of useful_meta_df: {len(useful_meta_df)}")
 
     item_df = useful_meta_df.rename(columns={'asin': 'item_id'})
     item_df = item_df[['item_id', 'title', 'brand', 'price', 'categories']]
