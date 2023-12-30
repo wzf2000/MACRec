@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import List
 
-def append_his_info(dfs: List[pd.DataFrame], summary: bool = False):
+def append_his_info(dfs: List[pd.DataFrame], summary: bool = False, neg: bool = False):
     all_df = pd.concat(dfs)
     sort_df = all_df.sort_values(by=['timestamp', 'user_id'], kind='mergesort')
     position = []
@@ -32,7 +32,11 @@ def append_his_info(dfs: List[pd.DataFrame], summary: bool = False):
         sort_df['history_summary'] = history_summary
     ret_dfs = []
     for df in dfs:
-        df = pd.merge(left=df, right=sort_df, on=['user_id', 'item_id', 'rating', 'summary', 'timestamp'] if summary else ['user_id', 'item_id', 'rating', 'timestamp'], how='left')
+        if neg:
+            df = df.drop(columns=['neg_item_id'])
+        if summary:
+            df = df.drop(columns=['summary'])
+        df = pd.merge(left=df, right=sort_df, on=['user_id', 'item_id', 'rating', 'timestamp'], how='left')
         ret_dfs.append(df)
     del sort_df
     return ret_dfs

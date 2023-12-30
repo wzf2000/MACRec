@@ -79,6 +79,8 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     clicked_item_set = dict()
     for user_id, seq_df in data_df.groupby('user_id'):
         clicked_item_set[user_id] = set(seq_df['item_id'].values.tolist())
+
+    # TODO neg_sampling
         
     def generate_dev_test(data_df: pd.DataFrame) -> Tuple[List[pd.DataFrame], pd.DataFrame]:
         result_dfs = []
@@ -95,7 +97,7 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     train_df = pd.concat([leave_df, train_df]).sort_index()
     return train_df, dev_df, test_df
 
-def process_data(dir: str):
+def process_data(dir: str, n_neg_items: int = 9):
     """Process the ml-100k raw data and output the processed data to `dir`.
 
     Args:

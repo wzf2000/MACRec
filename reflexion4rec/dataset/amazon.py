@@ -102,7 +102,7 @@ def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> Tuple[dict, d
     return user2id, item2id
 
 
-def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     out_df = data_df.rename(columns={'asin': 'item_id', 'reviewerID': 'user_id', 'overall': 'rating', 'unixReviewTime': 'timestamp'})
     out_df = out_df[['user_id', 'item_id', 'rating', 'summary', 'timestamp']]
     out_df = out_df.drop_duplicates(['user_id', 'item_id', 'timestamp'])
@@ -118,21 +118,27 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     for user_id, seq_df in out_df.groupby('user_id'):
         clicked_item_set[user_id] = set(seq_df['item_id'].values.tolist())
 
+    n_items = out_df['item_id'].value_counts().size
+
+    def negative_sample(df):
+        neg_items = np.random.randint(1, n_items + 1, (len(df), n_neg_items))
+        for i, uid in enumerate(df['user_id'].values):
+            user_clicked = clicked_item_set[uid]
+            for j in range(len(neg_items[i])):
+                while neg_items[i][j] in user_clicked:
+                    neg_items[i][j] = np.random.randint(1, n_items + 1)
+        df['neg_item_id'] = neg_items.tolist()
+        return df
+
     def generate_dev_test(data_df):
         result_dfs = []
-        # n_items = data_df['item_id'].value_counts().size
         for idx in range(2):
             result_df = data_df.groupby('user_id').tail(1).copy()
             data_df = data_df.drop(result_df.index)
-            # neg_items = np.random.randint(1, n_items + 1, (len(result_df), NEG_ITEMS))
-            # for i, uid in enumerate(result_df['user_id'].values):
-            #     user_clicked = clicked_item_set[uid]
-            #     for j in range(len(neg_items[i])):
-            #         while neg_items[i][j] in user_clicked:
-            #             neg_items[i][j] = np.random.randint(1, n_items + 1)
-            # result_df['neg_items'] = neg_items.tolist()
             result_dfs.append(result_df)
         return result_dfs, data_df
+
+    out_df = negative_sample(out_df)
     
     leave_df = out_df.groupby('user_id').head(1)
     data_df = out_df.drop(leave_df.index)
@@ -142,7 +148,7 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
 
     return train_df, dev_df, test_df, out_df
 
-def process_data(dir: str):
+def process_data(dir: str, neg_items = 9):
     """Process the amazon raw data and output the processed data to `dir`.
 
     Args:
@@ -153,7 +159,7 @@ def process_data(dir: str):
     download_data(dir, dataset)
     data_df, meta_df = read_data(dir, dataset)
 
-    train_df, dev_df, test_df, out_df = process_interaction_data(data_df)
+    train_df, dev_df, test_df, out_df = process_interaction_data(data_df, neg_items)
     logger.info(f'Number of interactions: {out_df.shape[0]}')
 
     # user_df = process_user_data(data_df)
@@ -162,7 +168,7 @@ def process_data(dir: str):
     item_df = process_item_data(data_df, meta_df)
     logger.info(f'Number of items: {item_df.shape[0]}')
 
-    dfs = append_his_info([train_df, dev_df, test_df], summary=True)
+    dfs = append_his_info([train_df, dev_df, test_df], summary=True, neg=True)
     logger.info(f'Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
@@ -174,6 +180,17 @@ def process_data(dir: str):
         # add user profile for this interaction
         df['user_profile'] = df['user_id'].apply(lambda x: 'unknown')
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        
+        # Separate each item attributes by a newline
+        def neg_attr(x):
+            neg_item_attributes = []
+            for neg_item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
+                neg_item_attributes.append(f'item_{neg_item_id}: {item_attributes}')
+            return neg_item_attributes
+        df['neg_item_attributes'] = df['neg_item_id'].apply(lambda x: neg_attr(x))
+        df['neg_item_attributes'] = df['neg_item_attributes'].apply(lambda x: '\n'.join(x))
+        # df['neg_item_attributes'] = df['neg_item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        # replace empty string with 'None'
         for col in df.columns.to_list():
             df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
     
@@ -188,4 +205,4 @@ def process_data(dir: str):
     test_df.to_csv(os.path.join(dir, 'test.csv'))
 
 if __name__ == '__main__':
-    process_data(process_data(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'Beauty')))
+    process_data(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'Beauty'))
