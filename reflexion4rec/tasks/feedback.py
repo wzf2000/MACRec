@@ -47,7 +47,9 @@ class FeedbackTask(Task):
         df = pd.read_csv(test_data)
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
-        data_prompt = read_template(f"config/prompts/{self.task}.json")[f"{self.task}_data_prompt"]
+        data_prompt = read_template(f"config/prompts/{self.task}.json")
+        self.prompts.update(data_prompt)
+        data_prompt = data_prompt[f'test_{self.task}_prompt']
         return [(data_prompt.format(
             user_id=df['user_id'][i],
             user_profile=df['user_profile'][i],
@@ -64,6 +66,7 @@ class FeedbackTask(Task):
 
         if agent == 'react_reflect':
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
+            self.prompts.update(prompts)
             agent_prompt = prompts[f'test_{agent}_prompt']
             reflect_prompt = prompts[f'test_reflect_prompt']
             reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
@@ -75,7 +78,7 @@ class FeedbackTask(Task):
                 reflect_examples="",
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
-                prompts=prompts,
+                prompts=self.prompts,
                 keep_reflections=True,
                 leak=False
             )
@@ -83,6 +86,7 @@ class FeedbackTask(Task):
             raise NotImplementedError
 
     def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, reflection_model: str, device: str, feedback_file: str, reward_version: str):
+        self.prompts = dict()
         self.task = task
         test_datas = self.get_data(test_data, max_his)
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nRating: {test_datas[0][1]}")

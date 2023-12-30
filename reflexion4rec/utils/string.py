@@ -19,3 +19,6 @@ def normalize_answer(s: str) -> str:
 
 def EM(answer, key) -> bool:
     return normalize_answer(answer) == normalize_answer(key)
+
+def str2list(s: str) -> list:
+    return [int(i) for i in s.split(',')]

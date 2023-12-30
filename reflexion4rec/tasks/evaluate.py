@@ -1,5 +1,6 @@
 import json
 import openai
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from loguru import logger
@@ -9,6 +10,7 @@ from .base import Task
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..prompts import read_template
+from ..utils import str2list
 
 class EvaluateTask(Task):
     @staticmethod
@@ -21,9 +23,10 @@ class EvaluateTask(Task):
         parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
+        parser.add_argument('--k', type=str2list, default=[1, 3, 5], help='K for ranking task')
         return parser
     
-    def update_evaluation(self, answer: float, gt_answer: float) -> str:
+    def update_evaluation(self, answer: Union[float, int, List[int]], gt_answer: Union[float, int]) -> str:
         if not hasattr(self, 'answers') or not hasattr(self, 'gt_answers'):
             self.answers = []
             self.gt_answers = []
@@ -42,12 +45,48 @@ class EvaluateTask(Task):
             else:
                 self.sum_squared_errors_cheat.append((answer - gt_answer) ** 2)
             logger.debug(f"Answer: {answer}, Ground Truth Answer: {gt_answer}")
-            logger.debug(f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}, Cheat RMSE: {(sum(self.sum_squared_errors_cheat) / len(self.sum_squared_errors_cheat)) ** 0.5:.4f}")
+            logger.debug(f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}, Cheat RMSE: {np.mean(self.sum_squared_errors_cheat) ** 0.5:.4f}")
             if len(self.sum_squared_errors_valid) > 0:
-                logger.debug(f"Valid RMSE: {(sum(self.sum_squared_errors_valid) / len(self.sum_squared_errors_valid)) ** 0.5:.4f}")
-                return f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}, Valid RMSE: {(sum(self.sum_squared_errors_valid) / len(self.sum_squared_errors_valid)) ** 0.5:.4f}"
+                logger.debug(f"Valid RMSE: {np.mean(self.sum_squared_errors_valid) ** 0.5:.4f}")
+                return f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}, Valid RMSE: {np.mean(self.sum_squared_errors_valid) ** 0.5:.4f}"
             else:
-                return f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}"
+                return f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}"
+        elif self.task == 'sr':
+            # check hit rate is exist, ndcg is exist
+            if not hasattr(self, 'hit_rate'):
+                self.hit_rate = {k: [] for k in self.Ks}
+                self.ndcg = {k: [] for k in self.Ks}
+                self.valid_hit_rate = {k: [] for k in self.Ks}
+                self.valid_ndcg = {k: [] for k in self.Ks}
+            if answer != []:
+                assert gt_answer in answer, f"Ground truth answer {gt_answer} is not in answer {answer}"
+                gt_position = answer.index(gt_answer) + 1
+                for k in self.Ks:
+                    if gt_position <= k:
+                        self.hit_rate[k].append(1)
+                        self.ndcg[k].append(1 / np.log(gt_position + 1))
+                        self.valid_hit_rate[k].append(1)
+                        self.valid_ndcg[k].append(1 / np.log(gt_position + 1))
+                    else:
+                        self.hit_rate[k].append(0)
+                        self.ndcg[k].append(0)
+                        self.valid_hit_rate[k].append(0)
+                        self.valid_ndcg[k].append(0)
+            else:
+                for k in self.Ks:
+                    self.hit_rate[k].append(0)
+                    self.ndcg[k].append(0)
+            logger.debug(f"Answer: {answer}, Ground Truth Answer: {gt_answer}")
+            for k in self.Ks:
+                logger.debug(f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}, NDCG@{k}: {np.mean(self.ndcg[k]):.4f}")
+            if len(self.valid_hit_rate) > 0:
+                for k in self.Ks:
+                    logger.debug(f"Valid Hit Rate@{k}: {np.mean(self.valid_hit_rate[k]):.4f}, Valid NDCG@{k}: {np.mean(self.valid_ndcg[k]):.4f}")
+                k = self.Ks[0]
+                return f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}, Valid Hit Rate@{k}: {np.mean(self.valid_hit_rate[k]):.4f}"
+            else:
+                k = self.Ks[0]
+                return f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}"
         else:
             raise NotImplementedError
         
@@ -62,20 +101,37 @@ class EvaluateTask(Task):
                     if hasattr(self.model, 'reflected') and self.model.reflected:
                         logger.trace(f"Reflection input: {self.model.reflection_input}")
                         logger.trace(f"Reflection output: {self.model.reflection_output}")
-                try:
-                    answer = float(self.model.answer)
-                except ValueError:
-                    answer = 0
-                pbar.set_description(self.update_evaluation(answer, float(gt_answer)))
+                if self.task == 'rp':
+                    try:
+                        answer = float(self.model.answer)
+                    except ValueError:
+                        answer = 0
+                elif self.task == 'sr':
+                    candidates = self.model.answer.split('\n')
+                    if len(candidates) != self.n_candidate:
+                        answer = []
+                    else:
+                        try:
+                            answer = [int(c) for c in candidates]
+                            if gt_answer not in answer:
+                                answer = []
+                        except ValueError:
+                            answer = []
+                pbar.set_description(self.update_evaluation(answer, gt_answer))
                 pbar.update(1)
         
     def report(self):
         # TODO: call evaluation methods
+        logger.success(f"Task {self.task} completed!")
         if self.task == 'rp':
             logger.success(f"Accuracy: {sum([1 if self.answers[i] == self.gt_answers[i] else 0 for i in range(len(self.answers))]) / len(self.answers):.4f}")
             # compute rmse
             rmse = (sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5
             logger.success(f"RMSE: {rmse:.4f}")
+        elif self.task == 'sr':
+            for k in self.Ks:
+                logger.success(f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}")
+                logger.success(f"NDCG@{k}: {np.mean(self.ndcg[k]):.4f}")
         else:
             # TODO: Add other tasks
             raise NotImplementedError
@@ -100,23 +156,40 @@ class EvaluateTask(Task):
         df = pd.read_csv(test_data)
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
-        data_prompt = read_template(f"config/prompts/{self.task}.json")[f"{self.task}_data_prompt"]
-        return [(data_prompt.format(
-            user_id=df['user_id'][i],
-            user_profile=df['user_profile'][i],
-            history=df['history'][i],
-            target_item_id=df['item_id'][i],
-            target_item_attributes=df['target_item_attributes'][i]
-        ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+        data_prompt = read_template(f"config/prompts/{self.task}.json")
+        self.prompts.update(data_prompt)
+        data_prompt = data_prompt[f'test_{self.task}_prompt']
+        if self.task == 'rp':
+            return [(data_prompt.format(
+                user_id=df['user_id'][i],
+                user_profile=df['user_profile'][i],
+                history=df['history'][i],
+                target_item_id=df['item_id'][i],
+                target_item_attributes=df['target_item_attributes'][i]
+            ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+        elif self.task == 'sr':
+            candidate_example: str = df['candidate_item_attributes'][0]
+            self.n_candidate = len(candidate_example.split('\n'))
+            return [(data_prompt.format(
+                user_id=df['user_id'][i],
+                user_profile=df['user_profile'][i],
+                history=df['history'][i],
+                candidate_item_attributes=df['candidate_item_attributes'][i]
+            ), df['item_id'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+        else:
+            raise NotImplementedError
         
     def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: int):
         if self.task == 'rp':
             task_type = 'rating prediction'
+        elif self.task == 'sr':
+            task_type = 'ranking'
         else:
             raise NotImplementedError
 
+        prompts = read_template(f"config/prompts/{agent}_prompt.json")
+        self.prompts.update(prompts)
         if agent == 'react':
-            prompts = read_template(f"config/prompts/{agent}_prompt.json")
             agent_prompt = prompts[f'test_{agent}_prompt']
             # TODO: Add examples
             self.model = ReactAgent(
@@ -124,11 +197,10 @@ class EvaluateTask(Task):
                 agent_prompt=agent_prompt,
                 react_examples="",
                 actor_llm=react_llm,
-                prompts=prompts,
+                prompts=self.prompts,
                 leak=False,
             )
         elif agent == 'react_reflect':
-            prompts = read_template(f"config/prompts/{agent}_prompt.json")
             agent_prompt = prompts[f'test_{agent}_prompt']
             reflect_prompt = prompts[f'test_reflect_prompt']
             reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
@@ -140,7 +212,7 @@ class EvaluateTask(Task):
                 reflect_examples="",
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
-                prompts=prompts,
+                prompts=self.prompts,
                 keep_reflections=True,
                 leak=False
             )
@@ -148,10 +220,12 @@ class EvaluateTask(Task):
             # TODO: Add other agents
             raise NotImplementedError
     
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int, k: List[int]):
+        self.Ks = k
+        self.prompts = dict()
         self.task = task
         test_datas = self.get_data(test_data, max_his)
-        logger.info(f"Test data sample: {test_datas[0][0][:100]}\nRating: {test_datas[0][1]}")
+        logger.info(f"Test data sample: {test_datas[0][0][:100]}\nGround Truth: {test_datas[0][1]}")
         react_llm = self.get_LLM(api_config=api_config)
         self.get_model(agent, react_llm, model, device)
         

@@ -15,3 +15,4 @@ datasets
 trl
 peft
 jsonlines
+torchmetrics
