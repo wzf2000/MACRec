@@ -190,7 +190,7 @@ def process_data(dir: str, n_neg_items: int = 9):
         def candidate_attr(x):
             candidate_item_attributes = []
             for item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
-                candidate_item_attributes.append(f'item_{item_id}: {item_attributes}')
+                candidate_item_attributes.append(f'{item_id}: {item_attributes}')
             return candidate_item_attributes
         df['candidate_item_attributes'] = df['candidate_item_id'].apply(lambda x: candidate_attr(x))
         df['candidate_item_attributes'] = df['candidate_item_attributes'].apply(lambda x: '\n'.join(x))
