@@ -29,6 +29,7 @@ class EvaluateTask(Task):
     
     def update_evaluation(self, answer: str, gt_answer: Union[float, int]) -> str:
         valid, answer = parse_answer(type=self.task, string=self.model.answer, gt_answer=gt_answer, n_candidate=self.n_candidate)
+        logger.debug(f'Answer: {answer}, Ground Truth: {gt_answer}')
         if valid:
             return self.metrics.update(output={
                 'answer': answer,
