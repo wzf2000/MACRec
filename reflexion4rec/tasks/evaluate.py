@@ -3,7 +3,7 @@ import openai
 import pandas as pd
 from tqdm import tqdm
 from loguru import logger
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from argparse import ArgumentParser
 from .base import Task
 from ..llms import AnyOpenAILLM, OpenSourceLLM
@@ -23,7 +23,7 @@ class EvaluateTask(Task):
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
         return parser
     
-    def update_evaluation(self, answer: int, gt_answer: int) -> str:
+    def update_evaluation(self, answer: float, gt_answer: float) -> str:
         if not hasattr(self, 'answers') or not hasattr(self, 'gt_answers'):
             self.answers = []
             self.gt_answers = []
@@ -32,14 +32,26 @@ class EvaluateTask(Task):
         if self.task == 'rp':
             # check sum squared errors is exist
             if not hasattr(self, 'sum_squared_errors'):
-                self.sum_squared_errors = 0.
-            self.sum_squared_errors += (answer - gt_answer) ** 2
+                self.sum_squared_errors = []
+                self.sum_squared_errors_valid = []
+                self.sum_squared_errors_cheat = []
+            self.sum_squared_errors.append((answer - gt_answer) ** 2)
+            if answer >= 1 and answer <= 5:
+                self.sum_squared_errors_valid.append((answer - gt_answer) ** 2)
+                self.sum_squared_errors_cheat.append((answer - gt_answer) ** 2)
+            else:
+                self.sum_squared_errors_cheat.append((answer - gt_answer) ** 2)
             logger.debug(f"Answer: {answer}, Ground Truth Answer: {gt_answer}")
-            return f"RMSE: {(self.sum_squared_errors / len(self.answers)) ** 0.5:.4f}"
+            logger.debug(f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}, Cheat RMSE: {(sum(self.sum_squared_errors_cheat) / len(self.sum_squared_errors_cheat)) ** 0.5:.4f}")
+            if len(self.sum_squared_errors_valid) > 0:
+                logger.debug(f"Valid RMSE: {(sum(self.sum_squared_errors_valid) / len(self.sum_squared_errors_valid)) ** 0.5:.4f}")
+                return f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}, Valid RMSE: {(sum(self.sum_squared_errors_valid) / len(self.sum_squared_errors_valid)) ** 0.5:.4f}"
+            else:
+                return f"RMSE: {(sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5:.4f}"
         else:
             raise NotImplementedError
         
-    def evaluate(self, test_datas: List[Tuple[str, int]], steps: int = 2):
+    def evaluate(self, test_datas: List[Tuple[str, Union[int, float]]], steps: int = 2):
         with tqdm(total=len(test_datas)) as pbar:
             for test_data, gt_answer in test_datas:
                 self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
@@ -54,7 +66,7 @@ class EvaluateTask(Task):
                     answer = float(self.model.answer)
                 except ValueError:
                     answer = 0
-                pbar.set_description(self.update_evaluation(answer, gt_answer))
+                pbar.set_description(self.update_evaluation(answer, float(gt_answer)))
                 pbar.update(1)
         
     def report(self):
@@ -62,7 +74,7 @@ class EvaluateTask(Task):
         if self.task == 'rp':
             logger.success(f"Accuracy: {sum([1 if self.answers[i] == self.gt_answers[i] else 0 for i in range(len(self.answers))]) / len(self.answers):.4f}")
             # compute rmse
-            rmse = (self.sum_squared_errors / len(self.answers)) ** 0.5
+            rmse = (sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5
             logger.success(f"RMSE: {rmse:.4f}")
         else:
             # TODO: Add other tasks

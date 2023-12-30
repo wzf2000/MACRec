@@ -28,11 +28,10 @@ class RatingPredictionRewardV1(Reward):
         return self.action_reward(action2, gt_answer) - self.action_reward(action1, gt_answer)
     
 class RatingPredictionRewardV2(Reward):
-    def __init__(self, invalid: float = -16, alpha: float = 4, beta: float = 4, gamma: float = 0.25, eta: float = 2, lower: float = 1, upper: float = 5, *args, **kwargs):
+    def __init__(self, invalid: float = -16, alpha: float = 4, gamma: float = 0.25, eta: float = 2, lower: float = 1, upper: float = 5, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.invalid = invalid
         self.alpha = alpha
-        self.beta = beta
         self.gamma = gamma
         self.lower = lower
         self.upper = upper
@@ -59,12 +58,15 @@ class RatingPredictionRewardV2(Reward):
     def reward(self, action1: str, action2: str, gt_answer: str) -> float:
         valid1, _ = self.check_valid(action1)
         valid2, _ = self.check_valid(action2)
-        if not valid1 and not valid2:
-            return -self.beta
+        if not valid2:
+            return self.invalid
         action1_reward = self.action_reward(action1, gt_answer)
         action2_reward = self.action_reward(action2, gt_answer)
-        if not valid1 or not valid2:
-            return (action2_reward - action1_reward) * self.gamma
+        if not valid1:
+            if action2_reward > action1_reward:
+                return (action2_reward - action1_reward) * self.gamma
+            else:
+                return action2_reward - action1_reward
         original_reward = action2_reward - action1_reward
         return original_reward + np.exp(-np.abs(original_reward) * self.eta) * (self.alpha + action2_reward)
 
@@ -81,6 +83,7 @@ if __name__ == '__main__':
     logger.success('Test RatingPredictionRewardV2')
     logger.info(f'reward(3, 4, 5) = {reward.reward("3", "4", "5")}')
     logger.info(f'reward(3, 4, 3) = {reward.reward("3", "4", "3")}')
+    logger.info(f'reward(1, 2, 5) = {reward.reward("1", "2", "5")}')
     logger.info(f'reward(invalid, 4, 1) = {reward.reward("a", "4", "1")}')
     logger.info(f'reward(3, invalid, 1) = {reward.reward("3", "a", "1")}')
     logger.info(f'reward(invalid, invalid, 2) = {reward.reward("a", "b", "2")}')

@@ -7,3 +7,4 @@ from .trl_rlhf import RLHFTrainingTask as TRLTrainingTask
 from .feedback_toy import ToyFeedbackTask
 from .feedback import FeedbackTask
 from .test import TestTask
+from .reward_update import RewardUpdateTask
