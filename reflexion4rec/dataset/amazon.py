@@ -7,6 +7,7 @@ from loguru import logger
 from typing import Tuple
 from langchain.prompts import PromptTemplate
 from .utils import append_his_info
+import random
 
 def parse(path: str) -> dict:
     g = gzip.open(path, 'rb')
@@ -53,7 +54,6 @@ def read_data(dir: str, dataset: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
 def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFrame:
     # Only retain items that appear in interaction data
     useful_meta_df = meta_df[meta_df['asin'].isin(data_df['asin'])].reset_index(drop=True)
-    logger.info(f"Length of useful_meta_df: {len(useful_meta_df)}")
 
     item_df = useful_meta_df.rename(columns={'asin': 'item_id'})
     item_df = item_df[['item_id', 'title', 'brand', 'price', 'categories']]
@@ -148,7 +148,7 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> Tuple[p
 
     return train_df, dev_df, test_df, out_df
 
-def process_data(dir: str, neg_items = 9):
+def process_data(dir: str, n_neg_items: int = 9):
     """Process the amazon raw data and output the processed data to `dir`.
 
     Args:
@@ -159,7 +159,7 @@ def process_data(dir: str, neg_items = 9):
     download_data(dir, dataset)
     data_df, meta_df = read_data(dir, dataset)
 
-    train_df, dev_df, test_df, out_df = process_interaction_data(data_df, neg_items)
+    train_df, dev_df, test_df, out_df = process_interaction_data(data_df, n_neg_items)
     logger.info(f'Number of interactions: {out_df.shape[0]}')
 
     # user_df = process_user_data(data_df)
@@ -180,16 +180,21 @@ def process_data(dir: str, neg_items = 9):
         # add user profile for this interaction
         df['user_profile'] = df['user_id'].apply(lambda x: 'unknown')
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
-        
-        # Separate each item attributes by a newline
-        def neg_attr(x):
-            neg_item_attributes = []
-            for neg_item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
-                neg_item_attributes.append(f'item_{neg_item_id}: {item_attributes}')
-            return neg_item_attributes
-        df['neg_item_attributes'] = df['neg_item_id'].apply(lambda x: neg_attr(x))
-        df['neg_item_attributes'] = df['neg_item_attributes'].apply(lambda x: '\n'.join(x))
-        # df['neg_item_attributes'] = df['neg_item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        # candidates id
+        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis = 1)
+        logger.info(f'candidate_item_id: {df["candidate_item_id"]}')
+        def shuffle_list(x):
+            random.shuffle(x)
+            return x
+        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x)) # shuffle candidates id
+        # add item attributes
+        def candidate_attr(x):
+            candidate_item_attributes = []
+            for item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
+                candidate_item_attributes.append(f'item_{item_id}: {item_attributes}')
+            return candidate_item_attributes
+        df['candidate_item_attributes'] = df['candidate_item_id'].apply(lambda x: candidate_attr(x))
+        df['candidate_item_attributes'] = df['candidate_item_attributes'].apply(lambda x: '\n'.join(x))
         # replace empty string with 'None'
         for col in df.columns.to_list():
             df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
