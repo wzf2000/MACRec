@@ -4,13 +4,14 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from loguru import logger
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
 from argparse import ArgumentParser
 from .base import Task
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..prompts import read_template
-from ..utils import str2list
+from ..utils import str2list, parse_answer
+from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy
 
 class EvaluateTask(Task):
     @staticmethod
@@ -26,69 +27,22 @@ class EvaluateTask(Task):
         parser.add_argument('--k', type=str2list, default=[1, 3, 5], help='K for ranking task')
         return parser
     
-    def update_evaluation(self, answer: Union[float, int, List[int]], gt_answer: Union[float, int]) -> str:
-        if not hasattr(self, 'answers') or not hasattr(self, 'gt_answers'):
-            self.answers = []
-            self.gt_answers = []
-        self.answers.append(answer)
-        self.gt_answers.append(gt_answer)
-        if self.task == 'rp':
-            # check sum squared errors is exist
-            if not hasattr(self, 'sum_squared_errors'):
-                self.sum_squared_errors = []
-                self.sum_squared_errors_valid = []
-                self.sum_squared_errors_cheat = []
-            self.sum_squared_errors.append((answer - gt_answer) ** 2)
-            if answer >= 1 and answer <= 5:
-                self.sum_squared_errors_valid.append((answer - gt_answer) ** 2)
-                self.sum_squared_errors_cheat.append((answer - gt_answer) ** 2)
-            else:
-                self.sum_squared_errors_cheat.append((answer - gt_answer) ** 2)
-            logger.debug(f"Answer: {answer}, Ground Truth Answer: {gt_answer}")
-            logger.debug(f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}, Cheat RMSE: {np.mean(self.sum_squared_errors_cheat) ** 0.5:.4f}")
-            if len(self.sum_squared_errors_valid) > 0:
-                logger.debug(f"Valid RMSE: {np.mean(self.sum_squared_errors_valid) ** 0.5:.4f}")
-                return f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}, Valid RMSE: {np.mean(self.sum_squared_errors_valid) ** 0.5:.4f}"
-            else:
-                return f"RMSE: {np.mean(self.sum_squared_errors) ** 0.5:.4f}"
-        elif self.task == 'sr':
-            # check hit rate is exist, ndcg is exist
-            if not hasattr(self, 'hit_rate'):
-                self.hit_rate = {k: [] for k in self.Ks}
-                self.ndcg = {k: [] for k in self.Ks}
-                self.valid_hit_rate = {k: [] for k in self.Ks}
-                self.valid_ndcg = {k: [] for k in self.Ks}
-            if answer != []:
-                assert gt_answer in answer, f"Ground truth answer {gt_answer} is not in answer {answer}"
-                gt_position = answer.index(gt_answer) + 1
-                for k in self.Ks:
-                    if gt_position <= k:
-                        self.hit_rate[k].append(1)
-                        self.ndcg[k].append(1 / np.log(gt_position + 1))
-                        self.valid_hit_rate[k].append(1)
-                        self.valid_ndcg[k].append(1 / np.log(gt_position + 1))
-                    else:
-                        self.hit_rate[k].append(0)
-                        self.ndcg[k].append(0)
-                        self.valid_hit_rate[k].append(0)
-                        self.valid_ndcg[k].append(0)
-            else:
-                for k in self.Ks:
-                    self.hit_rate[k].append(0)
-                    self.ndcg[k].append(0)
-            logger.debug(f"Answer: {answer}, Ground Truth Answer: {gt_answer}")
-            for k in self.Ks:
-                logger.debug(f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}, NDCG@{k}: {np.mean(self.ndcg[k]):.4f}")
-            if len(self.valid_hit_rate) > 0:
-                for k in self.Ks:
-                    logger.debug(f"Valid Hit Rate@{k}: {np.mean(self.valid_hit_rate[k]):.4f}, Valid NDCG@{k}: {np.mean(self.valid_ndcg[k]):.4f}")
-                k = self.Ks[0]
-                return f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}, Valid Hit Rate@{k}: {np.mean(self.valid_hit_rate[k]):.4f}"
-            else:
-                k = self.Ks[0]
-                return f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}"
+    def update_evaluation(self, answer: str, gt_answer: Union[float, int]) -> str:
+        valid, answer = parse_answer(type=self.task, string=self.model.answer, gt_answer=gt_answer, n_candidate=self.n_candidate)
+        if valid:
+            return self.metrics.update(output={
+                'answer': answer,
+                'label': gt_answer,
+            })
         else:
-            raise NotImplementedError
+            self.metrics.update(output={
+                'answer': self.cheat_answer,
+                'label': gt_answer,
+            }, prefix='cheat')
+            return self.metrics.update(output={
+                'answer': answer,
+                'label': gt_answer,
+            }, prefix='true')
         
     def evaluate(self, test_datas: List[Tuple[str, Union[int, float]]], steps: int = 2):
         with tqdm(total=len(test_datas)) as pbar:
@@ -101,45 +55,17 @@ class EvaluateTask(Task):
                     if hasattr(self.model, 'reflected') and self.model.reflected:
                         logger.trace(f"Reflection input: {self.model.reflection_input}")
                         logger.trace(f"Reflection output: {self.model.reflection_output}")
-                if self.task == 'rp':
-                    try:
-                        answer = float(self.model.answer)
-                    except ValueError:
-                        answer = 0
-                elif self.task == 'sr':
-                    candidates = self.model.answer.split(',')
-                    if len(candidates) != self.n_candidate:
-                        answer = []
-                    else:
-                        try:
-                            answer = [int(c) for c in candidates]
-                            if gt_answer not in answer:
-                                answer = []
-                        except ValueError:
-                            answer = []
-                pbar.set_description(self.update_evaluation(answer, gt_answer))
+                pbar.set_description(self.update_evaluation(self.model.answer, gt_answer))
                 pbar.update(1)
         
     def report(self):
-        # TODO: call evaluation methods
-        logger.success(f"Task {self.task} completed!")
-        if self.task == 'rp':
-            logger.success(f"Accuracy: {sum([1 if self.answers[i] == self.gt_answers[i] else 0 for i in range(len(self.answers))]) / len(self.answers):.4f}")
-            # compute rmse
-            rmse = (sum(self.sum_squared_errors) / len(self.sum_squared_errors)) ** 0.5
-            logger.success(f"RMSE: {rmse:.4f}")
-        elif self.task == 'sr':
-            for k in self.Ks:
-                logger.success(f"Hit Rate@{k}: {np.mean(self.hit_rate[k]):.4f}")
-                logger.success(f"NDCG@{k}: {np.mean(self.ndcg[k]):.4f}")
-        else:
-            # TODO: Add other tasks
-            raise NotImplementedError
+        logger.success("===================================Evaluation Report===================================")
+        self.metrics.report()
         
     def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: int = 0):
         if model_path != 'openai':
             return OpenSourceLLM(model_path=model_path, device=device)
-        if api_config is not None and not hasattr(self, 'api_config'):
+        if api_config is not None and self.api_config is None:
             with open(api_config, 'r') as f:
                 self.api_config = json.load(f)
             openai.api_base = self.api_config['api_base']
@@ -152,7 +78,7 @@ class EvaluateTask(Task):
             openai_api_key=self.api_config['api_key'],
         )
         
-    def get_data(self, test_data: str, max_his: int):
+    def get_data(self, test_data: str, max_his: int) -> List[Tuple[str, Union[int, float]]]:
         df = pd.read_csv(test_data)
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
@@ -219,12 +145,33 @@ class EvaluateTask(Task):
         else:
             # TODO: Add other agents
             raise NotImplementedError
+        
+    def get_metrics(self):
+        if self.task == 'rp':
+            self.metrics = MetricDict({
+                'true_accuracy': Accuracy(),
+                'true_rmse': RMSE(),
+                'valid_rmse': RMSE(),
+                'cheat_rmse': RMSE(),
+            })
+            self.cheat_answer = 3
+        elif self.task == 'sr':
+            self.metrics = MetricDict({
+                'true_hit_rate': HitRatioAt(topks=self.Ks),
+                'true_ndcg': NDCGAt(topks=self.Ks),
+                'valid_hit_rate': HitRatioAt(topks=self.Ks),
+                'valid_ndcg': NDCGAt(topks=self.Ks),
+            })
+            self.cheat_answer = []
+        else:
+            raise NotImplementedError
     
     def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int, k: List[int]):
         self.Ks = k
         self.prompts = dict()
         self.task = task
         test_datas = self.get_data(test_data, max_his)
+        self.get_metrics()
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nGround Truth: {test_datas[0][1]}")
         react_llm = self.get_LLM(api_config=api_config)
         self.get_model(agent, react_llm, model, device)
