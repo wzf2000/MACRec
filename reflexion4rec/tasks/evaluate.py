@@ -158,7 +158,7 @@ class EvaluateTask(Task):
         
         data_prompt = read_template(f"config/prompts/{self.task}.json")
         self.prompts.update(data_prompt)
-        data_prompt = data_prompt[f'test_{self.task}_prompt']
+        data_prompt = data_prompt[f'{self.task}_data_prompt']
         if self.task == 'rp':
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
