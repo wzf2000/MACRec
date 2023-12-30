@@ -182,7 +182,6 @@ def process_data(dir: str, n_neg_items: int = 9):
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
         # candidates id
         df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis = 1)
-        logger.info(f'candidate_item_id: {df["candidate_item_id"]}')
         def shuffle_list(x):
             random.shuffle(x)
             return x
@@ -203,7 +202,6 @@ def process_data(dir: str, n_neg_items: int = 9):
     dev_df = dfs[1]
     test_df = dfs[2]
     logger.info('Outputing data to csv files...')
-
     item_df.to_csv(os.path.join(dir, 'item.csv'))
     train_df.to_csv(os.path.join(dir, 'train.csv'))
     dev_df.to_csv(os.path.join(dir, 'dev.csv'))

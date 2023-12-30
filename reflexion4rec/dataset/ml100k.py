@@ -1,9 +1,11 @@
 import os
 import pandas as pd
+import numpy as np
 from loguru import logger
 from typing import Tuple, List, Dict, Union
 from langchain.prompts import PromptTemplate
 from .utils import append_his_info
+import random
 
 def read_data(dir: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(os.path.join(dir, 'u.data'), 'r') as f:
@@ -71,7 +73,7 @@ def filter_data(data_df: pd.DataFrame) -> pd.DataFrame:
         data_df = data_df.groupby('item_id').filter(lambda x: len(x) >= 5)
     return data_df
 
-def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     data_df.columns = ['user_id', 'item_id', 'rating', 'timestamp']
     # sort data_df by timestamp
     data_df = data_df.sort_values(by=['timestamp'])
@@ -80,7 +82,17 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
     for user_id, seq_df in data_df.groupby('user_id'):
         clicked_item_set[user_id] = set(seq_df['item_id'].values.tolist())
 
-    # TODO neg_sampling
+    n_items = data_df['item_id'].value_counts().size
+
+    def negative_sample(df):
+        neg_items = np.random.randint(1, n_items + 1, (len(df), n_neg_items))
+        for i, uid in enumerate(df['user_id'].values):
+            user_clicked = clicked_item_set[uid]
+            for j in range(len(neg_items[i])):
+                while neg_items[i][j] in user_clicked:
+                    neg_items[i][j] = np.random.randint(1, n_items + 1)
+        df['neg_item_id'] = neg_items.tolist()
+        return df
         
     def generate_dev_test(data_df: pd.DataFrame) -> Tuple[List[pd.DataFrame], pd.DataFrame]:
         result_dfs = []
@@ -90,6 +102,7 @@ def process_interaction_data(data_df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Da
             result_dfs.append(result_df)
         return result_dfs, data_df
     
+    data_df = negative_sample(data_df)
     leave_df = data_df.groupby('user_id').head(1)
     left_df = data_df.drop(leave_df.index)
     
@@ -108,9 +121,9 @@ def process_data(dir: str, n_neg_items: int = 9):
     logger.info(f'Number of users: {user_df.shape[0]}')
     item_df = process_item_data(item_df)
     logger.info(f'Number of items: {item_df.shape[0]}')
-    train_df, dev_df, test_df = process_interaction_data(data_df)
+    train_df, dev_df, test_df = process_interaction_data(data_df, n_neg_items)
     logger.info(f'Number of train interactions: {train_df.shape[0]}')
-    dfs = append_his_info([train_df, dev_df, test_df])
+    dfs = append_his_info([train_df, dev_df, test_df], neg=True)
     logger.info(f'Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
@@ -122,6 +135,21 @@ def process_data(dir: str, n_neg_items: int = 9):
         # add user profile for this interaction
         df['user_profile'] = df['user_id'].apply(lambda x: user_df.loc[x]['user_profile'])
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
+        # candidates id
+        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis = 1)
+        def shuffle_list(x):
+            random.shuffle(x)
+            return x
+        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x)) # shuffle candidates id
+        # add item attributes
+        def candidate_attr(x):
+            candidate_item_attributes = []
+            for item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
+                candidate_item_attributes.append(f'item_{item_id}: {item_attributes}')
+            return candidate_item_attributes
+        df['candidate_item_attributes'] = df['candidate_item_id'].apply(lambda x: candidate_attr(x))
+        df['candidate_item_attributes'] = df['candidate_item_attributes'].apply(lambda x: '\n'.join(x))
+        # replace empty string with 'None'
         for col in df.columns.to_list():
             df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
 
