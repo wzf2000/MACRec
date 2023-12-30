@@ -20,7 +20,7 @@ class EvaluateTask(Task):
         parser.add_argument('--agent', type=str, default='react', choices=['react', 'react_reflect'], help='Agent name')
         parser.add_argument('--model', type=str, default='openai', help='Reflection model name, set openai to use OpenAI API')
         parser.add_argument('--device', type=int, default=0, help='Device number')
-        parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
+        parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
         parser.add_argument('--k', type=str2list, default=[1, 3, 5], help='K for ranking task')
@@ -107,7 +107,7 @@ class EvaluateTask(Task):
                     except ValueError:
                         answer = 0
                 elif self.task == 'sr':
-                    candidates = self.model.answer.split('\n')
+                    candidates = self.model.answer.split(',')
                     if len(candidates) != self.n_candidate:
                         answer = []
                     else:
