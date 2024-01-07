@@ -9,5 +9,5 @@ class OpenSourceLLM(BaseLLM):
         self.max_tokens = max_length
         self.max_context_length: int = 16384 if '16k' in model_path else 32768 if '32k' in model_path else 4096
     
-    def __call__(self, prompt: str):
+    def __call__(self, prompt: str, *args, **kwargs):
         return self.pipe(prompt, return_full_text=False, do_sample=True, temperature=0.9, top_p=1)[0]['generated_text']
