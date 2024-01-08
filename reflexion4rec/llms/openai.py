@@ -24,7 +24,7 @@ class AnyOpenAILLM(BaseLLM):
         if json_mode and self.model_name not in ['gpt-3.5-turbo-1106', 'gpt-4-1106-preview']:
             raise ValueError("json_mode is only available for gpt-3.5-turbo-1106 and gpt-4-1106-preview")
         if json_mode:
-            self.model._default_params['response_format'] = {
+            self.model.model_kwargs['response_format'] = {
                 'type': 'json_object'
             }
             content = self.model(
@@ -34,7 +34,7 @@ class AnyOpenAILLM(BaseLLM):
                     )
                 ]
             ).content
-            del self.model._default_params['response_format']
+            del self.model.model_kwargs['response_format']
             return content
         if self.model_type == 'completion':
             return self.model(prompt)

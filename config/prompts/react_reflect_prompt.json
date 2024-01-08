@@ -4,7 +4,7 @@
         "input_variables": ["task_type", "examples", "reflections", "input", "scratchpad"]
     },
     "agent_prompt_json": {
-        "template": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput: {input}{scratchpad}",
+        "template": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Actions should be described in JSON format. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput: {input}{scratchpad}",
         "input_variables": ["task_type", "examples", "reflections", "input", "scratchpad"]
     },
     "reflect_prompt": {

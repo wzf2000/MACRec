@@ -39,7 +39,7 @@ class ReactAgent(BaseAgent):
         self.scratchpad += f'\nHint: {self.prompts["hint"]}'
         self.scratchpad += f'\nValid action example: {self.valid_action_example()}:'
         self.scratchpad += f'\nAction {self.step_n}:'
-        action = self.prompt_agent()
+        action = self.prompt_agent(json_mode=self.json_mode)
         self.action_process(action)
 
         self.step_n += 1

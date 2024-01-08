@@ -130,9 +130,9 @@ class BaseAgent:
     def _build_agent_prompt(self) -> str:
         raise NotImplementedError("BaseAgent._build_agent_prompt() not implemented")
     
-    def prompt_agent(self) -> str:
+    def prompt_agent(self, json_mode: bool = False) -> str:
         agent_input = self._build_agent_prompt()
-        agent_response = self.actor_llm(agent_input)
+        agent_response = self.actor_llm(agent_input, json_mode=json_mode)
         logger.debug(f'Agent input length: {len(self.enc.encode(agent_input))}')
         logger.debug(f'Agent output length: {len(self.enc.encode(agent_response))}')
         return format_step(agent_response)

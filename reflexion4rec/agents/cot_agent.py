@@ -39,7 +39,7 @@ class CoTAgent(ReflectAgent):
 
         # Act
         self.scratchpad += f'\nAction:'
-        action = self.prompt_agent()
+        action = self.prompt_agent(json_mode=self.json_mode)
         self.action_process(action)
         
         self.step_n += 1
