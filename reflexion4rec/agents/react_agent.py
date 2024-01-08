@@ -1,7 +1,5 @@
 from loguru import logger
-from langchain.prompts import PromptTemplate
 from .base_agent import BaseAgent
-from ..llms import BaseLLM
 
 class ReactAgent(BaseAgent):
     def __init__(self, max_steps: int = 6, *args, **kwargs) -> None:

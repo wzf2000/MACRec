@@ -1,15 +1,10 @@
 from loguru import logger
-from langchain.prompts import PromptTemplate
 from .strategy import ReflexionStrategy
 from .reflect_agent import ReflectAgent
-from ..llms import BaseLLM
 
 class CoTAgent(ReflectAgent):
-    def __init__(
-        self, reflect_llm: BaseLLM, actor_llm: BaseLLM,
-        *args, **kwargs
-    ) -> None:
-        super().__init__(actor_llm=actor_llm, reflect_llm=reflect_llm, *args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.step_n: int = 0
         
     @property
@@ -46,11 +41,12 @@ class CoTAgent(ReflectAgent):
         self.scratchpad += f'\nAction:'
         action = self.prompt_agent()
         self.action_process(action)
+        
+        self.step_n += 1
     
     def run(self, reflexion_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> str:
         if self.step_n > 0 and not self.is_correct() and reflexion_strategy != ReflexionStrategy.NONE:
             self.reflect(reflexion_strategy)
         self.reset()
         self.step()
-        self.step_n += 1
         return self.answer
