@@ -1,13 +1,8 @@
-import os
 import json
 from argparse import ArgumentParser
-from typing import List
 from tqdm import tqdm
 
 import torch
-from torch import nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
 
 from trl import AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer
 from peft import LoraConfig

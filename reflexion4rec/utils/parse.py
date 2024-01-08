@@ -1,7 +1,7 @@
 import re
-from typing import Tuple, List, Tuple
+from typing import Any
 
-def parse_action(string: str) -> Tuple[str, str]:
+def parse_action(string: str) -> tuple[str, str]:
     pattern = r'^(\w+)\[(.+)\]$'
     match = re.match(pattern, string)
     
@@ -13,18 +13,33 @@ def parse_action(string: str) -> Tuple[str, str]:
     else:
         return None, None
     
-def parse_rating_answer(string: str, *args, **kwargs) -> Tuple[bool, float]:
+def parse_QA_answer(answer: str, *args, **kwargs) -> tuple[bool, str]:
+    return True, answer
+    
+def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *args, **kwargs) -> tuple[bool, float]:
     try:
-        answer = float(string)
+        answer = float(answer)
         if answer < 1 or answer > 5:
             return False, 0
     except ValueError:
         return False, 0
     return True, answer
     
-def parse_ranking_answer(string: str, gt_answer: int, n_candidate: str, *args, **kwargs) -> Tuple[bool, List[int]]:
-    candidates = string.split(',')
-    if len(candidates) != n_candidate:
+def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, json_mode: bool = False, *args, **kwargs) -> tuple[bool, list[int]]:
+    if not json_mode:
+        candidates = answer.split(',')
+    else:
+        if isinstance(answer, list):
+            candidates = answer
+        elif isinstance(answer, str):
+            candidates = answer.split(',')
+        else:
+            return False, []
+    try:
+        length = len(candidates)
+    except TypeError:
+        return False, []
+    if length != n_candidate:
         return False, []
     else:
         try:
@@ -35,8 +50,10 @@ def parse_ranking_answer(string: str, gt_answer: int, n_candidate: str, *args, *
             return False, []
     return True, answer
 
-def parse_answer(type, *args, **kwargs) -> Tuple[bool, any]:
-    if type == 'rp':
+def parse_answer(type, *args, **kwargs) -> tuple[bool, Any]:
+    if type == 'qa':
+        return parse_QA_answer(*args, **kwargs)
+    elif type == 'rp':
         return parse_rating_answer(*args, **kwargs)
     elif type == 'sr':
         return parse_ranking_answer(*args, **kwargs)

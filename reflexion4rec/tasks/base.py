@@ -1,12 +1,13 @@
 from argparse import ArgumentParser
 from loguru import logger
+from typing import Any
 
 class Task:
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         raise NotImplementedError
     
-    def __getattr__(self, __name: str) -> any:
+    def __getattr__(self, __name: str) -> Any:
         # return none if attribute not exists
         if __name not in self.__dict__:
             return None

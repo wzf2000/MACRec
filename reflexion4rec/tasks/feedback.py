@@ -59,28 +59,17 @@ class FeedbackTask(Task):
         ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
         
     def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: int):
-        if self.task == 'rp':
-            task_type = 'rating prediction'
-        else:
-            raise NotImplementedError
-
         if agent == 'react_reflect':
             prompts = read_template(f"config/prompts/{agent}_prompt.json")
             self.prompts.update(prompts)
-            agent_prompt = prompts[f'test_{agent}_prompt']
-            reflect_prompt = prompts[f'test_reflect_prompt']
             reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
             self.model = ReactReflectAgent(
-                task_type=task_type,
-                agent_prompt=agent_prompt,
-                reflect_prompt=reflect_prompt,
-                react_examples="",
-                reflect_examples="",
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
                 prompts=self.prompts,
                 keep_reflections=True,
-                leak=False
+                leak=False,
+                task=self.task,
             )
         else: # Feedback only for react_reflect
             raise NotImplementedError
@@ -109,8 +98,7 @@ class FeedbackTask(Task):
                 for test_data, gt_answer in test_datas:
                     ret = {}
                     answers = []
-                    origin_answers = []
-                    self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
+                    self.model.set_data(input=test_data, context="", gt_answer=gt_answer)
                     self.model.reset(remove_reflections=True)
                     # run 2 steps
                     for i in range(2):
@@ -122,17 +110,12 @@ class FeedbackTask(Task):
                             ret["input"] = self.model.reflection_input
                             ret["output"] = self.model.reflection_output 
                         
-                        try:
-                            answer = float(self.model.answer)
-                        except ValueError:
-                            answer = 0
-                        answers.append(answer)
-                        origin_answers.append(self.model.answer)
+                        answers.append(self.model.answer)
                     pbar.update(1)
-                    ret["Answer_1"] = origin_answers[0]
-                    ret["Answer_2"] = origin_answers[1]
+                    ret["Answer_1"] = str(answers[0])
+                    ret["Answer_2"] = str(answers[1])
                     ret["Answer_GT"] = str(gt_answer)
-                    ret['reward'] = self.reward_model.reward(origin_answers[0], origin_answers[1], str(gt_answer))
+                    ret['reward'] = self.reward_model.reward(ret["Answer_1"], ret["Answer_2"], ret["Answer_GT"])
 
                     logger.debug(f"Answer_1: {answers[0]}, Answer_2: {answers[1]}, Ground Truth Answer: {gt_answer}")
                     logger.debug(f'Reward: {ret["reward"]}')  # logger.success

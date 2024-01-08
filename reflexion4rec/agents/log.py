@@ -1,8 +1,7 @@
-from typing import List
 from . import BaseAgent, ReactAgent
 from .utils import summarize_trial, summarize_react_trial
 
-def log_trial(agents: List[BaseAgent], trial_n: int) -> str:
+def log_trial(agents: list[BaseAgent], trial_n: int) -> str:
     correct, incorrect = summarize_trial(agents)
 
     log = f"""
@@ -22,7 +21,7 @@ Trial summary: Correct: {len(correct)}, Incorrect: {len(incorrect)}
 
     return log
 
-def log_react_trial(agents: List[ReactAgent], trial_n: int) -> str:
+def log_react_trial(agents: list[ReactAgent], trial_n: int) -> str:
     correct, incorrect, halted = summarize_react_trial(agents)
 
     log = f"""

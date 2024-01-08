@@ -1,4 +1,3 @@
-from typing import List
 from langchain.prompts import PromptTemplate
 from .strategy import ReflexionStrategy
 from .reflect_agent import ReflectAgent
@@ -7,20 +6,14 @@ from ..llms import BaseLLM
 from ..utils import format_last_attempt, format_reflections
 
 class ReactReflectAgent(ReactAgent, ReflectAgent):
-    def __init__(
-        self, task_type: str, agent_prompt: PromptTemplate, reflect_prompt: PromptTemplate,
-        react_examples: str, reflect_examples: str,
-        actor_llm: BaseLLM = None, reflect_llm: BaseLLM = None,
-        max_steps: int = 6,
-        *args, **kwargs
-    ) -> None:
-        super().__init__(task_type=task_type, agent_prompt=agent_prompt, reflect_prompt=reflect_prompt, react_examples=react_examples, reflect_examples=reflect_examples, actor_llm=actor_llm, reflect_llm=reflect_llm, max_steps=max_steps, *args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.reflected: bool = False
         
     def reset(self, remove_reflections: bool = False, *args, **kwargs) -> None:
         super().reset(remove_reflections=remove_reflections, *args, **kwargs)
         if remove_reflections:
-            self.reflections: List[str] = []
+            self.reflections: list[str] = []
             self.reflections_str: str = ''
         
     def _build_agent_prompt(self) -> str:

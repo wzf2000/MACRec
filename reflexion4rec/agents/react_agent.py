@@ -2,27 +2,22 @@ from loguru import logger
 from langchain.prompts import PromptTemplate
 from .base_agent import BaseAgent
 from ..llms import BaseLLM
-from ..utils import parse_action, format_step
 
 class ReactAgent(BaseAgent):
-    def __init__(
-        self,
-        task_type: str,
-        agent_prompt: PromptTemplate,
-        react_examples: str,
-        actor_llm: BaseLLM = None,
-        max_steps: int = 6,
-        *args, **kwargs
-    ) -> None:
-        super().__init__(task_type=task_type, agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
-        self.react_examples = react_examples
+    def __init__(self, max_steps: int = 6, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.max_steps = max_steps
         
+    @property
+    def react_examples(self) -> str:
+        if 'react_examples' in self.prompts:
+            return self.prompts['react_examples']
+        else:
+            return ''
+        
     def reset(self, *args, **kwargs) -> None:
+        super().reset(*args, **kwargs)
         self.step_n: int = 1
-        self.finished: bool = False
-        self.scratchpad: str = ''
-        self.answer = ''
         
     def _build_agent_prompt(self) -> str:
         return self.agent_prompt.format(
@@ -44,24 +39,10 @@ class ReactAgent(BaseAgent):
 
         # Act
         self.scratchpad += f'\nHint: {self.prompts["hint"]}'
-        self.scratchpad += f'\nValid action example: {self.prompts["valid_action_example"]}:'
+        self.scratchpad += f'\nValid action example: {self.valid_action_example()}:'
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent()
-        self.scratchpad += ' ' + action
-        action_type, argument = parse_action(action)
-        logger.debug(self.scratchpad.split('\n')[-1])
-
-        # Observe
-        self.scratchpad += f'\nObservation {self.step_n}: '
-        
-        if action_type == 'Finish':
-            self.finish(argument)
-        # TODO: Add other actions
-        else:
-            self.scratchpad += 'Invalid Action. Valid Actions are `Finish[<answer>]`.'
-
-        logger.trace(f'Answer: {self.answer}')
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.action_process(action)
 
         self.step_n += 1
         

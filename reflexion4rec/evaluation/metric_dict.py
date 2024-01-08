@@ -1,10 +1,9 @@
 import torchmetrics
 from loguru import logger
-from typing import Dict
 
 class MetricDict:
-    def __init__(self, metrics: Dict[str, torchmetrics.Metric] = {}):
-        self.metrics: Dict[str, torchmetrics.Metric]  = metrics
+    def __init__(self, metrics: dict[str, torchmetrics.Metric] = {}):
+        self.metrics: dict[str, torchmetrics.Metric]  = metrics
         
     def add(self, name: str, metric: torchmetrics.Metric):
         self.metrics[name] = metric

@@ -1,10 +1,9 @@
 import torch
-from typing import List, Union
 from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 class OfflinePPODataset(Dataset):
-    def __init__(self, prompts: List[str], responses: List[str], rewards: List[Union[int, float]], tokenizer: Union[PreTrainedTokenizer, PreTrainedTokenizerFast]):
+    def __init__(self, prompts: list[str], responses: list[str], rewards: list[int | float], tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast):
         assert len(prompts) == len(responses) == len(rewards)
         self.prompts = prompts
         self.reponses = responses

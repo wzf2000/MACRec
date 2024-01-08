@@ -4,7 +4,6 @@ import numpy as np
 import gzip
 import subprocess
 from loguru import logger
-from typing import Tuple
 from langchain.prompts import PromptTemplate
 from .utils import append_his_info
 import random
@@ -42,7 +41,7 @@ def download_data(dir: str, dataset: str):
             'cd {} && curl -O http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/meta_{}.json.gz'
             .format(raw_path, dataset), shell=True)
 
-def read_data(dir: str, dataset: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def read_data(dir: str, dataset: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     raw_path = os.path.join(dir, 'raw_data')
     data_file = 'reviews_{}_5.json.gz'.format(dataset)
     meta_file = 'meta_{}.json.gz'.format(dataset)
@@ -87,7 +86,7 @@ def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFr
     
     return item_df
 
-def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> Tuple[dict, dict]:
+def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> tuple[dict, dict]:
     if out_df is None:
         out_df = data_df.rename(columns={'asin': 'item_id', 'reviewerID': 'user_id', 'overall': 'rating', 'unixReviewTime': 'timestamp'})
         out_df = out_df[['user_id', 'item_id', 'rating', 'summary', 'timestamp']]
@@ -102,7 +101,7 @@ def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> Tuple[dict, d
     return user2id, item2id
 
 
-def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     out_df = data_df.rename(columns={'asin': 'item_id', 'reviewerID': 'user_id', 'overall': 'rating', 'unixReviewTime': 'timestamp'})
     out_df = out_df[['user_id', 'item_id', 'rating', 'summary', 'timestamp']]
     out_df = out_df.drop_duplicates(['user_id', 'item_id', 'timestamp'])

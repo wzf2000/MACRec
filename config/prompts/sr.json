@@ -5,5 +5,8 @@
     },
     "valid_action_example": {
         "template": "Finish[3343, 3693, 104, 1947, 10418, 8398, 2373, 3284, 4127, 7310]"
+    },
+    "valid_action_example_json": {
+        "template": "{\"type\": \"finish\", \"content\": [3343, 3693, 104, 1947, 10418, 8398, 2373, 3284, 4127, 7310]}"
     }
 }

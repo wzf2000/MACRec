@@ -1,10 +1,18 @@
 {
-    "test_react_reflect_prompt": {
+    "agent_prompt": {
         "template": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation, and Action can be just one type: \n(1) `Finish[answer]`, which returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput: {input}{scratchpad}",
         "input_variables": ["task_type", "examples", "reflections", "input", "scratchpad"]
     },
-    "test_reflect_prompt": {
+    "agent_prompt_json": {
+        "template": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput: {input}{scratchpad}",
+        "input_variables": ["task_type", "examples", "reflections", "input", "scratchpad"]
+    },
+    "reflect_prompt": {
         "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using Finish[<answer>] or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput: {input}{scratchpad}\n\nReflection:",
+        "input_variables": ["examples", "input", "scratchpad"]
+    },
+    "reflect_prompt_json": {
+        "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using `{{\"type\": \"finish\", \"content\": answer}}` or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput: {input}{scratchpad}\n\nReflection:",
         "input_variables": ["examples", "input", "scratchpad"]
     },
     "hint": {

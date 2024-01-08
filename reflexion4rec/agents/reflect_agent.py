@@ -1,5 +1,4 @@
 from loguru import logger
-from typing import List
 from langchain.prompts import PromptTemplate
 from .strategy import ReflexionStrategy
 from .base_agent import BaseAgent
@@ -8,19 +7,29 @@ from ..utils import format_last_attempt, format_reflections, format_step
 
 class ReflectAgent(BaseAgent):
     def __init__(
-        self, task_type: str, agent_prompt: PromptTemplate, reflect_prompt: PromptTemplate,
-        reflect_examples: str,
-        actor_llm: BaseLLM, reflect_llm: BaseLLM,
+        self, reflect_llm: BaseLLM,
         keep_reflections: bool = False,
         *args, **kwargs
     ) -> None:
-        super().__init__(task_type=task_type, agent_prompt=agent_prompt, actor_llm=actor_llm, *args, **kwargs)
-        self.reflect_prompt = reflect_prompt
-        self.reflect_examples = reflect_examples
+        super().__init__(*args, **kwargs)
         self.reflect_llm = reflect_llm
         self.keep_reflections = keep_reflections
-        self.reflections: List[str] = []
+        self.reflections: list[str] = []
         self.reflections_str: str = ''
+    
+    @property
+    def reflect_prompt(self) -> PromptTemplate:
+        if self.json_mode:
+            return self.prompts['reflect_prompt_json']
+        else:
+            return self.prompts['reflect_prompt']
+        
+    @property
+    def reflect_examples(self) -> str:
+        if 'reflect_examples' in self.prompts:
+            return self.prompts['reflect_examples']
+        else:
+            return ''
         
     def _build_reflection_prompt(self) -> str:
         raise NotImplementedError("ReflexionAgent._build_reflection_prompt() not implemented")

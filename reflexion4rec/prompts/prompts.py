@@ -1,11 +1,10 @@
 import json
-from typing import List, Dict, Union
 from langchain.prompts import PromptTemplate
 
-def get_template(template: str, input_variables: List[str]) -> PromptTemplate:
+def get_template(template: str, input_variables: list[str]) -> PromptTemplate:
     return PromptTemplate(input_variables=input_variables, template=template)
 
-def read_template(config_file: str) -> Dict[str, Union[PromptTemplate, str]]:
+def read_template(config_file: str) -> dict[str, PromptTemplate | str]:
     with open(config_file, 'r') as f:
         config = json.load(f)
     ret = {}

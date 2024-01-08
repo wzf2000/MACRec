@@ -1,14 +1,13 @@
 import os
 import joblib
-from typing import List, Tuple
 from . import BaseAgent, ReactAgent
 
-def summarize_trial(agents: List[BaseAgent]) -> Tuple[List[BaseAgent], List[BaseAgent]]:
+def summarize_trial(agents: list[BaseAgent]) -> tuple[list[BaseAgent], list[BaseAgent]]:
     correct = [a for a in agents if a.is_correct()]
     incorrect = [a for a in agents if a.is_finished() and not a.is_correct()]
     return correct, incorrect
 
-def summarize_react_trial(agents: List[ReactAgent]) -> Tuple[List[ReactAgent], List[ReactAgent], List[ReactAgent]]:
+def summarize_react_trial(agents: list[ReactAgent]) -> tuple[list[ReactAgent], list[ReactAgent], list[ReactAgent]]:
     correct = [a for a in agents if a.is_correct()]
     halted = [a for a in agents if a.is_halted()]
     incorrect = [a for a in agents if a.is_finished() and not a.is_correct()]

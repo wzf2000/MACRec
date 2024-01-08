@@ -1,7 +1,5 @@
-import re
 import gym
 from loguru import logger
-from typing import Tuple
 from langchain import Wikipedia
 from langchain.agents.react.base import DocstoreExplorer
 
@@ -28,7 +26,7 @@ class QAEnv(gym.Env):
         self.terminated = False
         self.answer = ''
 
-    def step(self, action: str) -> Tuple[str, bool, bool, bool, bool]:
+    def step(self, action: str) -> tuple[str, bool, bool, bool, bool]:
         action_type, argument = parse_action(action)
 
         if action_type == 'Finish':

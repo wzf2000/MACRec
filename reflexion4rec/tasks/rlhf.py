@@ -1,6 +1,5 @@
 import json
 from argparse import ArgumentParser
-from typing import List
 
 import torch
 from torch import nn
@@ -59,7 +58,7 @@ class RLHFTrainingTask(Task):
                 "Extract value associated with a positive sentiment from pipeline's output"
                 return dict(map(lambda x: tuple(x.values()), scores))["POSITIVE"]
 
-            def reward_fn(samples: List[str], **kwargs) -> List[float]:
+            def reward_fn(samples: list[str], **kwargs) -> list[float]:
                 sentiments = list(map(get_positive_score, sentiment_fn(samples)))
                 return sentiments
         elif reward_type == 'data':

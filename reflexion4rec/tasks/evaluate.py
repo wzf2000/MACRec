@@ -1,16 +1,14 @@
 import json
 import openai
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from loguru import logger
-from typing import Any, List, Tuple, Union
 from argparse import ArgumentParser
 from .base import Task
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..prompts import read_template
-from ..utils import str2list, parse_answer
+from ..utils import str2list
 from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy
 
 class EvaluateTask(Task):
@@ -25,10 +23,11 @@ class EvaluateTask(Task):
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
         parser.add_argument('--k', type=str2list, default=[1, 3, 5], help='K for ranking task')
+        parser.add_argument('--json_mode', action='store_true', help='Use json mode')
         return parser
     
-    def update_evaluation(self, answer: str, gt_answer: Union[float, int]) -> str:
-        valid, answer = parse_answer(type=self.task, string=self.model.answer, gt_answer=gt_answer, n_candidate=self.n_candidate)
+    def update_evaluation(self, answer: float | int | str, gt_answer: float | int | str) -> str:
+        valid = self.model.finished
         logger.debug(f'Answer: {answer}, Ground Truth: {gt_answer}')
         if valid:
             return self.metrics.update(output={
@@ -45,10 +44,10 @@ class EvaluateTask(Task):
                 'label': gt_answer,
             }, prefix='true')
         
-    def evaluate(self, test_datas: List[Tuple[str, Union[int, float]]], steps: int = 2):
+    def evaluate(self, test_datas: list[tuple[str, int | float | str]], steps: int = 2):
         with tqdm(total=len(test_datas)) as pbar:
             for test_data, gt_answer in test_datas:
-                self.model.set_data(input=test_data, context="", gt_answer=str(gt_answer))
+                self.model.set_data(input=test_data, context="", gt_answer=gt_answer)
                 self.model.reset(remove_reflections=True)
                 for i in range(steps):
                     logger.debug(f'===================================Running step {i}...===================================')
@@ -79,7 +78,7 @@ class EvaluateTask(Task):
             openai_api_key=self.api_config['api_key'],
         )
         
-    def get_data(self, test_data: str, max_his: int) -> List[Tuple[str, Union[int, float]]]:
+    def get_data(self, test_data: str, max_his: int) -> list[tuple[str, int | float | str]]:
         df = pd.read_csv(test_data)
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
@@ -97,6 +96,7 @@ class EvaluateTask(Task):
         elif self.task == 'sr':
             candidate_example: str = df['candidate_item_attributes'][0]
             self.n_candidate = len(candidate_example.split('\n'))
+            self.model_kwargs['n_candidate'] = self.n_candidate
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
                 user_profile=df['user_profile'][i],
@@ -107,41 +107,22 @@ class EvaluateTask(Task):
             raise NotImplementedError
         
     def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: int):
-        if self.task == 'rp':
-            task_type = 'rating prediction'
-        elif self.task == 'sr':
-            task_type = 'ranking'
-        else:
-            raise NotImplementedError
-
         prompts = read_template(f"config/prompts/{agent}_prompt.json")
         self.prompts.update(prompts)
         if agent == 'react':
-            agent_prompt = prompts[f'test_{agent}_prompt']
-            # TODO: Add examples
             self.model = ReactAgent(
-                task_type=task_type,
-                agent_prompt=agent_prompt,
-                react_examples="",
                 actor_llm=react_llm,
                 prompts=self.prompts,
-                leak=False,
+                **self.model_kwargs,
             )
         elif agent == 'react_reflect':
-            agent_prompt = prompts[f'test_{agent}_prompt']
-            reflect_prompt = prompts[f'test_reflect_prompt']
             reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
             self.model = ReactReflectAgent(
-                task_type=task_type,
-                agent_prompt=agent_prompt,
-                reflect_prompt=reflect_prompt,
-                react_examples="",
-                reflect_examples="",
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
                 prompts=self.prompts,
                 keep_reflections=True,
-                leak=False
+                **self.model_kwargs,
             )
         else:
             # TODO: Add other agents
@@ -167,10 +148,16 @@ class EvaluateTask(Task):
         else:
             raise NotImplementedError
     
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int, k: List[int]):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int, k: list[int], json_mode: bool):
         self.Ks = k
+        self.json_mode = json_mode
         self.prompts = dict()
         self.task = task
+        self.model_kwargs = {
+            'task': self.task,
+            'json_mode': self.json_mode,
+            'leak': False,
+        }
         test_datas = self.get_data(test_data, max_his)
         self.get_metrics()
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nGround Truth: {test_datas[0][1]}")

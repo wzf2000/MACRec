@@ -2,12 +2,11 @@ import os
 import pandas as pd
 import numpy as np
 from loguru import logger
-from typing import Tuple, List, Dict, Union
 from langchain.prompts import PromptTemplate
 from .utils import append_his_info
 import random
 
-def read_data(dir: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def read_data(dir: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(os.path.join(dir, 'u.data'), 'r') as f:
         data_df = pd.read_csv(f, sep='\t', header=None)
     with open(os.path.join(dir, 'u.item'), 'r', encoding='ISO-8859-1') as f:
@@ -50,7 +49,7 @@ def process_item_data(item_df: pd.DataFrame) -> pd.DataFrame:
     # set release_date to unknown if it is null
     item_df['release_date'] = item_df['release_date'].fillna('unknown')
     # set a genre column to be a list of genres
-    def get_genre(x: pd.Series) -> List[str]:
+    def get_genre(x: pd.Series) -> list[str]:
         return '|'.join([genre for genre, value in x.items() if value == 1])
     item_df['genre'] = item_df[genres].apply(lambda x: get_genre(x), axis=1)
     # set a item_attributes column to be a string contain all the item information with a template
@@ -73,7 +72,7 @@ def filter_data(data_df: pd.DataFrame) -> pd.DataFrame:
         data_df = data_df.groupby('item_id').filter(lambda x: len(x) >= 5)
     return data_df
 
-def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     data_df.columns = ['user_id', 'item_id', 'rating', 'timestamp']
     # sort data_df by timestamp
     data_df = data_df.sort_values(by=['timestamp'])
@@ -94,7 +93,7 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> Tup
         df['neg_item_id'] = neg_items.tolist()
         return df
         
-    def generate_dev_test(data_df: pd.DataFrame) -> Tuple[List[pd.DataFrame], pd.DataFrame]:
+    def generate_dev_test(data_df: pd.DataFrame) -> tuple[list[pd.DataFrame], pd.DataFrame]:
         result_dfs = []
         for idx in range(2):
             result_df = data_df.groupby('user_id').tail(1).copy()

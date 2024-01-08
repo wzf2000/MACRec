@@ -1,7 +1,6 @@
 import pandas as pd
-from typing import List
 
-def append_his_info(dfs: List[pd.DataFrame], summary: bool = False, neg: bool = False):
+def append_his_info(dfs: list[pd.DataFrame], summary: bool = False, neg: bool = False):
     all_df = pd.concat(dfs)
     sort_df = all_df.sort_values(by=['timestamp', 'user_id'], kind='mergesort')
     position = []

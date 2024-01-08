@@ -1,9 +1,8 @@
 import torch
 import torchmetrics
-from typing import List, Union
 
 class RankMetric(torchmetrics.Metric):
-    def __init__(self, topks: Union[List[int], int], *args, **kwargs):
+    def __init__(self, topks: list[int] | int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if isinstance(topks, int):
             topks = [topks]
@@ -30,11 +29,11 @@ class RankMetric(torchmetrics.Metric):
                 result[topk] = 0
         return result
     
-    def metric_at_k(self, answer: List[int], label: int) -> dict:
+    def metric_at_k(self, answer: list[int], label: int) -> dict:
         raise NotImplementedError
     
 class HitRatioAt(RankMetric):
-    def metric_at_k(self, answer: List[int], label: int) -> dict:
+    def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:
             if label in answer[:topk]:
@@ -48,7 +47,7 @@ class HitRatioAt(RankMetric):
         return {f'HR@{topk}': result[topk] for topk in self.topks}
     
 class NDCGAt(RankMetric):
-    def metric_at_k(self, answer: List[int], label: int) -> dict:
+    def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:
             try:
@@ -66,7 +65,7 @@ class NDCGAt(RankMetric):
         return {f'NDCG@{topk}': result[topk] for topk in self.topks}
     
 class MRRAt(RankMetric):
-    def metric_at_k(self, answer: List[int], label: int) -> dict:
+    def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:
             label_pos = answer.index(label) + 1

@@ -6,7 +6,7 @@ from reflexion4rec.tasks import *
 
 def main():
     init_parser = ArgumentParser()
-    init_parser.add_argument('-m', '--mode', type=str, required=True, help='The main function to run')
+    init_parser.add_argument('-m', '--main', type=str, required=True, help='The main function to run')
     init_parser.add_argument('--verbose', type=str, default='INFO', choices=['TRACE', 'DEBUG', 'INFO', 'SUCCESS', 'WARNING', 'ERROR', 'CRITICAL'], help='The log level')
     init_args, init_extras = init_parser.parse_known_args()
 
@@ -17,7 +17,7 @@ def main():
     logger.add('logs/{time:YYYY-MM-DD:HH:mm:ss}.log', level='DEBUG')
 
     try:
-        task = eval(init_args.mode + 'Task')()
+        task = eval(init_args.main + 'Task')()
     except NameError:
         logger.error('No such task!')
         return
