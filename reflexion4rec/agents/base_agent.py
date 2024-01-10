@@ -112,7 +112,7 @@ class BaseAgent:
         else:
             valid, answer = False, None
         if not valid:
-            self.scratchpad += f'Invalid Action. Valid Actions are {self.valid_action_example()}.'
+            self.scratchpad += f'Invalid Action. Valid Actions are {self.valid_action_example}.'
         elif action_type.lower() == 'finish':
             self.finish(answer)
             logger.debug(f'Answer: {self.answer}')
@@ -121,6 +121,7 @@ class BaseAgent:
         
         logger.debug(self.scratchpad.split('\n')[-1])
         
+    @property
     def valid_action_example(self) -> str:
         if self.json_mode:
             return self.prompts['valid_action_example_json']

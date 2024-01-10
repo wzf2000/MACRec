@@ -26,8 +26,9 @@ class ReflectAgent(BaseAgent):
         
     @property
     def reflect_examples(self) -> str:
-        if 'reflect_examples' in self.prompts:
-            return self.prompts['reflect_examples']
+        prompt_name = 'reflect_examples_json' if self.json_mode else 'reflect_examples'
+        if prompt_name in self.prompts:
+            return self.prompts[prompt_name]
         else:
             return ''
         
@@ -36,11 +37,12 @@ class ReflectAgent(BaseAgent):
         
     def prompt_reflection(self) -> str:
         reflection_prompt = self._build_reflection_prompt()
-        reflection_response = self.reflect_llm(reflection_prompt)
+        reflection_response = self.reflect_llm(reflection_prompt, json_mode=self.json_mode)
         if self.keep_reflections:
             self.reflection_input = reflection_prompt
             self.reflection_output = reflection_response
             logger.debug(f'Reflection input length: {len(self.enc.encode(self.reflection_input))}')
+            logger.debug(f"Reflection input: {self.reflection_input}")
             logger.debug(f'Reflection output length: {len(self.enc.encode(self.reflection_output))}')
             logger.debug(f"Reflection output: {self.reflection_output}")
         return format_step(reflection_response)

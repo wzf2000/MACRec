@@ -12,8 +12,11 @@
         "input_variables": ["examples", "input", "scratchpad"]
     },
     "reflect_prompt_json": {
-        "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using `{{\"type\": \"finish\", \"content\": answer}}` or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput: {input}{scratchpad}\n\nReflection:",
+        "template": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using `{{\"type\": \"finish\", \"content\": answer}}` or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences in reasoning. Reflections should be described in JSON format.\nPrevious trial:\nInput: {input}{scratchpad}\n\nValid reflection example:\n{examples}\n\nReflection:",
         "input_variables": ["examples", "input", "scratchpad"]
+    },
+    "reflect_examples_json": {
+        "template": "`{\"correctness\": false, \"reason\": \"The potential problem ...\"}`\n`{\"correctness\": true, \"reason\": \"There is no problem with the agent's plan ...\"}`"
     },
     "hint": {
         "template": "Use `Finish[answer]` to return the answer and finish the task. Please do not reply with anything other than `Finish[answer]` in the Action phase."

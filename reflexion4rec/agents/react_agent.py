@@ -13,6 +13,13 @@ class ReactAgent(BaseAgent):
         else:
             return ''
         
+    @property
+    def hint(self) -> str:
+        if 'hint' in self.prompts:
+            return self.prompts['hint']
+        else:
+            return ''
+        
     def reset(self, *args, **kwargs) -> None:
         super().reset(*args, **kwargs)
         self.step_n: int = 1
@@ -36,15 +43,17 @@ class ReactAgent(BaseAgent):
         logger.debug(self.scratchpad.split('\n')[-1])
 
         # Act
-        self.scratchpad += f'\nHint: {self.prompts["hint"]}'
-        self.scratchpad += f'\nValid action example: {self.valid_action_example()}:'
+        if not self.json_mode:
+            # TODO: may by removed after adding more actions
+            self.scratchpad += f'\nHint: {self.hint}'
+        self.scratchpad += f'\nValid action example: {self.valid_action_example}:'
         self.scratchpad += f'\nAction {self.step_n}:'
         action = self.prompt_agent(json_mode=self.json_mode)
         self.action_process(action)
 
         self.step_n += 1
         
-    def run(self, reset=True) -> str:
+    def run(self, reset: bool = True) -> str:
         if reset:
             self.reset()
         while not self.is_finished() and not self.is_halted():
