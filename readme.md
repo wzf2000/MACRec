@@ -1,4 +1,4 @@
-## Reflexion4Rec
+## Reflexion4Rec: Multi LLM-based Agents for Recommender System
 
 ### File structure
 
