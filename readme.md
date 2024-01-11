@@ -20,13 +20,13 @@
 
 ### Requirements
 
-1. Run following commands to install dependencies:
-    ```shell
-    pip install -r requirements.txt
-    ```
-2. Run following commands to install PyTorch (Note: change the url setting if using another version of CUDA):
+1. Run following commands to install PyTorch (Note: change the url setting if using another version of CUDA):
     ```shell
     pip install torch --extra-index-url https://download.pytorch.org/whl/cu118
+    ```
+2. Run following commands to install dependencies:
+    ```shell
+    pip install -r requirements.txt
     ```
 3. (Optional) Run following commands to install `trlx` (Run it where you want to place it):
     ```shell
