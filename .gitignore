@@ -23,6 +23,7 @@ __pycache__/
 # Others
 data/
 logs/
+run/
 config/api-config.json
 test*
 !reflexion4rec/*/test*
