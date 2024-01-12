@@ -16,3 +16,5 @@ trl
 peft
 jsonlines
 torchmetrics
+sentencepiece
+protobuf

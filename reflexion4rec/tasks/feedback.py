@@ -20,7 +20,7 @@ class FeedbackTask(Task):
         parser.add_argument('--agent', type=str, default='react_reflect', choices=['react_reflect'], help='Agent name')
         # parser.add_argument('--reflection_model', type=str, default='meta-llama/Llama-2-7b-hf', help='Reflection method')
         parser.add_argument('--reflection_model', type=str, default='openai', help='Reflection model name, set openai to use OpenAI API')
-        parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device')
+        parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device type, set auto to use device_map = auto')
         parser.add_argument('--task', type=str, default='rp', choices=['rp'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--feedback_file', type=str, default='data/ml-100k/data_exp.jsonl', help='Output Feedback File')

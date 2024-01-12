@@ -1,4 +1,5 @@
 import json
+import torch
 import openai
 import pandas as pd
 from tqdm import tqdm
@@ -18,7 +19,7 @@ class EvaluateTask(Task):
         parser.add_argument('--test_data', type=str, required=True, help='Test data file')
         parser.add_argument('--agent', type=str, default='react', choices=['react', 'react_reflect'], help='Agent name')
         parser.add_argument('--model', type=str, default='openai', help='Reflection model name, set openai to use OpenAI API')
-        parser.add_argument('--device', type=int, default=0, help='Device number')
+        parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device type, set auto to use device_map = auto')
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
@@ -62,7 +63,7 @@ class EvaluateTask(Task):
         logger.success("===================================Evaluation Report===================================")
         self.metrics.report()
         
-    def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: int = 0):
+    def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: str = 'cpu'):
         if model_path != 'openai':
             return OpenSourceLLM(model_path=model_path, device=device)
         if api_config is not None and self.api_config is None:
@@ -106,7 +107,7 @@ class EvaluateTask(Task):
         else:
             raise NotImplementedError
         
-    def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: int):
+    def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: str):
         prompts = read_template(f"config/prompts/{agent}_prompt.json")
         self.prompts.update(prompts)
         if agent == 'react':
@@ -148,7 +149,7 @@ class EvaluateTask(Task):
         else:
             raise NotImplementedError
     
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: int, k: list[int], json_mode: bool):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: str, k: list[int], json_mode: bool):
         self.Ks = k
         self.json_mode = json_mode
         self.prompts = dict()
