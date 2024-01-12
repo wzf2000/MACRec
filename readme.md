@@ -4,11 +4,11 @@
 
 - `reflexion4rec/`: The source foleder.
     - `agents/`: All agent classes defined here.
-    - `environments/`: Environment for each task defined here.
-    - `evaluation/`: The pipeline and basic function for evaluation the model.
+    - `dataset/`: All dataset preprocessing method.
+    - `evaluation/`: The pipeline and basic class for evaluation the model.
     - `llms/`: The wrapper for LLMs (both API and open source LLMs).
     - `prompts/`: Some functions for getting the prompts.
-    - `rl/`: The datasets for the RLHF are defined here.
+    - `rl/`: The datasets and reward function for the RLHF are defined here.
     - `tasks/`: For external function call (e.g. main.py).
     - `utils/`: Some useful functions are defined here.
 - `config/`: The config folder.
@@ -28,23 +28,6 @@
     ```shell
     pip install -r requirements.txt
     ```
-3. (Optional) Run following commands to install `trlx` (Run it where you want to place it):
-    ```shell
-    git clone https://github.com/CarperAI/trlx.git
-    cd trlx
-    pip install -e .
-    ```
-
-#### VSCode configuration for `trlx` (Optional)
-
-For VSCode programmer, add the following settings to `.vscode/settings.json` in this repositoriy's folder:
-```json
-{
-    "python.analysis.extraPaths": [
-        "/path/to/trlx/repo/directory"
-    ]
-}
-```
 
 ### Run
 
