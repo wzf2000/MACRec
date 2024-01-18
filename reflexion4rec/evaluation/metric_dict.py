@@ -46,6 +46,6 @@ class MetricDict:
                 logger.success(f'{metric_name}: {metric:.4f}')
             else:
                 # output every metric with at most 4 decimal places
-                logger.debug(f'{metric_name}:')
+                logger.success(f'{metric_name}:')
                 for key, value in metric.items():
-                    logger.debug(f'{key}: {value:.4f}')
+                    logger.success(f'{key}: {value:.4f}')
