@@ -1,10 +1,29 @@
 import os
+import random
+import subprocess
 import pandas as pd
 import numpy as np
 from loguru import logger
 from langchain.prompts import PromptTemplate
 from .utils import append_his_info
-import random
+
+def download_data(dir: str):
+    raw_path = os.path.join(dir, 'raw_data')
+    os.makedirs(raw_path, exist_ok=True)
+    if not os.path.exists(os.path.join(raw_path, 'ml-100k.zip')):
+        logger.info('Downloading ml-100k dataset into ' + raw_path)
+        subprocess.call(
+            f'cd {raw_path} && curl -O http://files.grouplens.org/datasets/movielens/ml-100k.zip', shell=True
+        )
+    if not os.path.exists(os.path.join(raw_path, 'u.data')):
+        logger.info('Unzipping ml-100k dataset into ' + raw_path)
+        subprocess.call(
+            f'cd {raw_path} && unzip ml-100k.zip', shell=True
+        )
+        # move the files to raw_data
+        subprocess.call(
+            f'cd {raw_path} && mv ml-100k/* . && rm -r ml-100k', shell=True
+        )
 
 def read_data(dir: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     with open(os.path.join(dir, 'u.data'), 'r') as f:
@@ -116,6 +135,7 @@ def process_data(dir: str, n_neg_items: int = 9):
     Args:
         `dir (str)`: the directory of the dataset. We suppose the raw data is in `dir/raw_data` and the processed data will be output to `dir`.
     """
+    download_data(dir)
     data_df, item_df, user_df, genre_df = read_data(os.path.join(dir, "raw_data"))
     user_df = process_user_data(user_df)
     logger.info(f'Number of users: {user_df.shape[0]}')
