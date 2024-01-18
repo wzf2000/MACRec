@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from .base import Task
 from ..dataset import ml100k_process_data, amazon_process_data
+from ..utils import init_all_seeds
 
 class PreprocessTask(Task):
     @staticmethod
@@ -11,6 +12,7 @@ class PreprocessTask(Task):
         return parser
     
     def run(self, data_dir: str, dataset: dir, n_neg_items: int):
+        init_all_seeds(2024)
         if dataset == 'ml-100k':
             ml100k_process_data(data_dir, n_neg_items)
         elif dataset == 'amazon':

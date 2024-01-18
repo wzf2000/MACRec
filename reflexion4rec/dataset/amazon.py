@@ -124,8 +124,9 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> tuple[p
         for i, uid in enumerate(df['user_id'].values):
             user_clicked = clicked_item_set[uid]
             for j in range(len(neg_items[i])):
-                while neg_items[i][j] in user_clicked:
+                while neg_items[i][j] in user_clicked or neg_items[i][j] in neg_items[i][:j]:
                     neg_items[i][j] = np.random.randint(1, n_items + 1)
+            assert len(set(neg_items[i])) == len(neg_items[i]) # check if there is duplicate item id
         df['neg_item_id'] = neg_items.tolist()
         return df
 
