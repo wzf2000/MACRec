@@ -94,12 +94,12 @@ class FeedbackTask(Task):
             'json_mode': self.json_mode,
             'leak': False,
         }
-        if self.model != 'openai':
+        if reflection_model != 'openai':
             with open(generation_config, 'r') as f:
                 self.generation_config = json.load(f)
         test_datas = self.get_data(test_data, max_his)
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nRating: {test_datas[0][1]}")
-        react_llm = self.get_LLM(api_config=api_config)
+        react_llm = self.get_LLM(config=api_config)
         # collect feedback dataset
         self.get_model(agent, react_llm, reflection_model, device)
         
