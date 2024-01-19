@@ -1,0 +1,5 @@
+{
+    "do_sample": true,
+    "temperature": 0.9,
+    "top_p": 1.0
+}

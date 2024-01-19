@@ -19,6 +19,7 @@ class EvaluateTask(Task):
         parser.add_argument('--test_data', type=str, required=True, help='Test data file')
         parser.add_argument('--agent', type=str, default='react', choices=['react', 'react_reflect'], help='Agent name')
         parser.add_argument('--model', type=str, default='openai', help='Reflection model name, set openai to use OpenAI API')
+        parser.add_argument('--generation_config', type=str, default='config/generation-config.json', help='Generation configuration file for open-source LLMs')
         parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device type, set auto to use device_map = auto')
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
         parser.add_argument('--max_his', type=int, default=20, help='Max history length')
@@ -63,11 +64,11 @@ class EvaluateTask(Task):
         logger.success("===================================Evaluation Report===================================")
         self.metrics.report()
         
-    def get_LLM(self, api_config: str = None, model_path: str = 'openai', device: str = 'cpu'):
+    def get_LLM(self, config: str = None, model_path: str = 'openai', device: str = 'cpu'):
         if model_path != 'openai':
-            return OpenSourceLLM(model_path=model_path, device=device)
-        if api_config is not None and self.api_config is None:
-            with open(api_config, 'r') as f:
+            return OpenSourceLLM(model_path=model_path, device=device, **self.generation_config)
+        if config is not None and self.api_config is None:
+            with open(config, 'r') as f:
                 self.api_config = json.load(f)
             openai.api_base = self.api_config['api_base']
         
@@ -149,7 +150,7 @@ class EvaluateTask(Task):
         else:
             raise NotImplementedError
     
-    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: str, k: list[int], json_mode: bool):
+    def run(self, api_config: str, test_data: str, agent: str, task: str, max_his: int, steps: int, model: str, device: str, k: list[int], json_mode: bool, generation_config: str):
         self.Ks = k
         self.json_mode = json_mode
         self.prompts = dict()
@@ -159,6 +160,9 @@ class EvaluateTask(Task):
             'json_mode': self.json_mode,
             'leak': False,
         }
+        if self.model != 'openai':
+            with open(generation_config, 'r') as f:
+                self.generation_config = json.load(f)
         test_datas = self.get_data(test_data, max_his)
         self.get_metrics()
         logger.info(f"Test data sample: {test_datas[0][0][:100]}\nGround Truth: {test_datas[0][1]}")
