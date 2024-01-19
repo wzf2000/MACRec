@@ -1,3 +1,4 @@
+python>=3.10.13
 gym==0.26.2
 joblib==1.2.0
 langchain==0.0.162
@@ -10,11 +11,11 @@ transformers==4.28.1
 pandas==1.5.3
 scikit-learn
 wikipedia
-loguru
-datasets
-trl
-peft
+loguru>=0.7.2
+datasets>=2.15.0
+trl>=0.7.6
+peft>=0.7.1
 jsonlines
-torchmetrics
+torchmetrics>=1.2.1
 sentencepiece
 protobuf
