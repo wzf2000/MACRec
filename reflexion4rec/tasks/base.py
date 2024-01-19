@@ -28,6 +28,7 @@ class Task:
         parser = ArgumentParser()
         parser = self.parse_task_args(parser)
         args, extras = parser.parse_known_args()
+        self.args = args
         # log the arguments
         logger.success(args)
         return self.run(**vars(args))

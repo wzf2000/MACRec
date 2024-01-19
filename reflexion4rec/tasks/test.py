@@ -15,12 +15,14 @@ class TestTask(EvaluateTask):
     def get_data(self, *args, **kwargs) -> list[tuple[str, int | float | str]]:
         data = super().get_data(*args, **kwargs)
         if self.random:
-            data = np.random.choice(data, self.samples, replace=False)
+            sample_idx = np.random.choice(len(data), self.samples, replace=False)
+            data = [data[i] for i in sample_idx]
         else:
             data = data[self.offset : self.offset + self.samples]
         return data
     
     def run(self, random: bool, samples: int, offset: int, *args, **kwargs):
+        self.sampled = True
         self.random = random
         if self.random:
             init_all_seeds(2024)

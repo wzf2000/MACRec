@@ -1,8 +1,10 @@
+import os
+import jsonlines
 from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
 from .base import GenerationTask
-from ..utils import str2list
+from ..utils import str2list, NumpyEncoder
 from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy
 
 class EvaluateTask(GenerationTask):
@@ -32,18 +34,39 @@ class EvaluateTask(GenerationTask):
             }, prefix='true')
         
     def evaluate(self, test_datas: list[tuple[str, int | float | str]], steps: int = 2):
-        with tqdm(total=len(test_datas)) as pbar:
-            for test_data, gt_answer in test_datas:
-                self.model.set_data(input=test_data, context="", gt_answer=gt_answer)
-                self.model.reset(remove_reflections=True)
-                for i in range(steps):
-                    logger.debug(f'===================================Running step {i}...===================================')
-                    self.model.run()
-                    if hasattr(self.model, 'reflected') and self.model.reflected:
-                        logger.trace(f"Reflection input: {self.model.reflection_input}")
-                        logger.trace(f"Reflection output: {self.model.reflection_output}")
-                pbar.set_description(self.update_evaluation(self.model.answer, gt_answer))
-                pbar.update(1)
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        dataset = os.path.basename(os.path.dirname(self.args.data_file))
+        data_file = os.path.basename(self.args.data_file)
+        run_dir = os.path.join(root_dir, 'run', dataset, self.task, self.args.agent)
+        os.makedirs(run_dir, exist_ok=True)
+        output_args = {
+            'data_file': data_file,
+            'sampled': self.sampled if hasattr(self, 'sampled') else False,
+            'reflection': self.args.reflection_model.replace('/', '-'),
+            'max_his': self.args.max_his,
+            'json_mode': self.json_mode,
+            'steps': steps,
+            'topk': self.args.k,
+        }
+        output_file_name = '_'.join([f'{k}={v}' for k, v in output_args.items()]) + '.jsonl'
+        with jsonlines.open(os.path.join(run_dir, output_file_name), mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode) as output_file:
+            with tqdm(total=len(test_datas)) as pbar:
+                for test_data, gt_answer in test_datas:
+                    ret = {}
+                    self.model.set_data(input=test_data, context="", gt_answer=gt_answer)
+                    self.model.reset(remove_reflections=True)
+                    for i in range(steps):
+                        logger.debug(f'===================================Running step {i}...===================================')
+                        self.model.run()
+                        if hasattr(self.model, 'reflected') and self.model.reflected:
+                            logger.trace(f"Reflection input: {self.model.reflection_input}")
+                            logger.trace(f"Reflection output: {self.model.reflection_output}")
+                    
+                        ret[f'Answer_{i}'] = self.model.answer
+                    ret['Answer_GT'] = gt_answer
+                    output_file.write(ret)
+                    pbar.set_description(self.update_evaluation(self.model.answer, gt_answer))
+                    pbar.update(1)
         
     def report(self):
         logger.success("===================================Evaluation Report===================================")

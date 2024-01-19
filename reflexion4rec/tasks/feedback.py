@@ -3,6 +3,7 @@ from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
 from .base import GenerationTask
+from ..utils import NumpyEncoder
 from ..agents import ReflectAgent
 from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, SequentialRecommendationRewardV1
 
@@ -29,7 +30,7 @@ class FeedbackTask(GenerationTask):
                 raise NotImplementedError
     
     def feedback(self, datas: list[tuple[str, int | float | str]], feedback_file: str):
-        with jsonlines.open(feedback_file, mode="w") as feedback_file:
+        with jsonlines.open(feedback_file, mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode) as feedback_file:
             with tqdm(total=len(datas)) as pbar:
                 for test_data, gt_answer in datas:
                     ret = {}
