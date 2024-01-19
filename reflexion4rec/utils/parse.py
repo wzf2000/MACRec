@@ -21,7 +21,7 @@ def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *arg
         answer = float(answer)
         if answer < 1 or answer > 5:
             return False, 0
-    except ValueError:
+    except ValueError or TypeError:
         return False, 0
     return True, answer
     
