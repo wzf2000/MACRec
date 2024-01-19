@@ -27,5 +27,5 @@ class RewardUpdateTask(Task):
             output_file = data_file.replace('.jsonl', f'_{reward_version}.jsonl')
             with jsonlines.open(output_file, 'w') as writer:
                 for obj in reader:
-                    obj['reward'] = reward.reward(obj['Answer_1'], obj['Answer_2'], obj['Answer_GT'])
+                    obj['reward'] = reward(obj['Answer_1'], obj['Answer_2'], obj['Answer_GT'])
                     writer.write(obj)
