@@ -103,7 +103,7 @@ class EvaluateTask(Task):
                 user_profile=df['user_profile'][i],
                 history=df['history'][i],
                 candidate_item_attributes=df['candidate_item_attributes'][i]
-            ), df['item_id'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+            ), df['item_id'][i]) for i in tqdm(range(len(df)), desc="Loading data") if df['rating'][i] >= 4]
         else:
             raise NotImplementedError
         
