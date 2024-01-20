@@ -35,4 +35,4 @@ Use following to run specific task:
 python main.py -m $task_name --verbose $verbose $extra_args
 ```
 
-Then `main.py` will run the `${task_name}Task` defined in `reflexion4rec/tasks/*.py`.
+Then `main.py` will run the `${task_name}Task` defined in `macrec/tasks/*.py`.
