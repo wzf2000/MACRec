@@ -2,7 +2,7 @@ import os
 import sys
 from loguru import logger
 from argparse import ArgumentParser
-from reflexion4rec.tasks import *
+from macrec.tasks import *
 
 def main():
     init_parser = ArgumentParser()

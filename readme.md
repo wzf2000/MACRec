@@ -1,8 +1,8 @@
-## Reflexion4Rec: Multi LLM-based Agents for Recommender System
+## MACRec: Multi Agents Collaboration for Recommender System
 
 ### File structure
 
-- `reflexion4rec/`: The source foleder.
+- `macrec/`: The source foleder.
     - `agents/`: All agent classes defined here.
     - `dataset/`: All dataset preprocessing method.
     - `evaluation/`: The pipeline and basic class for evaluation the model.
