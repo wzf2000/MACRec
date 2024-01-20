@@ -1,3 +1,4 @@
+import os
 import jsonlines
 from tqdm import tqdm
 from loguru import logger
@@ -30,6 +31,7 @@ class FeedbackTask(GenerationTask):
                 raise NotImplementedError
     
     def feedback(self, datas: list[tuple[str, int | float | str]], feedback_file: str):
+        os.makedirs(os.path.dirname(feedback_file), exist_ok=True)
         with jsonlines.open(feedback_file, mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode) as feedback_file:
             with tqdm(total=len(datas)) as pbar:
                 for test_data, gt_answer in datas:
