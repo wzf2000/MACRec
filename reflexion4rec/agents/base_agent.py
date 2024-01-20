@@ -14,7 +14,7 @@ class BaseAgent:
         self.leak = leak
         self.json_mode = json_mode
         self.task = task
-        self.answer = parse_answer(type=self.task, answer='', gt_answer='', n_candidate=10)[1]
+        self.answer = parse_answer(type=self.task, answer='', gt_answer='', n_candidate=10)['answer']
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.scratchpad: str = ''
@@ -53,7 +53,7 @@ class BaseAgent:
         self.context: str = context
         self.gt_answer = gt_answer
         
-    def parse_answer(self, answer: Any = None) -> tuple[bool, Any]:
+    def parse_answer(self, answer: Any = None) -> dict[str, Any]:
         if answer is None:
             answer = self.answer
         return parse_answer(type=self.task, answer=answer, gt_answer=self.gt_answer, n_candidate=self.n_candidate, json_mode=self.json_mode)
@@ -68,13 +68,12 @@ class BaseAgent:
             else:
                 return EM(str(self.answer), self.gt_answer)
         elif self.task in ['rp', 'sr']:
-            valid, answer = self.parse_answer()
-            if not valid:
-                return False
             if self.task == 'rp':
-                return answer == self.gt_answer
+                return self.answer == self.gt_answer
             elif self.task == 'sr':
-                return answer[0] == self.gt_answer
+                if len(self.answer) == 0:
+                    return False
+                return self.answer[0] == self.gt_answer
             else:
                 raise ValueError(f'Invalid recomendation task type: {self.task}')
         else:
@@ -108,13 +107,18 @@ class BaseAgent:
 
         self.scratchpad += f'\nObservation: '
         if action_type.lower() == 'finish':
-            valid, answer = self.parse_answer(argument)
+            parse_result = self.parse_answer(argument)
         else:
-            valid, answer = False, None
-        if not valid:
-            self.scratchpad += f'Invalid Action. Valid Actions are {self.valid_action_example}.'
+            parse_result = {
+                'valid': False,
+                'answer': self.answer,
+                'message': 'Invalid Action type or format.'
+            }
+        if not parse_result['valid']:
+            assert "message" in parse_result, "Invalid parse result."
+            self.scratchpad += f'{parse_result["message"]} Valid Action examples are {self.valid_action_example}.'
         elif action_type.lower() == 'finish':
-            self.finish(answer)
+            self.finish(parse_result['answer'])
             logger.debug(f'Answer: {self.answer}')
         else:
             raise ValueError(f'Invalid action type: {action_type}')
@@ -139,6 +143,6 @@ class BaseAgent:
         return format_step(agent_response)
     
     def reset(self, *args, **kwargs) -> None:
-        self.answer = parse_answer(type=self.task, answer='', gt_answer='', n_candidate=10)[1]
+        self.answer = parse_answer(type=self.task, answer='', gt_answer='', n_candidate=10)['answer']
         self.scratchpad: str = ''
         self.finished: bool = False

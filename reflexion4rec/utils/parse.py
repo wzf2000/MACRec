@@ -13,19 +13,33 @@ def parse_action(string: str) -> tuple[str, str]:
     else:
         return None, None
     
-def parse_QA_answer(answer: str, *args, **kwargs) -> tuple[bool, str]:
-    return True, answer
+def parse_QA_answer(answer: str, *args, **kwargs) -> dict[str, bool | str]:
+    return {
+        'valid': True,
+        'answer': answer
+    }
     
-def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *args, **kwargs) -> tuple[bool, float]:
+def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *args, **kwargs) -> dict[str, float | str]:
     try:
         answer = float(answer)
         if answer < 1 or answer > 5:
-            return False, 0
+            return {
+                'valid': False,
+                'answer': 0,
+                'message': 'Rating should be in range [1, 5].'
+            }
     except ValueError or TypeError:
-        return False, 0
-    return True, answer
+        return {
+            'valid': False,
+            'answer': 0,
+            'message': 'Rating should be a float number.'
+        }
+    return {
+        'valid': True,
+        'answer': answer
+    }
     
-def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, json_mode: bool = False, *args, **kwargs) -> tuple[bool, list[int]]:
+def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, json_mode: bool = False, *args, **kwargs) -> dict[str, bool | list[int]]:
     if not json_mode:
         candidates = answer.split(',')
     else:
@@ -34,23 +48,46 @@ def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, js
         elif isinstance(answer, str):
             candidates = answer.split(',')
         else:
-            return False, []
+            return {
+                'valid': False,
+                'answer': [],
+                'message': 'Answer should be a permutated list of candidate ids.'
+            }
     try:
         length = len(candidates)
     except TypeError:
-        return False, []
+        return {
+            'valid': False,
+            'answer': [],
+            'message': 'Answer should be a permutated list of candidate ids.'
+        }
     if length != n_candidate:
-        return False, []
+        return {
+            'valid': False,
+            'answer': [],
+            'message': f'Answer should contain {n_candidate} ids, which is the same as the number of candidates in the question.'
+        }
     else:
         try:
             answer = [int(c) for c in candidates]
             if gt_answer not in answer:
-                return False, []
+                return {
+                    'valid': False,
+                    'answer': [],
+                    'message': 'Answer should contain all the candidate ids.'
+                }
         except ValueError:
-            return False, []
-    return True, answer
+            return {
+                'valid': False,
+                'answer': [],
+                'message': 'The ids in the answer list should be integers.'
+            }
+    return {
+        'valid': True,
+        'answer': answer
+    }
 
-def parse_answer(type, *args, **kwargs) -> tuple[bool, Any]:
+def parse_answer(type, *args, **kwargs) -> dict[str, Any]:
     if type == 'qa':
         return parse_QA_answer(*args, **kwargs)
     elif type == 'rp':
