@@ -24,7 +24,7 @@ class AnyOpenAILLM(BaseLLM):
             self.model.model_kwargs['response_format'] = {
                 'type': 'json_object'
             }
-            content = self.model(
+            content = self.model.invoke(
                 [
                     HumanMessage(
                         content=prompt,
@@ -34,9 +34,9 @@ class AnyOpenAILLM(BaseLLM):
             del self.model.model_kwargs['response_format']
             return content
         if self.model_type == 'completion':
-            return self.model(prompt)
+            return self.model.invoke(prompt)
         else:
-            return self.model(
+            return self.model.invoke(
                 [
                     HumanMessage(
                         content=prompt,

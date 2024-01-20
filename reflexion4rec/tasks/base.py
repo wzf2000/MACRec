@@ -75,9 +75,9 @@ class GenerationTask(Task):
         else:
             raise NotImplementedError
     
-    def get_LLM(self, model_path: str = 'openai', device: str = 'cpu'):
+    def get_LLM(self, model_path: str = 'openai', device: str = 'cpu', prefix: str = 'react'):
         if model_path != 'openai':
-            return OpenSourceLLM(model_path=model_path, device=device, **self.generation_config)
+            return OpenSourceLLM(model_path=model_path, device=device, prefix=prefix, **self.generation_config)
         
         return AnyOpenAILLM(
             temperature=self.api_config['temperature'],
@@ -96,7 +96,7 @@ class GenerationTask(Task):
                 **self.model_kwargs,
             )
         elif agent == 'react_reflect':
-            reflect_llm = self.get_LLM(model_path=reflect_model, device=device)
+            reflect_llm = self.get_LLM(model_path=reflect_model, device=device, prefix='reflect')
             self.model = ReactReflectAgent(
                 actor_llm=react_llm,
                 reflect_llm=reflect_llm,
@@ -127,8 +127,10 @@ class GenerationTask(Task):
         if reflection_model != 'openai':
             with open(generation_config, 'r') as f:
                 self.generation_config = json.load(f)
+                if 'json_mode' in self.generation_config:
+                    assert self.json_mode == self.generation_config['json_mode'], "json_mode must be the same in both generation_config and task arguments"
         data = self.get_data(data_file, max_his)
         logger.info(f"Test data sample: {data[0][0][:100]}\nGround Truth: {data[0][1]}")
-        react_llm = self.get_LLM()
+        react_llm = self.get_LLM(prefix='react')
         self.get_model(agent, react_llm, reflection_model, device)
         return data
