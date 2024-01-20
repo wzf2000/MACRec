@@ -1,8 +1,5 @@
-from langchain.chat_models import ChatOpenAI
-from langchain import OpenAI
-from langchain.schema import (
-    HumanMessage
-)
+from langchain_openai import ChatOpenAI, OpenAI
+from langchain.schema import HumanMessage
 from .basellm import BaseLLM
 
 class AnyOpenAILLM(BaseLLM):

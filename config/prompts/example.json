@@ -1,6 +1,6 @@
 {
-    "template_name": {
-        "template": "template content",
-        "input_variables": "(optional) input variables for template"
+    "prompt_name": {
+        "type": "(optional) raw/template",
+        "content": "template content/raw string content"
     }
 }

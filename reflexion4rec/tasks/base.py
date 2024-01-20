@@ -1,12 +1,12 @@
+import os
 import json
 import torch
-import openai
 import pandas as pd
 from argparse import ArgumentParser
 from loguru import logger
 from typing import Any
 from tqdm import tqdm
-from ..prompts import read_template
+from ..utils import read_prompts
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 
@@ -51,7 +51,7 @@ class GenerationTask(Task):
         df = pd.read_csv(test_data)
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
-        data_prompt = read_template(f"config/prompts/{self.task}.json")
+        data_prompt = read_prompts(f"config/prompts/{self.task}.json")
         self.prompts.update(data_prompt)
         data_prompt = data_prompt[f'{self.task}_data_prompt']
         if self.task == 'rp':
@@ -84,11 +84,10 @@ class GenerationTask(Task):
             max_tokens=self.api_config['max_tokens'],
             model_name=self.api_config['model'],
             model_kwargs={"stop": "\n"},
-            openai_api_key=self.api_config['api_key'],
         )
     
     def get_model(self, agent: str, react_llm: AnyOpenAILLM, reflect_model: str, device: str):
-        prompts = read_template(f"config/prompts/{agent}_prompt.json")
+        prompts = read_prompts(f"config/prompts/{agent}_prompt.json")
         self.prompts.update(prompts)
         if agent == 'react':
             self.model = ReactAgent(
@@ -109,10 +108,14 @@ class GenerationTask(Task):
             # TODO: Add other agents
             raise NotImplementedError
     
-    def run(self, api_config: str, data_file: str, agent: str, reflection_model: str, generation_config: str, device: str, task: str, max_his: int, json_mode: bool, *args, **kwargs) -> list[tuple[str, int | float | str]]:
+    def openai_init(self, api_config: str):
         with open(api_config, 'r') as f:
             self.api_config = json.load(f)
-            openai.api_base = self.api_config['api_base']
+            os.environ["OPENAI_API_BASE"] = self.api_config['api_base']
+            os.environ["OPENAI_API_KEY"] = self.api_config['api_key']
+    
+    def run(self, api_config: str, data_file: str, agent: str, reflection_model: str, generation_config: str, device: str, task: str, max_his: int, json_mode: bool, *args, **kwargs) -> list[tuple[str, int | float | str]]:
+        self.openai_init(api_config)
         self.json_mode = json_mode
         self.task = task
         self.prompts = dict()
