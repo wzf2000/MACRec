@@ -1,10 +1,11 @@
 import os
 import jsonlines
+import numpy as np
 from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
 from .base import GenerationTask
-from ..utils import NumpyEncoder
+from ..utils import NumpyEncoder, init_all_seeds
 from ..agents import ReflectAgent
 from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, SequentialRecommendationRewardV1
 
@@ -14,7 +15,15 @@ class FeedbackTask(GenerationTask):
         parser = GenerationTask.parse_task_args(parser)
         parser.add_argument('--feedback_file', type=str, default='data/ml-100k/data_exp.jsonl', help='Output Feedback File')
         parser.add_argument('--reward_version', type=str, default='v1', choices=['v1', 'v2'], help='Reward version')
+        parser.add_argument('--samples', type=int, default=500, help='Number of samples')
         return parser
+    
+    def get_data(self, test_data: str, max_his: int) -> list[tuple[str, int | float | str]]:
+        data = super().get_data(test_data, max_his)
+        # sample data
+        sample_idx = np.random.choice(len(data), self.samples, replace=False)
+        data = [data[i] for i in sample_idx]
+        return data
     
     def get_reward_model(self, reward_version: str) -> Reward:
         if self.task == 'rp':
@@ -61,7 +70,9 @@ class FeedbackTask(GenerationTask):
                     feedback_file.write(ret)
                     pbar.update(1)
 
-    def run(self, feedback_file: str, reward_version: str, *args, **kwargs):
+    def run(self, feedback_file: str, reward_version: str, samples: int, *args, **kwargs):
+        init_all_seeds(2024)
+        self.samples = samples
         datas = super().run(*args, **kwargs)
         assert isinstance(self.model, ReflectAgent)
         self.reward_model = self.get_reward_model(reward_version)
