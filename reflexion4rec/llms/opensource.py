@@ -1,4 +1,3 @@
-from typing import Optional
 from transformers import pipeline
 
 from .basellm import BaseLLM
