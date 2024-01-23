@@ -4,17 +4,16 @@ import numpy as np
 from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
-from .base import GenerationTask
+from .base import GenerationTask, RewardTask
 from ..utils import NumpyEncoder, init_all_seeds
 from ..agents import ReflectAgent
-from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, SequentialRecommendationRewardV1
 
-class FeedbackTask(GenerationTask):
+class FeedbackTask(GenerationTask, RewardTask):
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         parser = GenerationTask.parse_task_args(parser)
         parser.add_argument('--feedback_file', type=str, default='data/ml-100k/data_exp.jsonl', help='Output Feedback File')
-        parser.add_argument('--reward_version', type=str, default='v1', choices=['v1', 'v2'], help='Reward version')
+        parser.add_argument('--reward_version', type=str, default='v1', choices=['v1', 'v2', 'reflection'], help='Reward version')
         parser.add_argument('--samples', type=int, default=500, help='Number of samples')
         return parser
     
@@ -24,20 +23,6 @@ class FeedbackTask(GenerationTask):
         sample_idx = np.random.choice(len(data), self.samples, replace=False)
         data = [data[i] for i in sample_idx]
         return data
-    
-    def get_reward_model(self, reward_version: str) -> Reward:
-        if self.task == 'rp':
-            if reward_version == 'v1':
-                return RatingPredictionRewardV1()
-            elif reward_version == 'v2':
-                return RatingPredictionRewardV2()
-            else:
-                raise NotImplementedError
-        elif self.task == 'sr':
-            if reward_version == 'v1':
-                return SequentialRecommendationRewardV1()
-            else:
-                raise NotImplementedError
     
     def feedback(self, datas: list[tuple[str, int | float | str]], feedback_file: str):
         os.makedirs(os.path.dirname(feedback_file), exist_ok=True)
@@ -62,7 +47,7 @@ class FeedbackTask(GenerationTask):
                     ret["Answer_1"] = answers[0]
                     ret["Answer_2"] = answers[1]
                     ret["Answer_GT"] = gt_answer
-                    ret['reward'] = self.reward_model(ret["Answer_1"], ret["Answer_2"], ret["Answer_GT"])
+                    ret['reward'] = self.reward_model(action1=ret["Answer_1"], action2=ret["Answer_2"], gt_answer=ret["Answer_GT"], reflection_output=ret["output"])
 
                     logger.debug(f"Answer_1: {answers[0]}, Answer_2: {answers[1]}, Ground Truth Answer: {gt_answer}")
                     logger.debug(f'Reward: {ret["reward"]}')  # logger.success

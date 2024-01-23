@@ -1,6 +1,8 @@
+import json
+from typing import Any
 import numpy as np
 from loguru import logger
-from .base import Reward, DeltaReward
+from .base import Reward, DeltaReward, ReflectionReward
 
 class RatingPredictionRewardV1(DeltaReward):
     def __init__(self, invalid: float = 0, lower: float = 1, upper: float = 5, *args, **kwargs):
@@ -41,7 +43,7 @@ class RatingPredictionRewardV2(Reward):
             return self.invalid
         return -(gt_answer - action_rating) ** 2
     
-    def reward(self, action1: float, action2: float, gt_answer: float) -> float:
+    def reward(self, action1: float, action2: float, gt_answer: float, *args, **kwargs) -> float:
         valid1, _ = self.check_valid(action1)
         valid2, _ = self.check_valid(action2)
         if not valid2:
@@ -55,6 +57,16 @@ class RatingPredictionRewardV2(Reward):
                 return action2_reward - action1_reward
         original_reward = action2_reward - action1_reward
         return original_reward + np.exp(-np.abs(original_reward) * self.eta) * (self.alpha + action2_reward)
+    
+class RatingPredictionReflectionReward(ReflectionReward):
+    def __init__(self, lower: float = 1, upper: float = 5, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.lower = lower
+        self.upper = upper
+    
+    def judge(self, action: float, gt_answer: float) -> bool:
+        assert self.lower <= gt_answer <= self.upper, f"Ground truth answer rating {gt_answer} is not in range [{self.lower}, {self.upper}]"
+        return action == gt_answer
 
 if __name__ == '__main__':
     # test RatingPredictionRewardV1
@@ -76,3 +88,12 @@ if __name__ == '__main__':
     logger.info(f'reward(3, 3, 5) = {reward(3, 3, 5)}')
     logger.info(f'reward(3, 3, 3) = {reward(3, 3, 3)}')
     logger.info(f'reward(5, 5, 1) = {reward(5, 5, 1)}')
+    # test RatingPredictionReflectionRewardV1
+    reward = RatingPredictionReflectionReward()
+    logger.success('Test RatingPredictionReflectionReward')
+    correct_reflection_output = '{"correctness": true, "reason": "some reason"}'
+    incorrect_reflection_output = '{"correctness": false, "reason": "some reason"}'
+    logger.info(f'reward(3, 4, 5, {correct_reflection_output}) = {reward(3, 4, 5, correct_reflection_output)}')
+    logger.info(f'reward(3, 4, 5, {incorrect_reflection_output}) = {reward(3, 4, 5, incorrect_reflection_output)}')
+    logger.info(f'reward(3, 4, 3, {correct_reflection_output}) = {reward(3, 4, 3, correct_reflection_output)}')
+    logger.info(f'reward(3, 4, 3, {incorrect_reflection_output}) = {reward(3, 4, 3, incorrect_reflection_output)}')

@@ -9,6 +9,7 @@ from tqdm import tqdm
 from ..utils import read_prompts
 from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
+from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, RatingPredictionReflectionReward, SequentialRecommendationRewardV1, SequentialRecommendationReflectionReward
 
 class Task:
     @staticmethod
@@ -32,6 +33,25 @@ class Task:
         # log the arguments
         logger.success(args)
         return self.run(**vars(args))
+    
+class RewardTask(Task):
+    def get_reward_model(self, reward_version: str) -> Reward:
+        if self.task == 'rp':
+            if reward_version == 'v1':
+                return RatingPredictionRewardV1()
+            elif reward_version == 'v2':
+                return RatingPredictionRewardV2()
+            elif reward_version == 'reflection':
+                return RatingPredictionReflectionReward()
+            else:
+                raise NotImplementedError
+        elif self.task == 'sr':
+            if reward_version == 'v1':
+                return SequentialRecommendationRewardV1()
+            elif reward_version == 'reflection':
+                return SequentialRecommendationReflectionReward()
+            else:
+                raise NotImplementedError
     
 class GenerationTask(Task):
     @staticmethod

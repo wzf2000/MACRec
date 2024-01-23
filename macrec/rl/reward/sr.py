@@ -1,6 +1,6 @@
 import numpy as np
 from loguru import logger
-from .base import Reward, DeltaReward
+from .base import Reward, DeltaReward, ReflectionReward
 
 class SequentialRecommendationRewardV1(DeltaReward):
     def action_reward(self, action: list[int], gt_answer: int) -> float:
@@ -8,6 +8,17 @@ class SequentialRecommendationRewardV1(DeltaReward):
             return 0
         gt_pos = action.index(gt_answer)
         return 1 / (gt_pos + 1)
+    
+class SequentialRecommendationReflectionReward(ReflectionReward):
+    def __init__(self, n_candidates: int = 10, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.n_candidates = n_candidates
+    
+    def judge(self, action: list[int], gt_answer: int) -> bool:
+        if len(action) == 0:
+            return False
+        assert len(action) == self.n_candidates, f'Number of candidates {len(action)} must equal to {self.n_candidates}'
+        return action[0] == gt_answer
 
 if __name__ == '__main__':
     # test SequentialRecommendationRewardV1
@@ -16,3 +27,14 @@ if __name__ == '__main__':
     logger.info(f'reward([1, 2, 3], [2, 3, 1], 2) = {reward([1, 2, 3], [2, 3, 1], 2)}')
     logger.info(f'reward([1, 2, 3], [2, 3, 1], 3) = {reward([1, 2, 3], [2, 3, 1], 3)}')
     logger.info(f'reward([1, 2, 3], [2, 3, 1], 1) = {reward([1, 2, 3], [2, 3, 1], 1)}')
+    # test SequentialRecommendationReflectionReward
+    reward = SequentialRecommendationReflectionReward(n_candidates=3)
+    logger.success('Test SequentialRecommendationReflectionReward')
+    correct_reflection_output = '{"correctness": true, "reason": "some reason"}'
+    incorrect_reflection_output = '{"correctness": false, "reason": "some reason"}'
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 2, {correct_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 2, correct_reflection_output)}')
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 3, {correct_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 3, correct_reflection_output)}')
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 1, {correct_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 1, correct_reflection_output)}')
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 2, {incorrect_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 2, incorrect_reflection_output)}')
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 3, {incorrect_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 3, incorrect_reflection_output)}')
+    logger.info(f'reward([1, 2, 3], [2, 3, 1], 1, {incorrect_reflection_output}) = {reward([1, 2, 3], [2, 3, 1], 1, incorrect_reflection_output)}')
