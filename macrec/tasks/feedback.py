@@ -15,6 +15,7 @@ class FeedbackTask(GenerationTask, RewardTask):
         parser.add_argument('--feedback_file', type=str, default='data/ml-100k/data_exp.jsonl', help='Output Feedback File')
         parser.add_argument('--reward_version', type=str, default='v1', choices=['v1', 'v2', 'reflection'], help='Reward version')
         parser.add_argument('--samples', type=int, default=500, help='Number of samples')
+        parser.add_argument('--seed', type=int, default=2024, help='Random seed')
         return parser
     
     def get_data(self, test_data: str, max_his: int) -> list[tuple[str, int | float | str]]:
@@ -55,8 +56,8 @@ class FeedbackTask(GenerationTask, RewardTask):
                     feedback_file.write(ret)
                     pbar.update(1)
 
-    def run(self, feedback_file: str, reward_version: str, samples: int, *args, **kwargs):
-        init_all_seeds(2024)
+    def run(self, feedback_file: str, reward_version: str, samples: int, seed: int, *args, **kwargs):
+        init_all_seeds(seed)
         self.samples = samples
         datas = super().run(*args, **kwargs)
         assert isinstance(self.model, ReflectAgent)

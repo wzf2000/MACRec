@@ -69,6 +69,7 @@ class GenerationTask(Task):
     
     def get_data(self, test_data: str, max_his: int) -> list[tuple[str, int | float | str]]:
         df = pd.read_csv(test_data)
+        df['history'] = df['history'].fillna('None')
         df['history'] = df['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
         
         data_prompt = read_prompts(f"config/prompts/{self.task}.json")
