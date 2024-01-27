@@ -33,10 +33,6 @@ class RLHFTrainingTask(Task):
             for batch_id, batch in tqdm(enumerate(self.trainer.dataloader)):
                 query_tensors, response_tensors = batch['input_ids'], batch['output_ids']
                 rewards = batch['rewards']
-                logger.debug(f"query_tensors: {query_tensors}")
-                logger.debug(f"query_tensors length: {len(query_tensors[0])}")
-                logger.debug(f"response_tensors: {response_tensors}")
-                logger.debug(f"response_tensors length: {len(response_tensors[0])}")
                 stats = self.trainer.step(query_tensors, response_tensors, rewards)
                 self.trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response"])
             self.trainer.save_pretrained(os.path.join(base_dir, f'epoch-{epoch}'))
