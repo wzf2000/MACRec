@@ -33,3 +33,9 @@ python main.py --main Feedback --data_file data/Beauty/train.csv --agent react_r
 
 ## sequential recommendation task
 python main.py --main Feedback --data_file data/Beauty/train.csv --agent react_reflect --device auto --reflection_model lmsys/vicuna-7b-v1.5-16k --task sr --json_mode --feedback_file data/ppo/sr/Beauty-reflection.jsonl --reward_version reflection
+
+#### RewardUpdateTask ####
+python main.py --main RewardUpdate --data_file data/ppo/rp/ml-100k-reflection.jsonl --output_file data/ppo/rp/ml-100k-v2.jsonl --reward_version v2
+python main.py --main RewardUpdate --data_file data/ppo/sr/ml-100k-reflection.jsonl --output_file data/ppo/sr/ml-100k-v2.jsonl --reward_version v2
+python main.py --main RewardUpdate --data_file data/ppo/rp/Beauty-reflection.jsonl --output_file data/ppo/rp/Beauty-v2.jsonl --reward_version v2
+python main.py --main RewardUpdate --data_file data/ppo/sr/Beauty-reflection.jsonl --output_file data/ppo/sr/Beauty-v2.jsonl --reward_version v2
