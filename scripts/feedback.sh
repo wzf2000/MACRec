@@ -36,6 +36,6 @@ python main.py --main Feedback --data_file data/Beauty/train.csv --agent react_r
 
 #### RewardUpdateTask ####
 python main.py --main RewardUpdate --data_file data/ppo/rp/ml-100k-reflection.jsonl --output_file data/ppo/rp/ml-100k-v2.jsonl --reward_version v2
-python main.py --main RewardUpdate --data_file data/ppo/sr/ml-100k-reflection.jsonl --output_file data/ppo/sr/ml-100k-v2.jsonl --reward_version v2
+python main.py --main RewardUpdate --data_file data/ppo/sr/ml-100k-reflection.jsonl --output_file data/ppo/sr/ml-100k-v1.jsonl --reward_version v1 --task sr
 python main.py --main RewardUpdate --data_file data/ppo/rp/Beauty-reflection.jsonl --output_file data/ppo/rp/Beauty-v2.jsonl --reward_version v2
-python main.py --main RewardUpdate --data_file data/ppo/sr/Beauty-reflection.jsonl --output_file data/ppo/sr/Beauty-v2.jsonl --reward_version v2
+python main.py --main RewardUpdate --data_file data/ppo/sr/Beauty-reflection.jsonl --output_file data/ppo/sr/Beauty-v1.jsonl --reward_version v1 --task sr
