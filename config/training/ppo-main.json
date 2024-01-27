@@ -1,0 +1,28 @@
+{
+    "model_path": "lmsys/vicuna-7b-v1.5-16k",
+    "epochs": 4,
+    "data_kwargs": {
+        "type": "jsonl",
+        "path": "data/ppo/rp/ml-100k-reflection.jsonl"
+    },
+    "ppo_kwargs": {
+        "learning_rate": 1.41e-5,
+        "log_with": null,
+        "mini_batch_size": 2,
+        "batch_size": 2,
+        "gradient_accumulation_steps": 1,
+        "early_stopping": false,
+        "target_kl": 6.0,
+        "kl_penalty": "kl",
+        "seed": 0,
+        "use_score_scaling": false,
+        "use_score_norm": false,
+        "score_clip": null
+    },
+    "peft_kwargs": {
+        "r": 16,
+        "lora_alpha": 16,
+        "bias": "none",
+        "task_type": "CAUSAL_LM"
+    }
+}
