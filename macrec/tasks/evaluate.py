@@ -65,6 +65,7 @@ class EvaluateTask(GenerationTask):
                         ret[f'Answer_{i}'] = self.model.answer
                     ret['Answer_GT'] = gt_answer
                     output_file.write(ret)
+                    output_file.flush()
                     pbar.set_description(self.update_evaluation(self.model.answer, gt_answer))
                     pbar.update(1)
         

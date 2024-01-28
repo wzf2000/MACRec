@@ -54,6 +54,7 @@ class FeedbackTask(GenerationTask, RewardTask):
                     logger.debug(f'Reward: {ret["reward"]}')  # logger.success
 
                     feedback_file.write(ret)
+                    feedback_file.flush()
                     pbar.update(1)
 
     def run(self, feedback_file: str, reward_version: str, samples: int, seed: int, *args, **kwargs):

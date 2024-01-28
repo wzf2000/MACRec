@@ -22,3 +22,4 @@ class RewardUpdateTask(RewardTask):
                 for obj in reader:
                     obj['reward'] = reward(action1=obj['Answer_1'], action2=obj['Answer_2'], gt_answer=obj['Answer_GT'], reflection_output=obj['output'])
                     writer.write(obj)
+                    writer.flush()
