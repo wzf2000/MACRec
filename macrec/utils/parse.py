@@ -28,11 +28,17 @@ def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *arg
                 'answer': 0,
                 'message': 'Rating should be in range [1, 5].'
             }
-    except ValueError or TypeError:
+    except (ValueError, TypeError):
         return {
             'valid': False,
             'answer': 0,
             'message': 'Rating should be a float number.'
+        }
+    except Exception:
+        return {
+            'valid': False,
+            'answer': 0,
+            'message': 'Other Exception when parsing rating.'
         }
     return {
         'valid': True,
@@ -61,6 +67,12 @@ def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, js
             'answer': [],
             'message': 'Answer should be a permutated list of candidate ids.'
         }
+    except Exception:
+        return {
+            'valid': False,
+            'answer': [],
+            'message': 'Other Exception when parsing ranking answer.'
+        }
     if length != n_candidate:
         return {
             'valid': False,
@@ -76,7 +88,7 @@ def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, js
                     'answer': [],
                     'message': 'Answer should contain all the candidate ids.'
                 }
-        except ValueError:
+        except (ValueError, TypeError):
             return {
                 'valid': False,
                 'answer': [],
