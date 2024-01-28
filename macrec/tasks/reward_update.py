@@ -18,8 +18,7 @@ class RewardUpdateTask(RewardTask):
         with jsonlines.open(data_file) as reader:
             # output to f'{data_file without extension}_{reward_version}.jsonl
             output_file = data_file.replace('.jsonl', f'_{reward_version}.jsonl') if output_file == '' else output_file
-            with jsonlines.open(output_file, 'w') as writer:
+            with jsonlines.open(output_file, 'w', flush=True) as writer:
                 for obj in reader:
                     obj['reward'] = reward(action1=obj['Answer_1'], action2=obj['Answer_2'], gt_answer=obj['Answer_GT'], reflection_output=obj['output'])
                     writer.write(obj)
-                    writer.flush()

@@ -49,7 +49,7 @@ class EvaluateTask(GenerationTask):
             'topk': self.args.k,
         }
         output_file_name = '_'.join([f'{k}={v}' for k, v in output_args.items()]) + '.jsonl'
-        with jsonlines.open(os.path.join(run_dir, output_file_name), mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode) as output_file:
+        with jsonlines.open(os.path.join(run_dir, output_file_name), mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode, flush=True) as output_file:
             with tqdm(total=len(test_datas)) as pbar:
                 for test_data, gt_answer in test_datas:
                     ret = {}
@@ -65,7 +65,6 @@ class EvaluateTask(GenerationTask):
                         ret[f'Answer_{i}'] = self.model.answer
                     ret['Answer_GT'] = gt_answer
                     output_file.write(ret)
-                    output_file.flush()
                     pbar.set_description(self.update_evaluation(self.model.answer, gt_answer))
                     pbar.update(1)
         
