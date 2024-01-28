@@ -74,7 +74,7 @@ def process_item_data(item_df: pd.DataFrame) -> pd.DataFrame:
     # set a item_attributes column to be a string contain all the item information with a template
     input_variables = item_df.columns.to_list()[:3] + ['genre']
     template = PromptTemplate(
-        template='Title: {title}, Release Date: {release_date}, Video Release Date: {video_release_date}, Genres: {genre}',
+        template='Title: {title}, Genres: {genre}',
         input_variables=input_variables,
     )
     item_df['item_attributes'] = item_df[input_variables].apply(lambda x: template.format(**x), axis=1)

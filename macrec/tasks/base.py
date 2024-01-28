@@ -63,7 +63,7 @@ class GenerationTask(Task):
         parser.add_argument('--generation_config', type=str, default='config/generation-config.json', help='Generation configuration file for open-source LLMs')
         parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device type, set auto to use device_map = auto')
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
-        parser.add_argument('--max_his', type=int, default=20, help='Max history length')
+        parser.add_argument('--max_his', type=int, default=10, help='Max history length')
         parser.add_argument('--json_mode', action='store_true', help='Use json mode')
         return parser
     

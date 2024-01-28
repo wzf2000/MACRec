@@ -79,7 +79,7 @@ def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFr
     # set a item_attributes column to be a string contain all the item information with a template
     input_variables = item_df.columns.to_list()
     template = PromptTemplate(
-        template='Title: {title}, Brand: {brand}, Price: {price}, Categories: {categories}',
+        template='Brand: {brand}, Price: {price}, Categories: {categories}',
         input_variables=input_variables,
     )
     item_df['item_attributes'] = item_df[input_variables].apply(lambda x: template.format(**x), axis=1)
