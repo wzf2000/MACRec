@@ -8,7 +8,7 @@ class PreprocessTask(Task):
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         parser.add_argument('--data_dir', type=str, required=True, help='input file')
         parser.add_argument('--dataset', type=str, required=True, choices=['ml-100k', 'amazon'], help='output file')
-        parser.add_argument('--n_neg_items', type=int, default=9, help='numbers of negative items')
+        parser.add_argument('--n_neg_items', type=int, default=7, help='numbers of negative items')
         return parser
     
     def run(self, data_dir: str, dataset: dir, n_neg_items: int):
