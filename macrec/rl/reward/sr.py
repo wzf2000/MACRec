@@ -10,7 +10,7 @@ class SequentialRecommendationRewardV1(DeltaReward):
         return 1 / (gt_pos + 1)
     
 class SequentialRecommendationReflectionReward(ReflectionReward):
-    def __init__(self, n_candidates: int = 10, *args, **kwargs):
+    def __init__(self, n_candidates: int = 8, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.n_candidates = n_candidates
     
