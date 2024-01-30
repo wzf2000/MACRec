@@ -64,6 +64,7 @@ class GenerationTask(Task):
         parser.add_argument('--device', type=str, default="cuda" if torch.cuda.is_available() else "cpu", help='Device type, set auto to use device_map = auto')
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
         parser.add_argument('--max_his', type=int, default=10, help='Max history length')
+        parser.add_argument('--max_steps', type=int, default=1, help='Max steps')
         parser.add_argument('--json_mode', action='store_true', help='Use json mode')
         return parser
     
@@ -135,7 +136,7 @@ class GenerationTask(Task):
             os.environ["OPENAI_API_BASE"] = self.api_config['api_base']
             os.environ["OPENAI_API_KEY"] = self.api_config['api_key']
     
-    def run(self, api_config: str, data_file: str, agent: str, reflection_model: str, generation_config: str, device: str, task: str, max_his: int, json_mode: bool, *args, **kwargs) -> list[tuple[str, int | float | str]]:
+    def run(self, api_config: str, data_file: str, agent: str, reflection_model: str, generation_config: str, device: str, task: str, max_his: int, json_mode: bool, max_steps: int, *args, **kwargs) -> list[tuple[str, int | float | str]]:
         self.openai_init(api_config)
         self.json_mode = json_mode
         self.task = task
@@ -144,6 +145,7 @@ class GenerationTask(Task):
             'task': self.task,
             'json_mode': self.json_mode,
             'leak': False,
+            'max_steps': max_steps,
         }
         if reflection_model != 'openai':
             with open(generation_config, 'r') as f:

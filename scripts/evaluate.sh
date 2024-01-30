@@ -35,7 +35,9 @@ python main.py --main Evaluate --data_file data/Beauty/test_sample1000.csv --age
 # Calculate the metrics directly from the run data file
 python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt.jsonl
 python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-gpt.jsonl
-python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-vicu.jsonl
+python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-vicu-0.jsonl
+python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-vicu-1.jsonl
 python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt.jsonl
 python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-gpt.jsonl
-python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-vicu.jsonl
+python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-vicu-0.jsonl
+python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-vicu-1.jsonl
