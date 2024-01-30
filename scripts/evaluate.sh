@@ -10,8 +10,7 @@ python main.py --main Evaluate --data_file data/ml-100k/test.csv --agent react -
 
 ## Evaluate Reflexion
 ### rating prediction task
-# remake python main.py --main Evaluate --data_file data/ml-100k/test.csv --agent react_reflect --task rp --json_mode
-python main.py --main Test --data_file data/ml-100k/test.csv --agent react_reflect --task rp --json_mode --samples 675 --offset 325
+# python main.py --main Evaluate --data_file data/ml-100k/test.csv --agent react_reflect --task rp --json_mode
 # python main.py --main Evaluate --data_file data/ml-100k/test.csv --agent react_reflect --device auto --reflection_model lmsys/vicuna-7b-v1.5-16k --task rp --json_mode
 ### sequential recommendation task
 python main.py --main Evaluate --data_file data/ml-100k/test.csv --agent react_reflect --task sr --json_mode
@@ -34,4 +33,9 @@ python main.py --main Evaluate --data_file data/Beauty/test_sample1000.csv --age
 python main.py --main Evaluate --data_file data/Beauty/test_sample1000.csv --agent react_reflect --device auto --reflection_model lmsys/vicuna-7b-v1.5-16k --task sr --json_mode
 
 # Calculate the metrics directly from the run data file
-python main.py --main Calculate --task rp --run_data_file run/ml-100k/rp/react_reflect/gpt-gpt.jsonl
+python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt.jsonl
+python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-gpt.jsonl
+python main.py --main Calculate --task rp --run_data_file results/ml-100k/rp/gpt-vicu.jsonl
+python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt.jsonl
+python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-gpt.jsonl
+python main.py --main Calculate --task rp --run_data_file results/Beauty/rp/gpt-vicu.jsonl

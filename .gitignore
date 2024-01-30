@@ -24,6 +24,7 @@ __pycache__/
 data/
 logs/
 run/
+results/
 config/api-config.json
 test*
 !macrec/*/test*

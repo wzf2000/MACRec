@@ -5,7 +5,7 @@ from loguru import logger
 from argparse import ArgumentParser
 from .base import GenerationTask
 from ..utils import str2list, NumpyEncoder
-from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy
+from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
 
 class EvaluateTask(GenerationTask):
     @staticmethod
@@ -76,6 +76,7 @@ class EvaluateTask(GenerationTask):
         if self.task == 'rp':
             self.metrics = MetricDict({
                 'true_accuracy': Accuracy(),
+                'true_mae': MAE(),
                 'true_rmse': RMSE(),
                 'valid_rmse': RMSE(),
                 'cheat_rmse': RMSE(),

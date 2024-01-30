@@ -3,7 +3,7 @@ from loguru import logger
 from argparse import ArgumentParser
 from .base import Task
 from ..utils import str2list, NumpyEncoder
-from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy
+from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
 
 class CalculateTask(Task):
     @staticmethod
@@ -20,6 +20,7 @@ class CalculateTask(Task):
                 'true_rmse': RMSE(),
                 'valid_rmse': RMSE(),
                 'cheat_rmse': RMSE(),
+                'true_mae': MAE(),
             })
             self.cheat_answer = 3
         elif self.task == 'sr':

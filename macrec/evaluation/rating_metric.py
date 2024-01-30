@@ -30,3 +30,10 @@ class RMSE(torchmetrics.MeanSquaredError):
     
     def compute(self):
         return {'rmse': super().compute().sqrt().item()}
+
+class MAE(torchmetrics.MeanAbsoluteError):
+    def update(self, output: dict) -> None:
+        super().update(preds=torch.tensor(output['answer']), target=torch.tensor(output['label']))
+    
+    def compute(self):
+        return {'mae': super().compute().item()}
