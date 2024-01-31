@@ -30,7 +30,11 @@ class Reflector(Agent):
         super().__init__(*args, **kwargs)
         config = read_json(config_path)
         keep_reflections = config.get('keep_reflections', True)
+        if 'keep_reflections' in config:
+            del config['keep_reflections']
         reflection_strategy = config.get('reflection_strategy', 'reflection')
+        if 'reflection_strategy' in config:
+            del config['reflection_strategy']
         self.llm = self.get_LLM(config=config)
         if isinstance(self.llm, AnyOpenAILLM):
             self.enc = tiktoken.encoding_for_model(self.llm.model_name)
