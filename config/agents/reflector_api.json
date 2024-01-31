@@ -6,5 +6,7 @@
     "model_kwargs": {
         "stop": "\n"
     },
-    "json_mode": true
+    "json_mode": true,
+    "keep_reflections": true,
+    "reflection_strategy": "reflection"
 }

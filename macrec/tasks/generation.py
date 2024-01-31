@@ -27,7 +27,7 @@ class GenerationTask(Task):
         if self.task == 'sr':
             candidate_example: str = df['candidate_item_attributes'][0]
             self.n_candidate = len(candidate_example.split('\n'))
-            self.system_kwargs['n_candidate'] = self.n_candidate
+            self.system_kwargs['n_candidate'] = self.n_candidate # Add n_candidate to system_kwargs by data sample
         return df
     
     def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
@@ -43,7 +43,6 @@ class GenerationTask(Task):
         elif self.task == 'sr':
             candidate_example: str = df['candidate_item_attributes'][0]
             self.n_candidate = len(candidate_example.split('\n'))
-            self.system_kwargs['n_candidate'] = self.n_candidate
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
                 user_profile=df['user_profile'][i],
@@ -57,7 +56,6 @@ class GenerationTask(Task):
         if system == 'react':
             self.system = ReActSystem(config_path=system_config, **self.system_kwargs)
         elif system == 'reflection':
-            self.system_kwargs['keep_reflections'] = True
             self.system = ReflectionSystem(config_path=system_config, **self.system_kwargs)
         else:
             raise NotImplementedError

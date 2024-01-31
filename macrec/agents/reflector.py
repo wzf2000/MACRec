@@ -6,7 +6,7 @@ from langchain.prompts import PromptTemplate
 
 from macrec.agents.base import Agent
 from macrec.llms import AnyOpenAILLM
-from macrec.utils import format_step, format_reflections, format_last_attempt
+from macrec.utils import format_step, format_reflections, format_last_attempt, read_json
 
 class ReflectionStrategy(Enum):
     """
@@ -21,16 +21,17 @@ class Reflector(Agent):
     """
     The reflector agent. The reflector agent prompts the LLM to reflect on the input and the scratchpad as default. Other reflection strategies are also supported. See `ReflectionStrategy` for more details.
     """
-    def __init__(self, config_path: str, keep_reflections: bool = True, reflection_strategy: str = 'reflection', *args, **kwargs) -> None:
+    def __init__(self, config_path: str, *args, **kwargs) -> None:
         """Initialize the reflector agent. The reflector agent prompts the LLM to reflect on the input and the scratchpad as default.
         
         Args:
             `config_path` (`str`): The path to the config file of the reflector LLM.
-            `keep_reflections` (`bool`, optional): Whether to keep the input and output of the reflections. Defaults to `True`.
-            `reflection_strategy` (`str`, optional): The reflection strategy. Defaults to `reflection`. See `ReflectionStrategy` for more details.
         """
         super().__init__(*args, **kwargs)
-        self.llm = self.get_LLM(config_path)
+        config = read_json(config_path)
+        keep_reflections = config.get('keep_reflections', True)
+        reflection_strategy = config.get('reflection_strategy', 'reflection')
+        self.llm = self.get_LLM(config=config)
         if isinstance(self.llm, AnyOpenAILLM):
             self.enc = tiktoken.encoding_for_model(self.llm.model_name)
         else:

@@ -30,7 +30,7 @@ class Agent(ABC):
         """
         raise NotImplementedError("Agent.forward() not implemented")
     
-    def get_LLM(self, config_path: str) -> BaseLLM:
+    def get_LLM(self, config_path: str, config: dict = None) -> BaseLLM:
         """Get the base large language model for the agent.
         
         Args:
@@ -38,8 +38,9 @@ class Agent(ABC):
         Returns:
             `BaseLLM`: The LLM.
         """
-        with open(config_path, 'r') as f:
-            config = json.load(f)
+        if config is None:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
         model_type = config['model_type']
         del config['model_type']
         if model_type != 'api':

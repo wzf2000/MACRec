@@ -19,5 +19,7 @@
                 "type": "string"
             }
         }
-    }
+    },
+    "keep_reflections": true,
+    "reflection_strategy": "reflection"
 }
