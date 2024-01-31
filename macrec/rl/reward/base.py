@@ -9,6 +9,13 @@ class Reward(ABC):
     
     @abstractmethod
     def reward(self, *args, **kwargs) -> float:
+        """Calculate the reward.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `float`: The reward value.
+        """
         raise NotImplementedError
     
     def __call__(self, *args, **kwargs) -> float:
@@ -17,6 +24,16 @@ class Reward(ABC):
 class DeltaReward(Reward):
     @abstractmethod
     def action_reward(self, action: Any, gt_answer: Any) -> float:
+        """Calculate the reward of an action. The final reward is the difference between the reward of the current action and the reward of the previous action.
+        
+        Args:
+            `action` (`Any`): The answer given by the system.
+            `gt_answer` (`Any`): The ground truth answer.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `float`: The reward value.
+        """
         raise NotImplementedError
     
     def reward(self, action1: Any, action2: Any, gt_answer: Any, *args, **kwargs) -> float:
@@ -30,6 +47,16 @@ class ReflectionReward(Reward):
         
     @abstractmethod
     def judge(self, action: Any, gt_answer: Any) -> bool:
+        """Judge whether the action is correct.
+        
+        Args:
+            `action` (`Any`): The answer given by the system.
+            `gt_answer` (`Any`): The ground truth answer.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `bool`: Whether the action is correct.
+        """
         raise NotImplementedError
     
     def reward(self, action1: float, action2: float, gt_answer: float, reflection_output: str, *args, **kwargs) -> float:

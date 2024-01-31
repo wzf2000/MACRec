@@ -8,6 +8,13 @@ class System(ABC):
     @staticmethod
     @abstractmethod
     def supported_tasks() -> list[str]:
+        """Return a list of supported tasks.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `list[str]`: A list of supported tasks.
+        """
         raise NotImplementedError("System.supported_tasks() not implemented")
     
     @property
@@ -44,6 +51,13 @@ class System(ABC):
     
     @abstractmethod
     def forward(self, *args, **kwargs) -> str:
+        """Forward pass of the system.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `str`: The system output.
+        """
         raise NotImplementedError("System.forward() not implemented")
         
     def is_finished(self) -> bool:

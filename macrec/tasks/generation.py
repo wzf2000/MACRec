@@ -65,22 +65,59 @@ class GenerationTask(Task):
     @property
     @abstractmethod
     def running_steps(self) -> int:
+        """Return the steps to run for each trial.
+        
+        Raises:
+            `NotImplementedError`: Subclasses should implement this method.
+        Returns:
+            `int`: The steps to run for each trial.
+        """
         raise NotImplementedError
     
     @abstractmethod
     def before_generate(self) -> None:
+        """The process to run before generating.
+        
+        Raises:
+            `NotImplementedError`: Subclasses should implement this method.
+        """
         raise NotImplementedError
     
     @abstractmethod
     def after_step(self, answer: Any, gt_answer: int | float | str, step: int, record: dict) -> None:
+        """The process to run after each system step during one trial.
+        
+        Args:
+            `answer` (`Any`): The answer given by the system.
+            `gt_answer` (`int | float | str`): The ground truth answer.
+            `step` (`int`): The current step. Starts from 0.
+            `record` (`dict`): The record of the current trial. Can be used to store intermediate results.
+        Raises:
+            `NotImplementedError`: Subclasses should implement this method.
+        """
         raise NotImplementedError
     
     @abstractmethod
     def after_iteration(self, answer: Any, gt_answer: int | float | str, record: dict, pbar: tqdm) -> None:
+        """The process to run after each trial.
+        
+        Args:
+            `answer` (`Any`): The final answer given by the system.
+            `gt_answer` (`int | float | str`): The ground truth answer.
+            `record` (`dict`): The record of the current trial. Can be used to store intermediate results.
+            `pbar` (`tqdm`): The progress bar. Can be used to update the information of the progress bar.
+        Raises:
+            `NotImplementedError`: Subclasses should implement this method.
+        """
         raise NotImplementedError
     
     @abstractmethod
     def after_generate(self) -> None:
+        """The process to run after generating.
+        
+        Raises:
+            `NotImplementedError`: Subclasses should implement this method.
+        """
         raise NotImplementedError
     
     def generate(self, data: list[tuple[str, int | float | str]], steps: int = 2):

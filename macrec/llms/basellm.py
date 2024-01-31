@@ -12,4 +12,13 @@ class BaseLLM(ABC):
     
     @abstractmethod
     def __call__(self, prompt: str, *args, **kwargs) -> str:
+        """Forward pass of the LLM.
+        
+        Args:
+            `prompt` (`str`): The prompt to feed into the LLM.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `str`: The LLM output.
+        """
         raise NotImplementedError("BaseLLM.__call__() not implemented")

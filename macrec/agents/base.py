@@ -13,6 +13,13 @@ class Agent(ABC):
     
     @abstractmethod
     def forward(self, *args: Any, **kwargs: Any) -> Any:
+        """Forward pass of the agent.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `Any`: The agent output.
+        """
         raise NotImplementedError("Agent.forward() not implemented")
     
     def get_LLM(self, config_path: str):

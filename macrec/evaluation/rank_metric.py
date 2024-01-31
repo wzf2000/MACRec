@@ -32,6 +32,16 @@ class RankMetric(torchmetrics.Metric):
     
     @abstractmethod
     def metric_at_k(self, answer: list[int], label: int) -> dict:
+        """Calculate the rank metric at k.
+        
+        Args:
+            `answer` (`list[int]`): The ranking given by the system.
+            `label` (`int`): The ground truth answer.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `dict`: The rank metric at k.
+        """
         raise NotImplementedError
     
 class HitRatioAt(RankMetric):

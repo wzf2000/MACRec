@@ -17,6 +17,15 @@ class Task(ABC):
     @staticmethod
     @abstractmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
+        """Parse task arguments.
+        
+        Args:
+            `parser` (`ArgumentParser`): An `ArgumentParser` object to parse arguments.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `ArgumentParser`: The `ArgumentParser` object with arguments added.
+        """
         raise NotImplementedError
     
     def __getattr__(self, __name: str) -> Any:
@@ -27,6 +36,11 @@ class Task(ABC):
 
     @abstractmethod
     def run(self, *args, **kwargs):
+        """The running pipeline of the task.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        """
         raise NotImplementedError
     
     def launch(self):
