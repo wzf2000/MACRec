@@ -1,0 +1,8 @@
+{
+    "manager_action": "config/agents/manager_action.json",
+    "manager_thought": "config/agents/manager_thought.json",
+    "reflector": "config/agents/reflector_api.json",
+    "agent_prompt": "config/prompts/react_reflect_prompt.json",
+    "data_prompt": "config/prompts/{task}.json",
+    "max_step": 1
+}

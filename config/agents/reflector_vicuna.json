@@ -1,0 +1,23 @@
+{
+    "model_type": "opensource",
+    "model_path": "lmsys/vicuna-7b-v1.5-16k",
+    "do_sample": true,
+    "temperature": 0.9,
+    "top_p": 1.0,
+    "max_new_tokens": 300,
+    "device": "auto",
+    "json_mode": true,
+    "prefix": "reflect",
+    "reflect_json_schema": {
+        "title": "Reflecion Schema",
+        "type": "object",
+        "properties": {
+            "correctness": {
+                "type": "boolean"
+            },
+            "reason": {
+                "type": "string"
+            }
+        }
+    }
+}
