@@ -25,6 +25,7 @@ data/
 logs/
 run/
 results/
+ckpts/
 config/api-config.json
 test*
 !macrec/*/test*
