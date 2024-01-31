@@ -5,6 +5,9 @@ from typing import Any
 from macrec.llms import BaseLLM, AnyOpenAILLM, OpenSourceLLM
 
 class Agent(ABC):
+    """
+    The base class of agents. We use the `forward` function to get the agent output. Use `get_LLM` to get the base large language model for the agent.
+    """
     def __init__(self, prompts: dict = dict(), *args, **kwargs) -> None:
         """Initialize the agent.
         

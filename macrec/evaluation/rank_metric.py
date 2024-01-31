@@ -1,8 +1,13 @@
-from abc import abstractmethod
 import torch
 import torchmetrics
+from abc import abstractmethod
 
 class RankMetric(torchmetrics.Metric):
+    """
+    The base class of rank metrics.
+    
+    One can inherit this class and implement the `metric_at_k` function to create a new rank metric.
+    """
     def __init__(self, topks: list[int] | int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if isinstance(topks, int):
@@ -45,6 +50,9 @@ class RankMetric(torchmetrics.Metric):
         raise NotImplementedError
     
 class HitRatioAt(RankMetric):
+    """
+    Hit ratio at k. If the ground truth answer is in the top k, then the metric is 1, otherwise 0.
+    """
     def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:
@@ -59,6 +67,9 @@ class HitRatioAt(RankMetric):
         return {f'HR@{topk}': result[topk] for topk in self.topks}
     
 class NDCGAt(RankMetric):
+    """
+    Normalized discounted cumulative gain at k. If the ground truth answer is in the top k, then the metric is 1 / log2(label position + 1), otherwise 0.
+    """
     def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:
@@ -77,6 +88,9 @@ class NDCGAt(RankMetric):
         return {f'NDCG@{topk}': result[topk] for topk in self.topks}
     
 class MRRAt(RankMetric):
+    """
+    Mean reciprocal rank at k. If the ground truth answer is in the top k, then the metric is 1 / label position, otherwise 0.
+    """
     def metric_at_k(self, answer: list[int], label: int) -> dict:
         result = {}
         for topk in self.topks:

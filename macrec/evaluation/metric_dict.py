@@ -2,6 +2,9 @@ import torchmetrics
 from loguru import logger
 
 class MetricDict:
+    """
+    A dictionary of metrics. Use `add` to add a metric to the dictionary. Use `update` to update the metrics with the output of the model. Use `compute` to compute the metrics. Use `report` to output the metrics.
+    """
     def __init__(self, metrics: dict[str, torchmetrics.Metric] = {}):
         self.metrics: dict[str, torchmetrics.Metric]  = metrics
         
@@ -9,6 +12,14 @@ class MetricDict:
         self.metrics[name] = metric
     
     def update(self, output: dict, prefix: str = '') -> str:
+        """Update the metrics with the output of the model. Only metrics with the given prefix will be updated.
+        
+        Args:
+            `output` (`dict`): The output of the model.
+            `prefix` (`str`, optional): The prefix of the metric names. Defaults to `''`.
+        Returns:
+            `str`: The first metric with the given prefix. If no metric with the given prefix is found, return `''`.
+        """
         for metric_name, metric in self.metrics.items():
             if not metric_name.startswith(prefix):
                 continue

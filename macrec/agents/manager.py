@@ -7,6 +7,9 @@ from macrec.utils import format_step
 from macrec.llms import AnyOpenAILLM
 
 class Manager(Agent):
+    """
+    The manager agent. The manager agent is a two-stage agent, which first prompts the thought LLM and then prompts the action LLM.
+    """
     def __init__(self, thought_config_path: str, action_config_path: str, *args, **kwargs) -> None:
         """Initialize the manager agent. The manager agent is a two-stage agent, which first prompts the thought LLM and then prompts the action LLM.
         

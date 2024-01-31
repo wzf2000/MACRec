@@ -18,6 +18,9 @@ class ReflectionStrategy(Enum):
     LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflection'
 
 class Reflector(Agent):
+    """
+    The reflector agent. The reflector agent prompts the LLM to reflect on the input and the scratchpad as default. Other reflection strategies are also supported. See `ReflectionStrategy` for more details.
+    """
     def __init__(self, config_path: str, keep_reflections: bool = True, reflection_strategy: str = 'reflection', *args, **kwargs) -> None:
         """Initialize the reflector agent. The reflector agent prompts the LLM to reflect on the input and the scratchpad as default.
         
