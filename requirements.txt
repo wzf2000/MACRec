@@ -18,3 +18,4 @@ jsonlines>=4.0.0
 torchmetrics>=1.2.1
 sentencepiece==0.1.99
 protobuf==4.25.1
+wikipedia>=1.4.0
