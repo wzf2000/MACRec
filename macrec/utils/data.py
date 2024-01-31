@@ -5,6 +5,10 @@ import numpy as np
 def collator(data: list[dict[str, torch.Tensor]]):
     return dict((key, [d[key] for d in data]) for key in data[0])
 
+def read_json(path: str) -> dict:
+    with open(path, 'r') as f:
+        return json.load(f)
+
 class NumpyEncoder(json.JSONEncoder):
     """ Custom encoder for numpy data types """
     def default(self, obj):

@@ -1,17 +1,25 @@
 import re
+import json
 from typing import Any
 
-def parse_action(string: str) -> tuple[str, str]:
-    pattern = r'^(\w+)\[(.+)\]$'
-    match = re.match(pattern, string)
-    
-    if match:
-        action_type = match.group(1)
-        argument = match.group(2)
-        return action_type, argument
-    
+def parse_action(action: str, json_mode: bool = False) -> tuple[str, Any]:
+    if json_mode:
+        try:
+            json_action = json.loads(action)
+            return json_action['type'], json_action['content']
+        except:
+            return 'Invalid', None
     else:
-        return None, None
+        pattern = r'^(\w+)\[(.+)\]$'
+        match = re.match(pattern, action)
+        
+        if match:
+            action_type = match.group(1)
+            argument = match.group(2)
+            return action_type, argument
+        
+        else:
+            return 'Invalid', None
     
 def parse_QA_answer(answer: str, *args, **kwargs) -> dict[str, bool | str]:
     return {
@@ -107,4 +115,14 @@ def parse_answer(type, *args, **kwargs) -> dict[str, Any]:
     elif type == 'sr':
         return parse_ranking_answer(*args, **kwargs)
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f'Unsupported task: {type}')
+
+def init_answer(type) -> Any:
+    if type == 'qa':
+        return ''
+    elif type == 'rp':
+        return 0
+    elif type == 'sr':
+        return []
+    else:
+        raise NotImplementedError(f'Unsupported task: {type}')

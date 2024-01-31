@@ -1,7 +1,9 @@
+import os
 import json
 from langchain.prompts import PromptTemplate
 
 def read_prompts(config_file: str) -> dict[str, PromptTemplate | str]:
+    assert os.path.exists(config_file), f'config file {config_file} does not exist'
     with open(config_file, 'r') as f:
         config = json.load(f)
     ret = {}
