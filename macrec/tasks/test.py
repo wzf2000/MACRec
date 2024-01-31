@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from argparse import ArgumentParser
 
 from macrec.tasks.evaluate import EvaluateTask
@@ -9,12 +10,12 @@ class TestTask(EvaluateTask):
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         parser = EvaluateTask.parse_task_args(parser)
         parser.add_argument('--random', action='store_true', help='Whether to randomly sample test data')
-        parser.add_argument('--samples', type=int, default=30, help='Number of samples to test')
+        parser.add_argument('--samples', type=int, default=5, help='Number of samples to test')
         parser.add_argument('--offset', type=int, default=0, help='Offset of samples, only works when random is False')
         return parser
 
-    def get_data(self, *args, **kwargs) -> list[tuple[str, int | float | str]]:
-        data = super().get_data(*args, **kwargs)
+    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
+        data = super().prompt_data(df)
         if self.random:
             sample_idx = np.random.choice(len(data), self.samples, replace=False)
             data = [data[i] for i in sample_idx]
@@ -30,3 +31,6 @@ class TestTask(EvaluateTask):
         self.samples = samples
         self.offset = offset
         super().run(*args, **kwargs)
+
+if __name__ == '__main__':
+    TestTask().launch()
