@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 from macrec.llms import BaseLLM, AnyOpenAILLM, OpenSourceLLM
 
@@ -30,15 +30,17 @@ class Agent(ABC):
         """
         raise NotImplementedError("Agent.forward() not implemented")
     
-    def get_LLM(self, config_path: str, config: dict = None) -> BaseLLM:
+    def get_LLM(self, config_path: Optional[str] = None, config: Optional[dict] = None) -> BaseLLM:
         """Get the base large language model for the agent.
         
         Args:
-            `config_path` (`str`): The path to the config file of the LLM.
+            `config_path` (`Optional[str]`): The path to the config file of the LLM. If `config` is not `None`, this argument will be ignored. Defaults to `None`.
+            `config` (`Optional[dict]`): The config of the LLM. Defaults to `None`.
         Returns:
             `BaseLLM`: The LLM.
         """
         if config is None:
+            assert config_path is not None
             with open(config_path, 'r') as f:
                 config = json.load(f)
         model_type = config['model_type']
