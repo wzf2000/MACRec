@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
-from .base import Task
-from ..dataset import ml100k_process_data, amazon_process_data
-from ..utils import init_all_seeds
+
+from macrec.tasks.base import Task
+from macrec.dataset import ml100k_process_data, amazon_process_data
+from macrec.utils import init_all_seeds
 
 class PreprocessTask(Task):
     @staticmethod

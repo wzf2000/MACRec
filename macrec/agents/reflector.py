@@ -3,10 +3,10 @@ from loguru import logger
 from transformers import AutoTokenizer
 from langchain.prompts import PromptTemplate
 
-from .base import Agent
-from .strategy import ReflexionStrategy
-from ..llms import AnyOpenAILLM
-from ..utils import format_step, format_reflections, format_last_attempt
+from macrec.agents.base import Agent
+from macrec.agents.strategy import ReflexionStrategy
+from macrec.llms import AnyOpenAILLM
+from macrec.utils import format_step, format_reflections, format_last_attempt
 
 class Reflector(Agent):
     def __init__(self, config_path: str, keep_reflections: bool = True, reflection_strategy: str = 'reflexion', *args, **kwargs) -> None:

@@ -1,8 +1,7 @@
-import json
-from typing import Any
 import numpy as np
 from loguru import logger
-from .base import Reward, DeltaReward, ReflectionReward
+
+from macrec.rl.reward.base import Reward, DeltaReward, ReflectionReward
 
 class RatingPredictionRewardV1(DeltaReward):
     def __init__(self, invalid: float = 0, lower: float = 1, upper: float = 5, *args, **kwargs):

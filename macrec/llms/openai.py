@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI, OpenAI
 from langchain.schema import HumanMessage
-from .basellm import BaseLLM
+
+from macrec.llms.basellm import BaseLLM
 
 class AnyOpenAILLM(BaseLLM):
     def __init__(self, model_name: str = 'gpt-3.5-turbo', json_mode: bool = False, *args, **kwargs):

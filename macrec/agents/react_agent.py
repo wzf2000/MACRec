@@ -1,5 +1,6 @@
 from loguru import logger
-from .base_agent import BaseAgent
+
+from macrec.agents.base_agent import BaseAgent
 
 class ReactAgent(BaseAgent):
     def __init__(self, max_steps: int = 6, *args, **kwargs) -> None:

@@ -1,7 +1,8 @@
 import numpy as np
 from argparse import ArgumentParser
-from .evaluate import EvaluateTask
-from ..utils import init_all_seeds
+
+from macrec.tasks.evaluate import EvaluateTask
+from macrec.utils import init_all_seeds
 
 class TestTask(EvaluateTask):
     @staticmethod

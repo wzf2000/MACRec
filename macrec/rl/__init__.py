@@ -1,1 +1,1 @@
-from .offline_ppo_dataset import OfflinePPODataset
+from macrec.rl.offline_ppo_dataset import OfflinePPODataset

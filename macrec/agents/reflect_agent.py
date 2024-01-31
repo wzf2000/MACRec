@@ -1,9 +1,10 @@
 from loguru import logger
 from langchain.prompts import PromptTemplate
-from .strategy import ReflexionStrategy
-from .base_agent import BaseAgent
-from ..llms import BaseLLM
-from ..utils import format_last_attempt, format_reflections, format_step
+
+from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.base_agent import BaseAgent
+from macrec.llms import BaseLLM
+from macrec.utils import format_last_attempt, format_reflections, format_step
 
 class ReflectAgent(BaseAgent):
     def __init__(

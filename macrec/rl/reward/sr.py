@@ -1,6 +1,6 @@
-import numpy as np
 from loguru import logger
-from .base import Reward, DeltaReward, ReflectionReward
+
+from macrec.rl.reward.base import Reward, DeltaReward, ReflectionReward
 
 class SequentialRecommendationRewardV1(DeltaReward):
     def action_reward(self, action: list[int], gt_answer: int) -> float:

@@ -3,9 +3,10 @@ import tiktoken
 from typing import Any
 from loguru import logger
 from langchain.prompts import PromptTemplate
-from ..utils import format_step
-from ..llms import BaseLLM
-from ..utils import EM, parse_action, parse_answer
+
+from macrec.utils import format_step
+from macrec.llms import BaseLLM
+from macrec.utils import EM, parse_action, parse_answer
 
 class BaseAgent:
     def __init__(self, actor_llm: BaseLLM, prompts: dict = dict(), leak: bool = True, json_mode: bool = False, task: str = 'qa', *args, **kwargs) -> None:

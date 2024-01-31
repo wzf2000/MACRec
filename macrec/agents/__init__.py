@@ -1,13 +1,11 @@
 # Description: all agents are defined here
-from .strategy import ReflexionStrategy
-from .base_agent import BaseAgent
-from .reflect_agent import ReflectAgent
-from .cot_agent import CoTAgent
-from .react_agent import ReactAgent
-from .react_reflect_agent import ReactReflectAgent
-from .utils import summarize_trial, summarize_react_trial, save_agents
-from .log import log_trial, log_react_trial
+from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.base_agent import BaseAgent
+from macrec.agents.reflect_agent import ReflectAgent
+from macrec.agents.cot_agent import CoTAgent
+from macrec.agents.react_agent import ReactAgent
+from macrec.agents.react_reflect_agent import ReactReflectAgent
 
-from .base import Agent
-from .manager import Manager
-from .reflector import Reflector
+from macrec.agents.base import Agent
+from macrec.agents.manager import Manager
+from macrec.agents.reflector import Reflector

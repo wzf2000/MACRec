@@ -3,9 +3,10 @@ import jsonlines
 from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
-from .base import GenerationTask
-from ..utils import str2list, NumpyEncoder
-from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
+
+from macrec.tasks.base import GenerationTask
+from macrec.utils import str2list, NumpyEncoder
+from macrec.evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
 
 class EvaluateTask(GenerationTask):
     @staticmethod

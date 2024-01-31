@@ -4,9 +4,10 @@ import numpy as np
 from tqdm import tqdm
 from loguru import logger
 from argparse import ArgumentParser
-from .base import GenerationTask, RewardTask
-from ..utils import NumpyEncoder, init_all_seeds
-from ..agents import ReflectAgent
+
+from macrec.tasks.base import GenerationTask, RewardTask
+from macrec.utils import NumpyEncoder, init_all_seeds
+from macrec.agents import ReflectAgent
 
 class FeedbackTask(GenerationTask, RewardTask):
     @staticmethod

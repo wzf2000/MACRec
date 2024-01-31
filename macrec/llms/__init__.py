@@ -1,4 +1,4 @@
 # Description: Package for large language models
-from .basellm import BaseLLM
-from .openai import AnyOpenAILLM
-from .opensource import OpenSourceLLM
+from macrec.llms.basellm import BaseLLM
+from macrec.llms.openai import AnyOpenAILLM
+from macrec.llms.opensource import OpenSourceLLM

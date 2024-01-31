@@ -1,9 +1,10 @@
 import jsonlines
 from loguru import logger
 from argparse import ArgumentParser
-from .base import Task
-from ..utils import str2list, NumpyEncoder
-from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
+
+from macrec.tasks.base import Task
+from macrec.utils import str2list, NumpyEncoder
+from macrec.evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
 
 class CalculateTask(Task):
     @staticmethod

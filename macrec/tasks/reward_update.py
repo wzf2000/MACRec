@@ -1,6 +1,7 @@
 import jsonlines
 from argparse import ArgumentParser
-from .base import RewardTask
+
+from macrec.tasks.base import RewardTask
 
 class RewardUpdateTask(RewardTask):
     @staticmethod

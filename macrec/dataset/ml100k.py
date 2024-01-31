@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 from loguru import logger
 from langchain.prompts import PromptTemplate
-from .utils import append_his_info
+
+from macrec.utils import append_his_info
 
 def download_data(dir: str):
     raw_path = os.path.join(dir, 'raw_data')

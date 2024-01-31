@@ -1,9 +1,9 @@
 from typing import Any
 from loguru import logger
 
-from .base import System
-from ..agents import Manager
-from ..utils import parse_answer, parse_action
+from macrec.system.base import System
+from macrec.agents import Manager
+from macrec.utils import parse_answer, parse_action
 
 class ReactSystem(System):
     @staticmethod

@@ -5,9 +5,9 @@ from typing import Any
 from loguru import logger
 from argparse import ArgumentParser
 
-from .base import Task
-from ..utils import openai_init, read_json
-from ..system import ReactSystem, ReflectionSystem
+from macrec.tasks.base import Task
+from macrec.utils import openai_init, read_json
+from macrec.system import ReactSystem, ReflectionSystem
 
 class GenerationTask(Task):
     @staticmethod

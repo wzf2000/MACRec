@@ -5,10 +5,10 @@ from typing import Any
 from loguru import logger
 from argparse import ArgumentParser
 
-from .generation import GenerationTask
-from ..utils import str2list, NumpyEncoder
-from ..system import ReflectionSystem
-from ..evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
+from macrec.tasks.generation import GenerationTask
+from macrec.utils import str2list, NumpyEncoder
+from macrec.system import ReflectionSystem
+from macrec.evaluation import MetricDict, HitRatioAt, NDCGAt, RMSE, Accuracy, MAE
 
 class MACEvaluateTask(GenerationTask):
     @staticmethod

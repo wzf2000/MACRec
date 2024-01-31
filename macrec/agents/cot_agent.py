@@ -1,6 +1,7 @@
 from loguru import logger
-from .strategy import ReflexionStrategy
-from .reflect_agent import ReflectAgent
+
+from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.reflect_agent import ReflectAgent
 
 class CoTAgent(ReflectAgent):
     def __init__(self, *args, **kwargs) -> None:

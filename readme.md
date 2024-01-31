@@ -8,7 +8,7 @@
     - `evaluation/`: The pipeline and basic class for evaluation the model.
     - `llms/`: The wrapper for LLMs (both API and open source LLMs).
     - `rl/`: The datasets and reward function for the RLHF are defined here.
-    - `systems/`: The multi-agent system classes are defined here.
+    - `system/`: The multi-agent system classes are defined here.
     - `tasks/`: For external function call (e.g. main.py).
     - `utils/`: Some useful functions are defined here.
 - `config/`: The config folder.

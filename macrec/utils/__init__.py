@@ -2,7 +2,7 @@
 from .string import EM, str2list, is_correct
 from .parse import parse_action, parse_answer, init_answer
 from .format import format_step, format_last_attempt, format_reflections
-from .data import collator, NumpyEncoder, read_json
+from .data import collator, read_json, append_his_info, NumpyEncoder
 from .random import init_all_seeds
 from .prompts import read_prompts
 from .api import openai_init

@@ -1,21 +1,16 @@
 import os
 import time
 import json
-from loguru import logger
+import torch
 from argparse import ArgumentParser
 from tqdm import tqdm
-
-import torch
-
-from trl import AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer
 from peft import LoraConfig
 from accelerate import Accelerator
 from transformers import AutoTokenizer
 
-
-from .base import Task
-from ..rl import OfflinePPODataset
-from ..utils import collator
+from macrec.tasks.base import Task
+from macrec.rl import OfflinePPODataset
+from macrec.utils import collator
         
 class RLHFTrainingTask(Task):
     @staticmethod
@@ -77,6 +72,8 @@ class RLHFTrainingTask(Task):
         else:
             raise NotImplementedError
 
+        from trl import AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer
+        
         ppo_kwargs = config.get('ppo_kwargs', {})
         ppo_config = PPOConfig(**ppo_kwargs)
 

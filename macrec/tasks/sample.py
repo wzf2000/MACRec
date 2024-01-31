@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
-from .base import Task
-from ..utils import init_all_seeds
+
+from macrec.tasks.base import Task
+from macrec.utils import init_all_seeds
 
 class SampleTask(Task):
     @staticmethod

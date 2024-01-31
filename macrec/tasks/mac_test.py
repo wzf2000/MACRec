@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
 
-from .mac_evaluate import MACEvaluateTask
-from ..utils import init_all_seeds
+from macrec.tasks.mac_evaluate import MACEvaluateTask
+from macrec.utils import init_all_seeds
 
 class MACTestTask(MACEvaluateTask):
     @staticmethod

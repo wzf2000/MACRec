@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any
 from langchain.prompts import PromptTemplate
 
-from ..utils import is_correct, init_answer, read_json, read_prompts
+from macrec.utils import is_correct, init_answer, read_json, read_prompts
 
 class System(ABC):
     @staticmethod

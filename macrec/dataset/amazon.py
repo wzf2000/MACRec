@@ -1,12 +1,13 @@
 import os
+import random
 import pandas as pd
 import numpy as np
 import gzip
 import subprocess
 from loguru import logger
 from langchain.prompts import PromptTemplate
-from .utils import append_his_info
-import random
+
+from macrec.utils import append_his_info
 
 def parse(path: str) -> dict:
     g = gzip.open(path, 'rb')

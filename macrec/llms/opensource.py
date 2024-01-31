@@ -5,7 +5,7 @@ from typing import Any
 from transformers import pipeline
 from transformers.pipelines import Pipeline
 
-from .basellm import BaseLLM
+from macrec.llms.basellm import BaseLLM
 
 class MyJsonFormer:
     def __init__(self, json_schema: dict, pipeline: Pipeline, max_new_tokens: int = 300, temperature: float = 0.9, debug: bool = False):

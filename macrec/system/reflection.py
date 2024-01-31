@@ -1,8 +1,8 @@
 import json
 from loguru import logger
 
-from .react import ReactSystem
-from ..agents import Reflector
+from macrec.system.react import ReactSystem
+from macrec.agents import Reflector
 
 class ReflectionSystem(ReactSystem):
     def __init__(self, keep_reflections: bool = True, *args, **kwargs) -> None:

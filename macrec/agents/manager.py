@@ -2,9 +2,9 @@ import tiktoken
 from transformers import AutoTokenizer
 from langchain.prompts import PromptTemplate
 
-from .base import Agent
-from ..utils import format_step
-from ..llms import AnyOpenAILLM
+from macrec.agents.base import Agent
+from macrec.utils import format_step
+from macrec.llms import AnyOpenAILLM
 
 class Manager(Agent):
     def __init__(self, thought_config_path: str, action_config_path: str, *args, **kwargs) -> None:

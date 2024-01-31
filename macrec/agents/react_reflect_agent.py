@@ -1,6 +1,6 @@
-from .strategy import ReflexionStrategy
-from .reflect_agent import ReflectAgent
-from .react_agent import ReactAgent
+from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.reflect_agent import ReflectAgent
+from macrec.agents.react_agent import ReactAgent
 
 class ReactReflectAgent(ReactAgent, ReflectAgent):
     def __init__(self, *args, **kwargs) -> None:

@@ -7,10 +7,11 @@ from argparse import ArgumentParser
 from loguru import logger
 from typing import Any
 from tqdm import tqdm
-from ..utils import read_prompts
-from ..llms import AnyOpenAILLM, OpenSourceLLM
-from ..agents import ReactAgent, ReactReflectAgent
-from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, RatingPredictionReflectionReward, SequentialRecommendationRewardV1, SequentialRecommendationReflectionReward
+
+from macrec.utils import read_prompts
+from macrec.llms import AnyOpenAILLM, OpenSourceLLM
+from macrec.agents import ReactAgent, ReactReflectAgent
+from macrec.rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, RatingPredictionReflectionReward, SequentialRecommendationRewardV1, SequentialRecommendationReflectionReward
 
 class Task(ABC):
     @staticmethod

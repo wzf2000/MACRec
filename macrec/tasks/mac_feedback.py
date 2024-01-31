@@ -7,9 +7,9 @@ from typing import Any
 from loguru import logger
 from argparse import ArgumentParser
 
-from .base import RewardTask
-from .generation import GenerationTask
-from ..utils import init_all_seeds, NumpyEncoder
+from macrec.tasks.base import RewardTask
+from macrec.tasks.generation import GenerationTask
+from macrec.utils import init_all_seeds, NumpyEncoder
 
 class MACFeedbackTask(GenerationTask, RewardTask):
     @staticmethod
