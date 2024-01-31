@@ -1,49 +1,47 @@
-import re
-import string
-from typing import Any
+# Description: Functions for string processing.
 
-def normalize_answer(s: str) -> str:
-    def remove_articles(text: str) -> str:
-        return re.sub(r"\b(a|an|the)\b", " ", text)
+def format_step(step: str) -> str:
+    """Format a step prompt.
     
-    def white_space_fix(text: str) -> str:
-        return " ".join(text.split())
+    Args:
+        `step` (`str`): A step prompt in string format.
+    Returns:
+        `str`: The formatted step prompt.
+    """
+    return step.strip('\n').strip().replace('\n', '')
+    
+def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
+    """Format the last attempt reflection prompt of a trial.
+    
+    Args:
+        `input` (`str`): The input of the last attempt.
+        `scratchpad` (`str`): The scratchpad of the last attempt.
+        `header` (`str`): The last attempt reflection header.
+    Returns:
+        `str`: The formatted last attempt prompt.
+    """
+    return header + f'Input: {input}\n' + scratchpad.strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
 
-    def remove_punc(text: str) -> str:
-        exclude = set(string.punctuation)
-        return "".join(ch for ch in text if ch not in exclude)
+def format_reflections(reflections: list[str], header: str) -> str:
+    """Format reflections prompt.
+    
+    Args:
+        `reflections` (`list[str]`): A list of former reflections.
+        `header` (`str`): The reflections header.
+    Returns:
+        `str`: The formatted reflections prompt. If `reflections` is empty, return an empty string.
+    """
+    if reflections == []:
+        return ''
+    else:
+        return header + 'Reflections:\n- ' + '\n- '.join([r.strip() for r in reflections])
 
-    def lower(text: str) -> str:
-        return text.lower()
-
-    return white_space_fix(remove_articles(remove_punc(lower(s))))
-
-def EM(answer, key) -> bool:
-    return normalize_answer(answer) == normalize_answer(key)
-
-def str2list(s: str) -> list:
+def str2list(s: str) -> list[int]:
+    """Convert a string to a list of integers.
+    
+    Args:
+        `s` (`str`): A string of integers separated by commas. For example, `'1,2,3'`.
+    Returns:
+        `list[int]`: A list of integers. For example, `[1, 2, 3]`.
+    """
     return [int(i) for i in s.split(',')]
-
-def is_correct_qa(answer: str, gt_answer: str) -> bool:
-    if isinstance(answer, str):
-        return EM(answer, gt_answer)
-    else:
-        return EM(str(answer), gt_answer)
-    
-def is_correct_rp(answer: float, gt_answer: float) -> bool:
-    return answer == gt_answer
-
-def is_correct_sr(answer: list[int], gt_answer: int) -> bool:
-    if len(answer) == 0:
-        return False
-    return answer[0] == gt_answer
-
-def is_correct(task: str, answer: Any, gt_answer: Any) -> bool:
-    if task == 'qa':
-        return is_correct_qa(answer, gt_answer)
-    elif task == 'rp':
-        return is_correct_rp(answer, gt_answer)
-    elif task == 'sr':
-        return is_correct_sr(answer, gt_answer)
-    else:
-        raise ValueError(f'Unsupported task type: {task}')

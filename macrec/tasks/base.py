@@ -136,14 +136,14 @@ class GenerationTask(Task):
             # TODO: Add other agents
             raise NotImplementedError
     
-    def openai_init(self, api_config: str):
+    def init_openai_api(self, api_config: str):
         with open(api_config, 'r') as f:
             self.api_config = json.load(f)
             os.environ["OPENAI_API_BASE"] = self.api_config['api_base']
             os.environ["OPENAI_API_KEY"] = self.api_config['api_key']
     
     def run(self, api_config: str, data_file: str, agent: str, reflection_model: str, generation_config: str, device: str, task: str, max_his: int, json_mode: bool, max_steps: int, *args, **kwargs) -> list[tuple[str, int | float | str]]:
-        self.openai_init(api_config)
+        self.init_openai_api(api_config)
         self.json_mode = json_mode
         self.task = task
         self.prompts = dict()

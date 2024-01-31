@@ -1,8 +1,7 @@
 # Description: __init__ file for utils package
-from .string import EM, str2list, is_correct
-from .parse import parse_action, parse_answer, init_answer
-from .format import format_step, format_last_attempt, format_reflections
+from .check import EM, is_correct
 from .data import collator, read_json, append_his_info, NumpyEncoder
-from .random import init_all_seeds
+from .string import format_step, format_last_attempt, format_reflections, str2list
+from .init import init_openai_api, init_all_seeds
+from .parse import parse_action, parse_answer, init_answer
 from .prompts import read_prompts
-from .api import openai_init

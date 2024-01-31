@@ -1,16 +1,44 @@
+# Description: Data utilities for macrec, including collator, json reader, json writer encoder, etc.
+
 import json
 import torch
 import numpy as np
 import pandas as pd
 
-def collator(data: list[dict[str, torch.Tensor]]):
+def collator(data: list[dict[str, torch.Tensor]]) -> dict:
+    """Collator for dataloader.
+
+    Args:
+        `data` (`list[dict[str, torch.Tensor]]`): List of data.
+
+    Returns:
+        `dict`: Collated data.
+    """
     return dict((key, [d[key] for d in data]) for key in data[0])
 
 def read_json(path: str) -> dict:
+    """Read json file.
+
+    Args:
+        `path` (`str`): Path to the json file.
+
+    Returns:
+        `dict`: The json data.
+    """
     with open(path, 'r') as f:
         return json.load(f)
 
-def append_his_info(dfs: list[pd.DataFrame], summary: bool = False, neg: bool = False):
+def append_his_info(dfs: list[pd.DataFrame], summary: bool = False, neg: bool = False) -> list[pd.DataFrame]:
+    """Append history information to the dataframes.
+
+    Args:
+        `dfs` (`list[pd.DataFrame]`): Dataframes to be appended, should contain columns `['user_id', 'item_id', 'rating', 'timestamp']`.
+        `summary` (`bool`, optional): Whether to append summary information. Defaults to `False`. If `True`, the input dataframes should contain column `summary`.
+        `neg` (`bool`, optional): Whether to append negative item information. Defaults to `False`.
+
+    Returns:
+        `list[pd.DataFrame]`: Appended dataframes.
+    """
     all_df = pd.concat(dfs)
     sort_df = all_df.sort_values(by=['timestamp', 'user_id'], kind='mergesort')
     position = []
@@ -51,7 +79,7 @@ def append_his_info(dfs: list[pd.DataFrame], summary: bool = False, neg: bool = 
     return ret_dfs
 
 class NumpyEncoder(json.JSONEncoder):
-    """ Custom encoder for numpy data types """
+    """ Custom json encoder for numpy data types """
     def default(self, obj):
         if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
                             np.int16, np.int32, np.int64, np.uint8,

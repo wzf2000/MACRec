@@ -1,8 +1,17 @@
+# Description: Prompt templates reader.
+
 import os
 import json
 from langchain.prompts import PromptTemplate
 
 def read_prompts(config_file: str) -> dict[str, PromptTemplate | str]:
+    """Read prompt templates from config file.
+    
+    Args:
+        `config_file` (`str`): Path to the prompts' config file.
+    Returns:
+        `dict[str, PromptTemplate | str]`: A dictionary of prompt templates. The value can be either a `PromptTemplate` object or a raw string.
+    """
     assert os.path.exists(config_file), f'config file {config_file} does not exist'
     with open(config_file, 'r') as f:
         config = json.load(f)
