@@ -1,7 +1,7 @@
 from loguru import logger
 from langchain.prompts import PromptTemplate
 
-from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.reflector import ReflexionStrategy
 from macrec.agents.base_agent import BaseAgent
 from macrec.llms import BaseLLM
 from macrec.utils import format_last_attempt, format_reflections, format_step

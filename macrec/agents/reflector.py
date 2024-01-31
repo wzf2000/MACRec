@@ -1,12 +1,24 @@
 import tiktoken
+from enum import Enum
 from loguru import logger
 from transformers import AutoTokenizer
 from langchain.prompts import PromptTemplate
 
 from macrec.agents.base import Agent
-from macrec.agents.strategy import ReflexionStrategy
 from macrec.llms import AnyOpenAILLM
 from macrec.utils import format_step, format_reflections, format_last_attempt
+
+class ReflexionStrategy(Enum):
+    """
+    NONE: No reflection
+    LAST_ATTEMPT: Use last reasoning trace in context 
+    REFLEXION: Apply reflexion to the next reasoning trace 
+    LAST_ATTEMPT_AND_REFLEXION: Use last reasoning trace in context and apply reflexion to the next reasoning trace 
+    """
+    NONE = 'base'
+    LAST_ATTEMPT = 'last_trial' 
+    REFLEXION = 'reflexion'
+    LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflexion'
 
 class Reflector(Agent):
     def __init__(self, config_path: str, keep_reflections: bool = True, reflection_strategy: str = 'reflexion', *args, **kwargs) -> None:

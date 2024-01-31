@@ -1,8 +1,6 @@
 # Description: all agents are defined here
-from macrec.agents.strategy import ReflexionStrategy
 from macrec.agents.base_agent import BaseAgent
 from macrec.agents.reflect_agent import ReflectAgent
-from macrec.agents.cot_agent import CoTAgent
 from macrec.agents.react_agent import ReactAgent
 from macrec.agents.react_reflect_agent import ReactReflectAgent
 

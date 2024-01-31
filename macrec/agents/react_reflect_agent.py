@@ -1,4 +1,4 @@
-from macrec.agents.strategy import ReflexionStrategy
+from macrec.agents.reflector import ReflexionStrategy
 from macrec.agents.reflect_agent import ReflectAgent
 from macrec.agents.react_agent import ReactAgent
 
