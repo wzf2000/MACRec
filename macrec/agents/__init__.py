@@ -7,3 +7,7 @@ from .react_agent import ReactAgent
 from .react_reflect_agent import ReactReflectAgent
 from .utils import summarize_trial, summarize_react_trial, save_agents
 from .log import log_trial, log_react_trial
+
+from .base import Agent
+from .manager import Manager
+from .reflector import Reflector
