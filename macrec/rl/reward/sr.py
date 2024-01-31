@@ -3,6 +3,9 @@ from loguru import logger
 from macrec.rl.reward.base import Reward, DeltaReward, ReflectionReward
 
 class SequentialRecommendationRewardV1(DeltaReward):
+    """
+    The reward function v1 for sequential recommendation. The reward of an action is the reciprocal of the position of the ground truth answer in the action list. If the ground truth answer is not in the action list, the reward is 0.
+    """
     def action_reward(self, action: list[int], gt_answer: int) -> float:
         if gt_answer not in action:
             return 0
@@ -10,6 +13,9 @@ class SequentialRecommendationRewardV1(DeltaReward):
         return 1 / (gt_pos + 1)
     
 class SequentialRecommendationReflectionReward(ReflectionReward):
+    """
+    The reflection reward function for sequential recommendation. The `judge` function judges whether the first candidate in the action list is the ground truth answer.
+    """
     def __init__(self, n_candidates: int = 8, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.n_candidates = n_candidates

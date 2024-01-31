@@ -1,4 +1,4 @@
-from macrec.agents.reflector import ReflexionStrategy
+from macrec.agents.reflector import ReflectionStrategy
 from macrec.agents.reflect_agent import ReflectAgent
 from macrec.agents.react_agent import ReactAgent
 
@@ -29,9 +29,9 @@ class ReactReflectAgent(ReactAgent, ReflectAgent):
             scratchpad=self.scratchpad
         )
         
-    def run(self, reset: bool = True, reflexion_strategy: ReflexionStrategy = ReflexionStrategy.REFLEXION) -> str:
+    def run(self, reset: bool = True, reflection_strategy: ReflectionStrategy = ReflectionStrategy.REFLEXION) -> str:
         if self.is_finished() or self.is_halted():
-            self.reflect(reflexion_strategy)
+            self.reflect(reflection_strategy)
             self.reflected = True
         else:
             self.reflected = False

@@ -5,6 +5,9 @@ from langchain.prompts import PromptTemplate
 from macrec.utils import is_correct, init_answer, read_json, read_prompts
 
 class System(ABC):
+    """
+    The base class of systems. We use the `forward` function to get the system output. Use `set_data` to set the input, context and ground truth answer. Use `is_finished` to check whether the system has finished. Use `is_correct` to check whether the system output is correct. Use `finish` to finish the system and set the system output.
+    """
     @staticmethod
     @abstractmethod
     def supported_tasks() -> list[str]:
@@ -29,6 +32,13 @@ class System(ABC):
             raise NotImplementedError
     
     def __init__(self, task: str, config_path: str, leak: bool = False, *args, **kwargs) -> None:
+        """Initialize the system.
+        
+        Args:
+            `task` (`str`): The task for the system to perform.
+            `config_path` (`str`): The path to the config file of the system.
+            `leak` (`bool`, optional): Whether to leak the ground truth answer to the system during inference. Defaults to `False`.
+        """
         self.task = task
         assert self.task in self.supported_tasks()
         self.config = read_json(config_path)

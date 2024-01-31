@@ -5,12 +5,16 @@ from macrec.system.base import System
 from macrec.agents import Manager
 from macrec.utils import parse_answer, parse_action
 
-class ReactSystem(System):
+class ReActSystem(System):
+    """
+    The system with a single agent (ReAct), which can perform multiple actions in sequence. The system will stop when the agent finishes or the maximum number of actions is reached or the agent is over limit of the context.
+    """
     @staticmethod
     def supported_tasks() -> list[str]:
         return ['qa', 'rp', 'sr']
     
     def __init__(self, *args, **kwargs) -> None:
+        """Initialize the ReAct system."""
         super().__init__(*args, **kwargs)
         self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts)
         self.max_step: int = self.config.get('max_step', 6)

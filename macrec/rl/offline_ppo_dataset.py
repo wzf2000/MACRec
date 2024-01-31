@@ -3,6 +3,12 @@ from torch.utils.data import Dataset
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 class OfflinePPODataset(Dataset):
+    """
+    The dataset for offline PPO algorithm. The dataset is a list of samples, each of which is a dictionary containing the following keys:
+    - `input_ids` (`torch.Tensor`): The input ids of the prompt.
+    - `output_ids` (`torch.Tensor`): The output ids of the response.
+    - `rewards` (`torch.Tensor`): The reward of the response.
+    """
     def __init__(self, prompts: list[str], responses: list[str], rewards: list[int | float], tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast):
         assert len(prompts) == len(responses) == len(rewards)
         self.prompts = prompts

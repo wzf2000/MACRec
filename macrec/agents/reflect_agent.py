@@ -1,7 +1,7 @@
 from loguru import logger
 from langchain.prompts import PromptTemplate
 
-from macrec.agents.reflector import ReflexionStrategy
+from macrec.agents.reflector import ReflectionStrategy
 from macrec.agents.base_agent import BaseAgent
 from macrec.llms import BaseLLM
 from macrec.utils import format_last_attempt, format_reflections, format_step
@@ -48,18 +48,18 @@ class ReflectAgent(BaseAgent):
             logger.debug(f"Reflection output: {self.reflection_output}")
         return format_step(reflection_response)
         
-    def reflect(self, reflexion_strategy: ReflexionStrategy) -> None:
+    def reflect(self, reflection_strategy: ReflectionStrategy) -> None:
         logger.trace('Running Reflexion strategy...')
-        if reflexion_strategy == ReflexionStrategy.LAST_ATTEMPT:
+        if reflection_strategy == ReflectionStrategy.LAST_ATTEMPT:
             self.reflections = [self.scratchpad]
             self.reflections_str = format_last_attempt(self.input, self.scratchpad, self.prompts['last_trial_header'])
-        elif reflexion_strategy == ReflexionStrategy.REFLEXION:
+        elif reflection_strategy == ReflectionStrategy.REFLEXION:
             self.reflections.append(self.prompt_reflection())
             self.reflections_str = format_reflections(self.reflections, header=self.prompts['reflection_header'])
-        elif reflexion_strategy == ReflexionStrategy.LAST_ATTEMPT_AND_REFLEXION:
+        elif reflection_strategy == ReflectionStrategy.LAST_ATTEMPT_AND_REFLEXION:
             self.reflections_str = format_last_attempt(self.input, self.scratchpad, self.prompts['last_trial_header'])
             self.reflections = self.prompt_reflection()
             self.reflections_str += format_reflections(self.reflections, header=self.prompts['reflection_last_trial_header'])
         else:
-            raise ValueError(f'Unknown reflexion strategy: {reflexion_strategy}')
+            raise ValueError(f'Unknown reflection strategy: {reflection_strategy}')
         logger.trace(self.reflections_str)

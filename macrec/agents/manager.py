@@ -8,6 +8,12 @@ from macrec.llms import AnyOpenAILLM
 
 class Manager(Agent):
     def __init__(self, thought_config_path: str, action_config_path: str, *args, **kwargs) -> None:
+        """Initialize the manager agent. The manager agent is a two-stage agent, which first prompts the thought LLM and then prompts the action LLM.
+        
+        Args:
+            `thought_config_path` (`str`): The path to the config file of the thought LLM.
+            `action_config_path` (`str`): The path to the config file of the action LLM.
+        """
         super().__init__(*args, **kwargs)
         self.thought_llm = self.get_LLM(thought_config_path)
         self.action_llm = self.get_LLM(action_config_path)

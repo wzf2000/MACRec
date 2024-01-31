@@ -8,6 +8,11 @@ class BaseLLM(ABC):
         
     @property
     def tokens_limit(self) -> int:
+        """Limit of tokens that can be fed into the LLM under the current context length.
+        
+        Returns:
+            `int`: The limit of tokens that can be fed into the LLM under the current context length.
+        """
         return self.max_context_length - 2 * self.max_tokens - 50 # single round need 2 agent prompt steps: thought and action
     
     @abstractmethod

@@ -1,7 +1,7 @@
 # Description: Functions for string processing.
 
 def format_step(step: str) -> str:
-    """Format a step prompt.
+    """Format a step prompt. Remove leading and trailing whitespaces and newlines, and replace newlines with spaces.
     
     Args:
         `step` (`str`): A step prompt in string format.
@@ -11,7 +11,7 @@ def format_step(step: str) -> str:
     return step.strip('\n').strip().replace('\n', '')
     
 def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
-    """Format the last attempt reflection prompt of a trial.
+    """Format the last attempt reflection prompt of a trial. Remove leading and trailing whitespaces and newlines of `scratchpad`, and replace newlines with spaces. Add `header` to the beginning of the prompt.
     
     Args:
         `input` (`str`): The input of the last attempt.
@@ -23,7 +23,7 @@ def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
     return header + f'Input: {input}\n' + scratchpad.strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
 
 def format_reflections(reflections: list[str], header: str) -> str:
-    """Format reflections prompt.
+    """Format reflections prompt. Remove leading and trailing whitespaces and newlines of each reflection, and replace newlines with spaces. Add `header` to the beginning of the prompt.
     
     Args:
         `reflections` (`list[str]`): A list of former reflections.

@@ -4,6 +4,9 @@ from loguru import logger
 from macrec.rl.reward.base import Reward, DeltaReward, ReflectionReward
 
 class RatingPredictionRewardV1(DeltaReward):
+    """
+    The reward function v1 for rating prediction. The action reward is the negative squared difference between the action and the ground truth answer rating.
+    """
     def __init__(self, invalid: float = 0, lower: float = 1, upper: float = 5, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.invalid = invalid
@@ -21,6 +24,9 @@ class RatingPredictionRewardV1(DeltaReward):
         return -(gt_answer - action_rating) ** 2
     
 class RatingPredictionRewardV2(Reward):
+    """
+    The reward function v2 for rating prediction. The reward is modified from the reward function v1, paying more attention to the invalid actions, and unchanged actions after reflection. See `reward` function for more details.
+    """
     def __init__(self, invalid: float = -16, alpha: float = 4, gamma: float = 0.25, eta: float = 2, lower: float = 1, upper: float = 5, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.invalid = invalid
@@ -58,6 +64,9 @@ class RatingPredictionRewardV2(Reward):
         return original_reward + np.exp(-np.abs(original_reward) * self.eta) * (self.alpha + action2_reward)
     
 class RatingPredictionReflectionReward(ReflectionReward):
+    """
+    The reflection reward function for rating prediction. The `judge` function simply checks whether the action is equal to the ground truth answer rating.
+    """
     def __init__(self, lower: float = 1, upper: float = 5, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.lower = lower

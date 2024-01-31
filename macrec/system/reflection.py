@@ -1,13 +1,22 @@
 import json
 from loguru import logger
 
-from macrec.system.react import ReactSystem
+from macrec.system.react import ReActSystem
 from macrec.agents import Reflector
 
-class ReflectionSystem(ReactSystem):
-    def __init__(self, keep_reflections: bool = True, *args, **kwargs) -> None:
+class ReflectionSystem(ReActSystem):
+    """
+    The system with a manager and a reflector, which can perform multiple actions in sequence. The system will stop when the agent finishes or the maximum number of actions is reached or the agent is over limit of the context. And the system will reflect the last trial if it thinks the last trial is incorrect.
+    """
+    def __init__(self, keep_reflections: bool = True, reflection_strategy: str = 'reflection', *args, **kwargs) -> None:
+        """Initialize the reflection system.
+        
+        Args:
+            `keep_reflections` (`bool`, optional): Whether to keep the input and output of reflections for the reflector. Defaults to `True`.
+            `reflection_strategy` (`str`, optional): The reflection strategy. Defaults to `reflection`.
+        """
         super().__init__(*args, **kwargs)
-        self.reflector = Reflector(config_path=self.config['reflector'], keep_reflections=keep_reflections, prompts=self.prompts)
+        self.reflector = Reflector(config_path=self.config['reflector'], keep_reflections=keep_reflections, reflection_strategy=reflection_strategy, prompts=self.prompts)
         self.manager_kwargs['reflections'] = ''
         
     def reset(self, remove_reflections: bool = False, *args, **kwargs) -> None:

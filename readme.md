@@ -12,7 +12,7 @@
     - `tasks/`: For external function call (e.g. main.py).
     - `utils/`: Some useful functions are defined here.
 - `config/`: The config folder.
-    - `api-config.json`: Used for OpenAI-like APIs' configuration.
+    - `api-config.json`: Used for OpenAI-like APIs' configuration. We give an example for the configuration, named `api-config-example.json`.
     - `agents/`: The configuration for each agent.
     - `prompts/`: All the prompts used in the experiments.
     - `systems/`: The configuration for each system.

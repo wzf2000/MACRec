@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 from macrec.tasks.base import Task
 from macrec.utils import init_openai_api, read_json
-from macrec.system import ReactSystem, ReflectionSystem
+from macrec.system import ReActSystem, ReflectionSystem
 
 class GenerationTask(Task):
     @staticmethod
@@ -55,7 +55,7 @@ class GenerationTask(Task):
         
     def get_system(self, system: str, system_config: str):
         if system == 'react':
-            self.system = ReactSystem(config_path=system_config, **self.system_kwargs)
+            self.system = ReActSystem(config_path=system_config, **self.system_kwargs)
         elif system == 'reflection':
             self.system_kwargs['keep_reflections'] = True
             self.system = ReflectionSystem(config_path=system_config, **self.system_kwargs)

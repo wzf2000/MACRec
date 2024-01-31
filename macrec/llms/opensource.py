@@ -8,7 +8,19 @@ from transformers.pipelines import Pipeline
 from macrec.llms.basellm import BaseLLM
 
 class MyJsonFormer:
+    """
+    The JsonFormer formatter, which formats the output of the LLM into JSON with the given JSON schema.
+    """
     def __init__(self, json_schema: dict, pipeline: Pipeline, max_new_tokens: int = 300, temperature: float = 0.9, debug: bool = False):
+        """Initialize the JsonFormer formatter.
+        
+        Args:
+            `json_schema` (`dict`): The JSON schema of the output.
+            `pipeline` (`Pipeline`): The pipeline of the LLM. Must be a `pipeline("text-generation")` pipeline here.
+            `max_new_tokens` (`int`, optional): Maximum number of new tokens to generate for each string and number field. Defaults to `300`.
+            `temperature` (`float`, optional): The temperature of the generation. Defaults to `0.9`.
+            `debug` (`bool`, optional): Whether to enable debug mode. Defaults to `False`.
+        """
         self.json_schema = json_schema
         self.pipeline = pipeline
         self.max_new_tokens = max_new_tokens
@@ -16,6 +28,13 @@ class MyJsonFormer:
         self.debug = debug
     
     def invoke(self, prompt: str, **kwargs: Any) -> str:
+        """Invoke the JsonFormer formatter.
+        
+        Args:
+            `prompt` (`str`): The prompt to feed into the LLM.
+        Returns:
+            `str`: The formatted output. Must be a valid JSON string.
+        """
         model = Jsonformer(
             model=self.pipeline.model,
             tokenizer=self.pipeline.tokenizer,
@@ -31,6 +50,18 @@ class MyJsonFormer:
 
 class OpenSourceLLM(BaseLLM):
     def __init__(self, model_path: str = 'lmsys/vicuna-7b-v1.5-16k', device: int = 0, json_mode: bool = False, prefix: str = 'react', max_new_tokens: int = 300, do_sample: bool = True, temperature: float = 0.9, top_p: float = 1.0, *args, **kwargs):
+        """Initialize the OpenSource LLM. The OpenSource LLM is a wrapper of the HuggingFace pipeline.
+        
+        Args:
+            `model_path` (`str`, optional): The path or name to the model. Defaults to `'lmsys/vicuna-7b-v1.5-16k'`.
+            `device` (`int`, optional): The device to use. Set to `auto` to automatically select the device. Defaults to `0`.
+            `json_mode` (`bool`, optional): Whether to enable json mode. If enabled, the output of the LLM will be formatted into JSON by `MyJsonFormer`. Defaults to `False`.
+            `prefix` (`str`, optional): The prefix of the some configuration arguments. Defaults to `'react'`.
+            `max_new_tokens` (`int`, optional): Maximum number of new tokens to generate. Defaults to `300`.
+            `do_sample` (`bool`, optional): Whether to use sampling. Defaults to `True`.
+            `temperature` (`float`, optional): The temperature of the generation. Defaults to `0.9`.
+            `top_p` (`float`, optional): The top-p of the generation. Defaults to `1.0`.
+        """
         self.json_mode = json_mode
         if device == 'auto':
             self.pipe = pipeline("text-generation", model=model_path, device_map='auto')
@@ -49,7 +80,14 @@ class OpenSourceLLM(BaseLLM):
         self.max_tokens = max_new_tokens
         self.max_context_length: int = 16384 if '16k' in model_path else 32768 if '32k' in model_path else 4096
     
-    def __call__(self, prompt: str, *args, **kwargs):
+    def __call__(self, prompt: str, *args, **kwargs) -> str:
+        """Forward pass of the OpenSource LLM. If json_mode is enabled, the output of the LLM will be formatted into JSON by `MyJsonFormer`.
+        
+        Args:
+            `prompt` (`str`): The prompt to feed into the LLM.
+        Returns:
+            `str`: The OpenSource LLM output.
+        """
         if self.json_mode:
             return self.pipe.invoke(prompt)
         else:
