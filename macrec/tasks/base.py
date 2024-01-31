@@ -2,6 +2,7 @@ import os
 import json
 import torch
 import pandas as pd
+from abc import ABC, abstractmethod
 from argparse import ArgumentParser
 from loguru import logger
 from typing import Any
@@ -11,8 +12,9 @@ from ..llms import AnyOpenAILLM, OpenSourceLLM
 from ..agents import ReactAgent, ReactReflectAgent
 from ..rl.reward import Reward, RatingPredictionRewardV1, RatingPredictionRewardV2, RatingPredictionReflectionReward, SequentialRecommendationRewardV1, SequentialRecommendationReflectionReward
 
-class Task:
+class Task(ABC):
     @staticmethod
+    @abstractmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         raise NotImplementedError
     
@@ -22,6 +24,7 @@ class Task:
             return None
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{__name}'")
 
+    @abstractmethod
     def run(self, *args, **kwargs):
         raise NotImplementedError
     
@@ -52,6 +55,8 @@ class RewardTask(Task):
                 return SequentialRecommendationReflectionReward()
             else:
                 raise NotImplementedError
+        else:
+            raise NotImplementedError
     
 class GenerationTask(Task):
     @staticmethod

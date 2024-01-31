@@ -1,11 +1,13 @@
 import json
+from abc import ABC, abstractmethod
 from typing import Any
 from loguru import logger
 
-class Reward:
+class Reward(ABC):
     def __init__(self, *args, **kwargs):
         pass
     
+    @abstractmethod
     def reward(self, *args, **kwargs) -> float:
         raise NotImplementedError
     
@@ -13,6 +15,7 @@ class Reward:
         return self.reward(*args, **kwargs)
 
 class DeltaReward(Reward):
+    @abstractmethod
     def action_reward(self, action: Any, gt_answer: Any) -> float:
         raise NotImplementedError
     
@@ -25,6 +28,7 @@ class ReflectionReward(Reward):
         self.alpha = alpha
         assert alpha > 0, f'alpha must be positive, but got {alpha}'
         
+    @abstractmethod
     def judge(self, action: Any, gt_answer: Any) -> bool:
         raise NotImplementedError
     

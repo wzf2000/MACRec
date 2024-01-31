@@ -1,4 +1,6 @@
-class BaseLLM:
+from abc import ABC, abstractmethod
+
+class BaseLLM(ABC):
     def __init__(self) -> None:
         self.model_name: str
         self.max_tokens: int
@@ -8,5 +10,6 @@ class BaseLLM:
     def tokens_limit(self) -> int:
         return self.max_context_length - 2 * self.max_tokens - 50 # single round need 2 agent prompt steps: thought and action
     
+    @abstractmethod
     def __call__(self, prompt: str, *args, **kwargs) -> str:
         raise NotImplementedError("BaseLLM.__call__() not implemented")

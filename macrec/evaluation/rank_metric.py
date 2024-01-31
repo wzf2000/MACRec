@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import torch
 import torchmetrics
 
@@ -29,6 +30,7 @@ class RankMetric(torchmetrics.Metric):
                 result[topk] = 0
         return result
     
+    @abstractmethod
     def metric_at_k(self, answer: list[int], label: int) -> dict:
         raise NotImplementedError
     
