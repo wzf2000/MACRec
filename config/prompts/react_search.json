@@ -1,0 +1,18 @@
+{
+    "searcher_prompt": {
+        "type": "template",
+        "content": "Help to search the wikipedia with the following requirements and give a result. You can use 3 type of commands:\n(1) Search[query], which searches the query on Wikipedia and returns the most {k} relevant documents' titles (the title can be used as the entity in the second command).\n(2) Lookup[entity, keyword], which returns the next sentence containing keyword in the passage with the entity.\n(3) Finish[result], which returns the result and finishes the task.\nYou may take as many steps as necessary.\nValid commands examples:\n{examples}\n(END OF EXAMPLES)\n\nRequirements: {requirements}\n{history}\nCommand: "
+    },
+    "searcher_prompt_json": {
+        "type": "template",
+        "content": "Help to search the wikipedia with the following requirements and give a result. You can use 3 type of commands in JSON format:\n(1) {{\"type\": \"Search\", \"content\": query}}, which searches the query on Wikipedia and returns the most {k} relevant documents' titles (the title can be used as the entity in the second command).\n(2) {{\"type\": \"Lookup\", \"content\": [entity, keyword]}}, which returns the next sentence containing keyword in the passage with the entity.\n(3) {{\"type\": \"Finish\", \"content\": result}}, which returns the result and finishes the task.\nYou may take as many steps as necessary.\nValid commands examples:\n{examples}\n(END OF EXAMPLES)\n\nRequirements: {requirements}\n\n{history}\n\nCommand: "
+    },
+    "searcher_examples": {
+        "type": "raw",
+        "content": "Search[Bumble and Bumble]\nLookup[Bumble and Bumble, Hair Care]\nFinish[A good hair care product]"
+    },
+    "searcher_examples_json": {
+        "type": "raw",
+        "content": "{\"type\": \"Search\", \"content\": \"Bumble and Bumble\"}\n{\"type\": \"Lookup\", \"content\": [\"Bumble and Bumble\", \"Hair Care\"]}\n{\"type\": \"Finish\", \"content\": \"A good hair care product\"}"
+    }
+}

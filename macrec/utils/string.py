@@ -36,6 +36,19 @@ def format_reflections(reflections: list[str], header: str) -> str:
     else:
         return header + 'Reflections:\n- ' + '\n- '.join([r.strip() for r in reflections])
 
+def format_history(history: list[dict]) -> str:
+    """Format history prompt. Add a newline between each turn in `history`.
+    
+    Args:
+        `history` (`list[dict]`): A list of turns in the history. Each turn is a dictionary with keys `command` and `observation`.
+    Returns:
+        `str`: The formatted history prompt. If `history` is empty, return an empty string.
+    """
+    if history == []:
+        return ''
+    else:
+        return '\n' + '\n'.join([f"Command: {turn['command']}\nObservation: {turn['observation']}\n" for turn in history]) + '\n'
+
 def str2list(s: str) -> list[int]:
     """Convert a string to a list of integers.
     
