@@ -20,7 +20,7 @@ def parse_action(action: str, json_mode: bool = False) -> tuple[str, Any]:
         except:
             return 'Invalid', None
     else:
-        pattern = r'^(\w+)\[(.+)\]$'
+        pattern = r'^(\w+)\[(.*)\]$'
         match = re.match(pattern, action)
         
         if match:

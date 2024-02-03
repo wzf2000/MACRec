@@ -16,7 +16,6 @@ class Searcher(ToolAgent):
         self.json_mode = self.searcher.json_mode
         self.reset()
     
-    @property
     @staticmethod
     def required_tools() -> dict[str, type]:
         return {

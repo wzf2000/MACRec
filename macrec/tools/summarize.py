@@ -6,6 +6,7 @@ from macrec.utils import get_rm
 
 class TextSummarizer(Tool):
     def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.model_path: str = get_rm(self.config, 'model_path', 't5-base')
         self.model_max_length: int = get_rm(self.config, 'model_max_length', 512)
         self.generate_kwargs: dict = get_rm(self.config, 'generate_kwargs', {})

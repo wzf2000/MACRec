@@ -16,6 +16,7 @@ class Interpreter(ToolAgent):
         self.json_mode = self.interpreter.json_mode
         self.reset()
         
+    @staticmethod
     def required_tools() -> dict[str, type]:
         return {
             'summarizer': TextSummarizer,
@@ -55,10 +56,7 @@ class Interpreter(ToolAgent):
         logger.debug(f'Command: {command}')
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'summarize':
-            if argument != '...':
-                observation = 'Invalid argument for summarize action. Should be `...`.'
-            else:
-                observation = self.summarizer.summarize(query=input)
+            observation = self.summarizer.summarize(text=input)
         elif action_type.lower() == 'finish':
             observation = self.finish(results=argument)
         else:
@@ -70,10 +68,24 @@ class Interpreter(ToolAgent):
         }
         self._history.append(turn)
         
-    def forward(self, requirements: str, input: str, *args, **kwargs) -> str:
+    def forward(self, input: str, *args, **kwargs) -> str:
         while not self.is_finished():
-            command = self._prompt_interpreter(requirements=requirements)
+            tokens = input.split()
+            if len(tokens) > 100:
+                truncated_input = ' '.join(tokens[:100]) + '...'
+            else:
+                truncated_input = input
+            command = self._prompt_interpreter(input=truncated_input)
             self.command(command, input=input)
         if not self.finished:
             return 'Interpreter did not return any result.'
         return self.results
+
+if __name__ == '__main__':
+    from macrec.utils import init_openai_api, read_json, read_prompts
+    init_openai_api(read_json('config/api-config.json'))
+    interpreter = Interpreter(config_path='config/agents/interpreter.json', prompts=read_prompts('config/prompts/react_chat.json'))
+    while True:
+        user_input = input('Input: ')
+        print(interpreter(input=user_input))
+# I'm very interested in watching movie. But recently I couldn't find a movie that satisfied me very much. Do you know how to solve this?

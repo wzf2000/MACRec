@@ -69,11 +69,11 @@ class ToolAgent(Agent):
         Raises:
             `AssertionError`: If a required tool is not found.
         """
-        for tool, tool_type in self.required_tools.items():
+        required_tools = self.required_tools()
+        for tool, tool_type in required_tools.items():
             assert tool in self.tools, f'Tool {tool} not found.'
             assert isinstance(self.tools[tool], tool_type), f'Tool {tool} must be an instance of {tool_type}.'
     
-    @property
     @staticmethod
     @abstractmethod
     def required_tools() -> dict[str, type]:
