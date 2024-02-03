@@ -8,9 +8,9 @@
     },
     "json_mode": true,
     "tool_config": {
-        "retriever": {
-            "type": "wikipedia",
-            "config_path": "config/tools/wikipedia.json"
+        "summarizer": {
+            "type": "summarize",
+            "config_path": "config/tools/summarize.json"
         }
     }
 }

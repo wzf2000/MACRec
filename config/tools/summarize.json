@@ -1,0 +1,11 @@
+{
+    "model_path": "t5-base",
+    "model_max_length": 1024,
+    "device_map": "auto",
+    "framework": "pt",
+    "generate_kwargs": {
+        "max_length": 100,
+        "min_length": 30,
+        "do_sample": false
+    }
+}

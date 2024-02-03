@@ -1,0 +1,5 @@
+{
+    "top_k": 3,
+    "max_doc_length": 4000,
+    "language": "en"
+}

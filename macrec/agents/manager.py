@@ -78,7 +78,7 @@ class Manager(Agent):
         action_response = self.action_llm(action_prompt)
         return format_step(action_response)
     
-    def forward(self, stage: str, **kwargs) -> str:
+    def forward(self, stage: str, *args, **kwargs) -> str:
         if stage == 'thought':
             return self._prompt_thought(**kwargs)
         elif stage == 'action':

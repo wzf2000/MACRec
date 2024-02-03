@@ -6,7 +6,7 @@ from langchain.prompts import PromptTemplate
 
 from macrec.agents.base import Agent
 from macrec.llms import AnyOpenAILLM
-from macrec.utils import format_step, format_reflections, format_last_attempt, read_json
+from macrec.utils import format_step, format_reflections, format_last_attempt, read_json, get_rm
 
 class ReflectionStrategy(Enum):
     """
@@ -29,12 +29,8 @@ class Reflector(Agent):
         """
         super().__init__(*args, **kwargs)
         config = read_json(config_path)
-        keep_reflections = config.get('keep_reflections', True)
-        if 'keep_reflections' in config:
-            del config['keep_reflections']
-        reflection_strategy = config.get('reflection_strategy', 'reflection')
-        if 'reflection_strategy' in config:
-            del config['reflection_strategy']
+        keep_reflections = get_rm(config, 'keep_reflections', True)
+        reflection_strategy = get_rm(config, 'reflection_strategy', ReflectionStrategy.REFLEXION.value)
         self.llm = self.get_LLM(config=config)
         if isinstance(self.llm, AnyOpenAILLM):
             self.enc = tiktoken.encoding_for_model(self.llm.model_name)
@@ -84,7 +80,7 @@ class Reflector(Agent):
             logger.debug(f"Reflection output: {self.reflection_output}")
         return format_step(reflection_response)
 
-    def forward(self, input: str, scratchpad: str) -> str:
+    def forward(self, input: str, scratchpad: str, *args, **kwargs) -> str:
         logger.trace('Running Reflecion strategy...')
         if self.reflection_strategy == ReflectionStrategy.LAST_ATTEMPT:
             self.reflections = [scratchpad]
