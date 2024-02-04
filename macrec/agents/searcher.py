@@ -43,7 +43,7 @@ class Searcher(ToolAgent):
     def _build_searcher_prompt(self, **kwargs) -> str:
         return self.searcher_prompt.format(
             examples=self.searcher_examples,
-            k=self.topk,
+            k=self.retriever.top_k,
             history=self.history,
             **kwargs
         )

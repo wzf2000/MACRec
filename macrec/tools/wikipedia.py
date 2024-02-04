@@ -6,10 +6,10 @@ from macrec.tools.base import RetrievalTool
 class Wikipedia(RetrievalTool):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        top_k: int = self.config.get('top_k', 3)
+        self.top_k: int = self.config.get('top_k', 3)
         max_doc_length: int = self.config.get('max_doc_length', 4000)
         language: str = self.config.get('language', 'en')
-        self.retriever = WikipediaRetriever(top_k_results=top_k, doc_content_chars_max=max_doc_length, lang=language)
+        self.retriever = WikipediaRetriever(top_k_results=self.top_k, doc_content_chars_max=max_doc_length, lang=language)
         self.cache = {}
     
     def reset(self) -> None:

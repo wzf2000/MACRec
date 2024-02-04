@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from loguru import logger
 
 from macrec.system.react import ReActSystem
@@ -25,7 +26,7 @@ class ReflectionSystem(ReActSystem):
             self.reflector.reflections = []
             self.reflector.reflections_str = ''
     
-    def forward(self, reset: bool = True) -> str:
+    def forward(self, reset: bool = True) -> Any:
         if self.is_finished() or self.is_halted():
             self.reflector(self.input, self.scratchpad)
             self.reflected = True

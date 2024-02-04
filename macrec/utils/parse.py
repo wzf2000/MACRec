@@ -145,7 +145,7 @@ def init_answer(type: str) -> Any:
     Returns:
         `Any`: Initialized answer. Different types of answers are returned for different tasks.
     """
-    if type == 'qa':
+    if type == 'qa' or type == 'chat':
         return ''
     elif type == 'rp':
         return 0

@@ -48,6 +48,19 @@ def format_history(history: list[dict]) -> str:
         return ''
     else:
         return '\n' + '\n'.join([f"Command: {turn['command']}\nObservation: {turn['observation']}\n" for turn in history]) + '\n'
+    
+def format_chat_history(history: list[tuple[str, str]]) -> str:
+    """Format chat history prompt. Add a newline between each turn in `history`.
+    
+    Args:
+        `history` (`list[tuple[str, str]]`): A list of turns in the chat history. Each turn is a tuple with the first element being the chat record and the second element being the role.
+    Returns:
+        `str`: The formatted chat history prompt. If `history` is empty, return `'No chat history.\\n'`.
+    """
+    if history == []:
+        return 'No chat history.\n'
+    else:
+        return '\n' + '\n'.join([f"{role.capitalize()}: {chat}" for chat, role in history]) + '\n'
 
 def str2list(s: str) -> list[int]:
     """Convert a string to a list of integers.

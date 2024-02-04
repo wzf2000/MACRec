@@ -80,7 +80,7 @@ class ReActSystem(System):
         self.execute(action_type, argument)
         self.step_n += 1
         
-    def forward(self, reset: bool = True) -> str:
+    def forward(self, reset: bool = True) -> Any:
         if reset:
             self.reset()
         while not self.is_finished() and not self.is_halted():

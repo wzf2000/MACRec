@@ -28,6 +28,8 @@ class System(ABC):
             return 'rating prediction'
         elif self.task == 'sr':
             return 'ranking'
+        elif self.task == 'chat':
+            return 'conversation'
         else:
             raise NotImplementedError
     
@@ -51,7 +53,7 @@ class System(ABC):
         self.kwargs = kwargs
         self.reset()
     
-    def __call__(self, *args: Any, **kwargs: Any) -> str:
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)
     
     def set_data(self, input: str, context: str, gt_answer: Any) -> None:
@@ -60,13 +62,13 @@ class System(ABC):
         self.gt_answer = gt_answer
     
     @abstractmethod
-    def forward(self, *args, **kwargs) -> str:
+    def forward(self, *args, **kwargs) -> Any:
         """Forward pass of the system.
         
         Raises:
             `NotImplementedError`: Should be implemented in subclasses.
         Returns:
-            `str`: The system output.
+            `Any`: The system output.
         """
         raise NotImplementedError("System.forward() not implemented")
         

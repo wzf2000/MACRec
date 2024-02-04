@@ -1,0 +1,8 @@
+{
+    "manager_action": "config/agents/manager_action.json",
+    "manager_thought": "config/agents/manager_thought.json",
+    "interpreter": "config/agents/interpreter.json",
+    "searcher": "config/agents/searcher.json",
+    "agent_prompt": "config/prompts/react_chat.json",
+    "data_prompt": "config/prompts/{task}.json"
+}

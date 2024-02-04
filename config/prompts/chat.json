@@ -1,0 +1,10 @@
+{
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Search[Schindler's list]\nFinish[Hello! How can I assist you today?]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "`{\"type\": \"search\", \"content\": \"Schindler's list\"}`\n`{\"type\": \"finish\", \"content\": \"Hello! How can I assist you today?\"}`"
+    }
+}

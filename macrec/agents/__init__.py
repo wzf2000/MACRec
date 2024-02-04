@@ -2,3 +2,5 @@
 from macrec.agents.base import Agent, ToolAgent
 from macrec.agents.manager import Manager
 from macrec.agents.reflector import Reflector
+from macrec.agents.searcher import Searcher
+from macrec.agents.interpreter import Interpreter
