@@ -35,7 +35,12 @@ class Task(ABC):
         """
         raise NotImplementedError
     
-    def launch(self):
+    def launch(self) -> Any:
+        """Launch the task. Parse the arguments with `parse_task_args` and run the task with `run`. The parsed arguments are stored in `self.args` and passed to the `run` method.
+        
+        Returns:
+            `Any`: The return value of the `run` method.
+        """
         parser = ArgumentParser()
         parser = self.parse_task_args(parser)
         args, extras = parser.parse_known_args()
