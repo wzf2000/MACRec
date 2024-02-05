@@ -112,7 +112,7 @@ class ToolAgent(Agent):
     def history(self) -> str:
         return format_history(self._history)
         
-    def finish(self, results: Any) -> Any:
+    def finish(self, results: Any) -> str:
         self.results = results
         self.finished = True
         return f'Finished with the results: {str(results)}'

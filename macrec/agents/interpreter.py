@@ -69,12 +69,12 @@ class Interpreter(ToolAgent):
         self._history.append(turn)
         
     def forward(self, input: str, *args, **kwargs) -> str:
+        tokens = input.split()
+        if len(tokens) > 100:
+            truncated_input = ' '.join(tokens[:100]) + '...'
+        else:
+            truncated_input = input
         while not self.is_finished():
-            tokens = input.split()
-            if len(tokens) > 100:
-                truncated_input = ' '.join(tokens[:100]) + '...'
-            else:
-                truncated_input = input
             command = self._prompt_interpreter(input=truncated_input)
             self.command(command, input=input)
         if not self.finished:
@@ -84,7 +84,7 @@ class Interpreter(ToolAgent):
 if __name__ == '__main__':
     from macrec.utils import init_openai_api, read_json, read_prompts
     init_openai_api(read_json('config/api-config.json'))
-    interpreter = Interpreter(config_path='config/agents/interpreter.json', prompts=read_prompts('config/prompts/react_chat.json'))
+    interpreter = Interpreter(config_path='config/agents/interpreter.json', prompts=read_prompts('config/prompts/agent_prompt/react_chat.json'))
     while True:
         user_input = input('Input: ')
         print(interpreter(input=user_input))

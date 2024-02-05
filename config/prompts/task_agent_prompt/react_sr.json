@@ -1,0 +1,10 @@
+{
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[3343, 3693, 104, 1947, 10418, 8398, 2373, 3284]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "`{\"type\": \"finish\", \"content\": [3343, 3693, 104, 1947, 10418, 8398, 2373, 3284]}`"
+    }
+}

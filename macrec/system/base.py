@@ -46,6 +46,8 @@ class System(ABC):
         self.config = read_json(config_path)
         self.prompts = read_prompts(self.config['agent_prompt'])
         self.prompts.update(read_prompts(self.config['data_prompt'].format(task=self.task)))
+        if 'task_agent_prompt' in self.config:
+            self.prompts.update(read_prompts(self.config['task_agent_prompt'].format(task=self.task)))
         for prompt_name, prompt_template in self.prompts.items():
             if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
                 self.prompts[prompt_name] = prompt_template.partial(task_type=self.task_type)

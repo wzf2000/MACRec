@@ -1,0 +1,4 @@
+{
+    "user_info": "data/ml-100k/user.csv",
+    "item_info": "data/ml-100k/item.csv"
+}

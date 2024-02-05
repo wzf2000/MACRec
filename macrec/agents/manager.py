@@ -37,9 +37,9 @@ class Manager(Agent):
     @property
     def manager_prompt(self) -> PromptTemplate:
         if self.json_mode:
-            return self.prompts['agent_prompt_json']
+            return self.prompts['manager_prompt_json']
         else:
-            return self.prompts['agent_prompt']
+            return self.prompts['manager_prompt']
         
     @property
     def valid_action_example(self) -> str:

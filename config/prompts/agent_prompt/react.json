@@ -1,9 +1,9 @@
 {
-    "agent_prompt": {
+    "manager_prompt": {
         "type": "template",
         "content": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. `Finish[answer]` returns the answer and finishes the task.{examples}\nInput: {input}\n{scratchpad}"
     },
-    "agent_prompt_json": {
+    "manager_prompt_json": {
         "type": "template",
         "content": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Actions should be described in JSON format. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.{examples}\nInput: {input}\n{scratchpad}"
     },

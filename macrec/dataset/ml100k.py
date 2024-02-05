@@ -177,12 +177,16 @@ def process_data(dir: str, n_neg_items: int = 9):
     train_df = dfs[0]
     dev_df = dfs[1]
     test_df = dfs[2]
+    all_df = pd.concat([train_df, dev_df, test_df])
+    all_df = all_df.sort_values(by=['timestamp'])
+    all_df = all_df.reset_index(drop=True)
     logger.info('Outputing data to csv files...')
     user_df.to_csv(os.path.join(dir, 'user.csv'))
     item_df.to_csv(os.path.join(dir, 'item.csv'))
-    train_df.to_csv(os.path.join(dir, 'train.csv'))
-    dev_df.to_csv(os.path.join(dir, 'dev.csv'))
-    test_df.to_csv(os.path.join(dir, 'test.csv'))
+    train_df.to_csv(os.path.join(dir, 'train.csv'), index=False)
+    dev_df.to_csv(os.path.join(dir, 'dev.csv'), index=False)
+    test_df.to_csv(os.path.join(dir, 'test.csv'), index=False)
+    all_df.to_csv(os.path.join(dir, 'all.csv'), index=False)
 
 if __name__ == '__main__':
     process_data(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data', 'ml-100k'))

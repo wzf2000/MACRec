@@ -1,0 +1,10 @@
+{
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[4.0]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "`{\"type\": \"finish\", \"content\": 4.0}`"
+    }
+}
