@@ -1,0 +1,9 @@
+{
+    "manager_action": "config/agents/manager_action.json",
+    "manager_thought": "config/agents/manager_thought.json",
+    "analyst": "config/agents/analyst_ml-100k.json",
+    "agent_prompt": "config/prompts/agent_prompt/react_analyst.json",
+    "data_prompt": "config/prompts/data_prompt/{task}_wohis.json",
+    "task_agent_prompt": "config/prompts/task_agent_prompt/analyse_{task}.json",
+    "max_step": 10
+}

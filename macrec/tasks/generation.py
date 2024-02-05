@@ -7,14 +7,14 @@ from argparse import ArgumentParser
 
 from macrec.tasks.base import Task
 from macrec.utils import init_openai_api, read_json
-from macrec.system import ReActSystem, ReflectionSystem
+from macrec.system import ReActSystem, ReflectionSystem, AnalyseSystem
 
 class GenerationTask(Task):
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         parser.add_argument('--api_config', type=str, default='config/api-config.json', help='Api configuration file')
         parser.add_argument('--data_file', type=str, required=True, help='Dataset file')
-        parser.add_argument('--system', type=str, default='react', choices=['react', 'reflection'], help='System name')
+        parser.add_argument('--system', type=str, default='react', choices=['react', 'reflection', 'analyse'], help='System name')
         parser.add_argument('--system_config', type=str, required=True, help='System configuration file')
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
         parser.add_argument('--max_his', type=int, default=10, help='Max history length')
@@ -31,7 +31,7 @@ class GenerationTask(Task):
         return df
     
     def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
-        data_prompt = self.system.prompts[f'{self.task}_data_prompt']
+        data_prompt = self.system.prompts[f'data_prompt']
         if self.task == 'rp':
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
@@ -57,6 +57,8 @@ class GenerationTask(Task):
             self.system = ReActSystem(config_path=system_config, **self.system_kwargs)
         elif system == 'reflection':
             self.system = ReflectionSystem(config_path=system_config, **self.system_kwargs)
+        elif system == 'analyse':
+            self.system = AnalyseSystem(config_path=system_config, **self.system_kwargs)
         else:
             raise NotImplementedError
         

@@ -83,11 +83,14 @@ class Analyst(ToolAgent):
         elif action_type.lower() == 'userhistory':
             valid = True
             if self.json_mode:
-                if len(argument) != 3:
+                if not isinstance(argument, list) or len(argument) != 3:
                     observation = f"Invalid user id and item id and retrieval number: {argument}"
                     valid = False
                 else:
                     query_user_id, query_item_id, k = argument
+                    if not isinstance(query_user_id, int) or not isinstance(query_item_id, int) or not isinstance(k, int):
+                        observation = f"Invalid user id and item id and retrieval number: {argument}"
+                        valid = False
             else:
                 try:
                     query_user_id, query_item_id, k = argument.split(',')
@@ -102,11 +105,14 @@ class Analyst(ToolAgent):
         elif action_type.lower() == 'itemhistory':
             valid = True
             if self.json_mode:
-                if len(argument) != 3:
+                if not isinstance(argument, list) or len(argument) != 3:
                     observation = f"Invalid user id and item id and retrieval number: {argument}"
                     valid = False
                 else:
                     query_user_id, query_item_id, k = argument
+                    if not isinstance(query_user_id, int) or not isinstance(query_item_id, int) or not isinstance(k, int):
+                        observation = f"Invalid user id and item id and retrieval number: {argument}"
+                        valid = False
             else:
                 try:
                     query_user_id, query_item_id, k = argument.split(',')

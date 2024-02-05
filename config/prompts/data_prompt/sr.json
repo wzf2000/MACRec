@@ -1,5 +1,5 @@
 {
-    "sr_data_prompt": {
+    "data_prompt": {
         "type": "template",
         "content": "\n[user_id]: user_{user_id}\n[user_profile]:\n{user_profile}\n[historical interactions]:\n{history}\nAccording to user_{user_id}'s preference, please give a rank order of the following candidates (with the format [id]: attribute): \n{candidate_item_attributes}\n"
     }
