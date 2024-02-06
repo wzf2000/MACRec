@@ -11,9 +11,9 @@ class ChatSystem(System):
         return ['chat']
     
     def init(self, *args, **kwargs) -> None:
-        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts, web_demo=self.web_demo, system=self)
-        self.searcher = Searcher(config_path=self.config['searcher'], prompts=self.prompts, web_demo=self.web_demo, system=self)
-        self.interpreter = Interpreter(config_path=self.config['interpreter'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], **self.agent_kwargs)
+        self.searcher = Searcher(config_path=self.config['searcher'], **self.agent_kwargs)
+        self.interpreter = Interpreter(config_path=self.config['interpreter'], **self.agent_kwargs)
         self.max_step: int = self.config.get('max_step', 6)
         self.manager_kwargs = {
             "max_step": self.max_step,

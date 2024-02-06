@@ -12,7 +12,7 @@ class AnalyseSystem(ReActSystem):
     
     def init(self, *args, **kwargs) -> None:
         super().init(*args, **kwargs)
-        self.analyst = Analyst(config_path=self.config['analyst'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.analyst = Analyst(config_path=self.config['analyst'], **self.agent_kwargs)
         self.manager_kwargs['max_step'] = self.max_step
         
     def act(self) -> tuple[str, Any]:
@@ -36,14 +36,21 @@ class AnalyseSystem(ReActSystem):
                     valid = False
                 else:
                     user_id, item_id = argument
-                    if not isinstance(user_id, int) or not isinstance(item_id, int):
+                    if (isinstance(user_id, str) and 'user_' in user_id) or (isinstance(item_id, str) and 'item_' in item_id):
+                        observation = f"Invalid user id and item id: {argument}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                        valid = False
+                    elif not isinstance(user_id, int) or not isinstance(item_id, int):
                         observation = f"Invalid user id and item id: {argument}"
                         valid = False
             else:
                 try:
                     user_id, item_id = map(int, argument.split(','))
                 except ValueError or TypeError:
-                    observation = f"Invalid user id and item id: {argument}"
+                    user_id, item_id = argument.split(',')
+                    if 'user_' in user_id or 'item_' in item_id:
+                        observation = f"Invalid user id and item id: {argument}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                    else:
+                        observation = f"Invalid user id and item id: {argument}"
                     valid = False
             if valid:
                 observation = self.analyst(user_id=user_id, item_id=item_id)

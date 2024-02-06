@@ -14,12 +14,12 @@ class ReflectionSystem(ReActSystem):
         Initialize the reflection system.
         """
         super().init(*args, **kwargs)
-        self.reflector = Reflector(config_path=self.config['reflector'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.reflector = Reflector(config_path=self.config['reflector'], **self.agent_kwargs)
         self.manager_kwargs['reflections'] = ''
         
-    def reset(self, remove_reflections: bool = False, *args, **kwargs) -> None:
-        super().reset(*args, **kwargs)
-        if remove_reflections:
+    def reset(self, clear: bool = False, *args, **kwargs) -> None:
+        super().reset(clear=clear, *args, **kwargs)
+        if clear:
             self.reflector.reflections = []
             self.reflector.reflections_str = ''
     

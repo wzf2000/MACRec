@@ -46,7 +46,7 @@ class AnyOpenAILLM(BaseLLM):
             `str`: The OpenAI LLM output.
         """
         if self.model_type == 'completion':
-            return self.model.invoke(prompt).content
+            return self.model.invoke(prompt).content.replace('\n', ' ').strip()
         else:
             return self.model.invoke(
                 [
@@ -54,4 +54,4 @@ class AnyOpenAILLM(BaseLLM):
                         content=prompt,
                     )
                 ]
-            ).content
+            ).content.replace('\n', ' ').strip()

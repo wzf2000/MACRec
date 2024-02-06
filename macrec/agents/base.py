@@ -14,17 +14,19 @@ class Agent(ABC):
     """
     The base class of agents. We use the `forward` function to get the agent output. Use `get_LLM` to get the base large language model for the agent.
     """
-    def __init__(self, prompts: dict = dict(), web_demo: bool = False, system: Optional['System'] = None, *args, **kwargs) -> None:
+    def __init__(self, prompts: dict = dict(), web_demo: bool = False, system: Optional['System'] = None, dataset: Optional[str] = None, *args, **kwargs) -> None:
         """Initialize the agent.
         
         Args:
             `prompts` (`dict`, optional): A dictionary of prompts for the agent. Defaults to `dict()`.
             `web_demo` (`bool`, optional): Whether the agent is used in a web demo. Defaults to `False`.
             `system` (`Optional[System]`): The system that the agent belongs to. Defaults to `None`.
+            `dataset` (`Optional[str]`): The dataset that the agent is used on. Defaults to `None`.
         """
         self.system = system
         self.prompts = prompts
         self.web_demo = web_demo
+        self.dataset = dataset
         if self.web_demo:
             assert self.system is not None, 'System not found.'
         
@@ -77,8 +79,8 @@ class ToolAgent(Agent):
     """
     The base class of agents that require tools. We use the `forward` function to get the agent output. Use `required_tools` to specify the required tools for the agent.
     """
-    def __init__(self, prompts: dict = dict(), *args, **kwargs) -> None:
-        super().__init__(prompts=prompts, *args, **kwargs)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.tools: dict[str, Tool] = {}
         self._history = []
         self.max_turns: int = 6
@@ -116,7 +118,10 @@ class ToolAgent(Agent):
             tool_type = tool['type']
             if tool_type not in TOOL_MAP:
                 raise NotImplementedError(f'Docstore {tool_type} not implemented.')
-            self.tools[tool_name] = TOOL_MAP[tool_type](config_path=tool['config_path'])
+            config_path = tool['config_path']
+            if self.dataset is not None:
+                config_path = config_path.format(dataset=self.dataset)
+            self.tools[tool_name] = TOOL_MAP[tool_type](config_path=config_path)
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         self.validate_tools()

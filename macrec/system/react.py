@@ -17,7 +17,7 @@ class ReActSystem(System):
         """
         Initialize the ReAct system.
         """
-        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], **self.agent_kwargs)
         self.max_step: int = self.config.get('max_step', 6)
         self.manager_kwargs = dict()
     

@@ -5,8 +5,8 @@ from macrec.tools.base import Tool
 class InfoDatabase(Tool):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        user_info_path = self.config['user_info']
-        item_info_path = self.config['item_info']
+        user_info_path = self.config.get('user_info', None)
+        item_info_path = self.config.get('item_info', None)
         if user_info_path is not None:
             self._user_info = pd.read_csv(user_info_path, sep=',')
             assert 'user_id' in self._user_info.columns, 'user_id column not found in user_info.'

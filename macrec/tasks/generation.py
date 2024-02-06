@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from abc import abstractmethod
 from tqdm import tqdm
@@ -13,6 +14,7 @@ class GenerationTask(Task):
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         parser.add_argument('--api_config', type=str, default='config/api-config.json', help='Api configuration file')
+        parser.add_argument('--dataset', type=str, default='None', help='Dataset name')
         parser.add_argument('--data_file', type=str, required=True, help='Dataset file')
         parser.add_argument('--system', type=str, default='react', choices=['react', 'reflection', 'analyse'], help='System name')
         parser.add_argument('--system_config', type=str, required=True, help='System configuration file')
@@ -135,7 +137,7 @@ class GenerationTask(Task):
             for test_data, gt_answer in data:
                 record = dict()
                 self.system.set_data(input=test_data, context="", gt_answer=gt_answer)
-                self.system.reset(remove_reflections=True)
+                self.system.reset(clear=True)
                 for i in range(steps):
                     logger.debug(f'===================================Running step {i}...===================================')
                     self.after_step(answer=self.system(), gt_answer=gt_answer, step=i, record=record)
@@ -143,12 +145,16 @@ class GenerationTask(Task):
                 pbar.update(1)
         self.after_generate()
     
-    def run(self, api_config: str, data_file: str, system: str, system_config: str, task: str, max_his: int):
+    def run(self, api_config: str, dataset: str, data_file: str, system: str, system_config: str, task: str, max_his: int):
+        if dataset == 'None':
+            dataset = os.path.basename(os.path.dirname(data_file))
+        self.dataset = dataset
         self.task = task
         self.max_his = max_his
         self.system_kwargs = {
             'task': self.task,
             'leak': False,
+            'dataset': self.dataset,
         }
         init_openai_api(read_json(api_config))
         data_df = self.get_data(data_file, max_his)

@@ -54,7 +54,7 @@ class System(ABC):
         else:
             raise NotImplementedError
     
-    def __init__(self, task: str, config_path: str, leak: bool = False, web_demo: bool = False, *args, **kwargs) -> None:
+    def __init__(self, task: str, config_path: str, leak: bool = False, web_demo: bool = False, dataset: Optional[str] = None, *args, **kwargs) -> None:
         """Initialize the system.
         
         Args:
@@ -62,10 +62,19 @@ class System(ABC):
             `config_path` (`str`): The path to the config file of the system.
             `leak` (`bool`, optional): Whether to leak the ground truth answer to the system during inference. Defaults to `False`.
             `web_demo` (`bool`, optional): Whether to run the system in web demo mode. Defaults to `False`.
+            `dataset` (`str`, optional): The dataset to run in the system. Defaults to `None`.
         """
         self.task = task
         assert self.task in self.supported_tasks()
         self.config = read_json(config_path)
+        self.agent_kwargs = {
+            'system': self,
+        }
+        if dataset is not None:
+            for key, value in self.config.items():
+                if isinstance(value, str):
+                    self.config[key] = value.format(dataset=dataset, task=self.task)
+            self.agent_kwargs['dataset'] = dataset
         self.prompts = read_prompts(self.config['agent_prompt'])
         self.prompts.update(read_prompts(self.config['data_prompt'].format(task=self.task)))
         if 'task_agent_prompt' in self.config:
@@ -73,8 +82,10 @@ class System(ABC):
         for prompt_name, prompt_template in self.prompts.items():
             if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
                 self.prompts[prompt_name] = prompt_template.partial(task_type=self.task_type)
+        self.agent_kwargs['prompts'] = self.prompts
         self.leak = leak
         self.web_demo = web_demo
+        self.agent_kwargs['web_demo'] = web_demo
         self.kwargs = kwargs
         self.init(*args, **kwargs)
         self.reset()
@@ -139,10 +150,13 @@ class System(ABC):
             observation = 'Answer is INCORRECT'
         self.finished = True
         return observation
+    
+    def clear_web_log(self) -> None:
+        self.web_log = []
 
-    def reset(self, *args, **kwargs) -> None:
+    def reset(self, clear: bool = False, *args, **kwargs) -> None:
         self.scratchpad: str = ''
         self.finished: bool = False
         self.answer = init_answer(type=self.task)
-        if self.web_demo:
-            self.web_log = []
+        if self.web_demo and clear:
+            self.clear_web_log()

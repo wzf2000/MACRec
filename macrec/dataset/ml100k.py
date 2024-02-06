@@ -178,7 +178,7 @@ def process_data(dir: str, n_neg_items: int = 9):
     dev_df = dfs[1]
     test_df = dfs[2]
     all_df = pd.concat([train_df, dev_df, test_df])
-    all_df = all_df.sort_values(by=['timestamp'])
+    all_df = all_df.sort_values(by=['timestamp'], kind='mergesort')
     all_df = all_df.reset_index(drop=True)
     logger.info('Outputing data to csv files...')
     user_df.to_csv(os.path.join(dir, 'user.csv'))
