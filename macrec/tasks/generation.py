@@ -16,7 +16,7 @@ class GenerationTask(Task):
         parser.add_argument('--data_file', type=str, required=True, help='Dataset file')
         parser.add_argument('--system', type=str, default='react', choices=['react', 'reflection', 'analyse'], help='System name')
         parser.add_argument('--system_config', type=str, required=True, help='System configuration file')
-        parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr'], help='Task name')
+        parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr', 'gen'], help='Task name')
         parser.add_argument('--max_his', type=int, default=10, help='Max history length')
         return parser
     
@@ -49,6 +49,15 @@ class GenerationTask(Task):
                 history=df['history'][i],
                 candidate_item_attributes=df['candidate_item_attributes'][i]
             ), df['item_id'][i]) for i in tqdm(range(len(df)), desc="Loading data") if df['rating'][i] >= 4]
+        elif self.task == 'gen':
+            return [(data_prompt.format(
+                user_id=df['user_id'][i],
+                user_profile=df['user_profile'][i],
+                history=df['history'][i],
+                target_item_id=df['item_id'][i],
+                target_item_attributes=df['target_item_attributes'][i],
+                rating=df['rating'][i]
+            ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
         else:
             raise NotImplementedError
         

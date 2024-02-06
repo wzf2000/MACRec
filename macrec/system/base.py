@@ -22,6 +22,22 @@ class System(ABC):
     
     @property
     def task_type(self) -> str:
+        """Return the type of the task. Can be inherited by subclasses to support more task types.
+        
+        Raises:
+            `NotImplementedError`: Not supported task type.
+        Returns:
+            `str`: The type of the task.
+        Example for subclass:
+        .. code-block:: python
+            class MySystem(System):
+                @property
+                def task_type(self) -> str:
+                    if self.task == 'my_task':
+                        return 'my task description'
+                    else:
+                        return super().task_type
+        """
         if self.task == 'qa':
             return 'question answering'
         elif self.task == 'rp':
@@ -30,6 +46,8 @@ class System(ABC):
             return 'ranking'
         elif self.task == 'chat':
             return 'conversation'
+        elif self.task == 'gen':
+            return 'explanation generation'
         else:
             raise NotImplementedError
     

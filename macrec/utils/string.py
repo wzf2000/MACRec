@@ -20,7 +20,7 @@ def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
     Returns:
         `str`: The formatted last attempt prompt.
     """
-    return header + f'Input: {input}\n' + scratchpad.strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
+    return header + f'Input:\n{input}\n' + scratchpad.strip('\n').strip() + '\n(END PREVIOUS TRIAL)\n'
 
 def format_reflections(reflections: list[str], header: str) -> str:
     """Format reflections prompt. Remove leading and trailing whitespaces and newlines of each reflection, and replace newlines with spaces. Add `header` to the beginning of the prompt.

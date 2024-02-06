@@ -1,6 +1,6 @@
 {
     "data_prompt": {
         "type": "template",
-        "content": "\n[user_id]: user_{user_id}\n[user_profile]:\n{user_profile}\nWhich star rating will user_{user_id} give item_{target_item_id} with attributes {target_item_attributes} (1 being lowest and 5 being highest)"
+        "content": "[user_id]: user_{user_id}\n[user_profile]:\n{user_profile}\nWhich star rating will user_{user_id} give item_{target_item_id} with attributes {target_item_attributes} (1 being lowest and 5 being highest)"
     }
 }

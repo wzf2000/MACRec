@@ -30,7 +30,7 @@ def parse_action(action: str, json_mode: bool = False) -> tuple[str, Any]:
         else:
             return 'Invalid', None
     
-def parse_QA_answer(answer: str, *args, **kwargs) -> dict[str, bool | str]:
+def parse_raw_answer(answer: str, *args, **kwargs) -> dict[str, bool | str]:
     return {
         'valid': True,
         'answer': answer
@@ -126,8 +126,8 @@ def parse_answer(type: str, *args, **kwargs) -> dict[str, Any]:
     Returns:
         `dict[str, Any]`: Parsed answer, including `valid`, `answer`, and `message`. `valid` indicates whether the answer is valid. `answer` is the parsed answer. `message` is the error message if the answer is invalid (otherwise not included).
     """
-    if type == 'qa':
-        return parse_QA_answer(*args, **kwargs)
+    if type == 'qa' or type == 'chat' or type == 'gen':
+        return parse_raw_answer(*args, **kwargs)
     elif type == 'rp':
         return parse_rating_answer(*args, **kwargs)
     elif type == 'sr':
@@ -145,7 +145,7 @@ def init_answer(type: str) -> Any:
     Returns:
         `Any`: Initialized answer. Different types of answers are returned for different tasks.
     """
-    if type == 'qa' or type == 'chat':
+    if type == 'qa' or type == 'chat' or type == 'gen':
         return ''
     elif type == 'rp':
         return 0

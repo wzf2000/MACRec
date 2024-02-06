@@ -90,6 +90,7 @@ class EvaluateTask(GenerationTask):
         self.metrics.report()
     
     def run(self, steps: int, topks: list[int], *args, **kwargs):
+        assert self.task == 'rp' or self.task == 'sr', "Only support ranking and rating tasks."
         self.steps = steps
         self.topks = topks
         super().run(*args, **kwargs)

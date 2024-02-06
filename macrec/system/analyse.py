@@ -8,7 +8,7 @@ from macrec.utils import parse_action
 class AnalyseSystem(ReActSystem):
     @staticmethod
     def supported_tasks() -> list[str]:
-        return ['rp', 'sr']
+        return ['rp', 'sr', 'gen']
     
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

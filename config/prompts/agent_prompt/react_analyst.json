@@ -1,11 +1,11 @@
 {
     "manager_prompt": {
         "type": "template",
-        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types:\n(1) Analyse[user_id, item_id], which will ask another agent (called Analyst) to help analyse the preferences or features of user_id and item_id (based on their profile/attributes and historical interactions before user_id interacted with item_id).\n(2) Finish[response], which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput: {input}\n{scratchpad}"
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types:\n(1) Analyse[user_id, item_id], which will ask another agent (called Analyst) to help analyse the preferences or features of user_id and item_id (based on their profile/attributes and historical interactions before user_id interacted with item_id).\n(2) Finish[response], which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput:\n{input}\n{scratchpad}"
     },
     "manager_prompt_json": {
         "type": "template",
-        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types in JSON format:\n(1) {{\"type\": \"Analyse\", \"content\": [user_id, item_id]}}, which will ask another agent (called Analyst) to help analyse the preferences or features of user_id and item_id (based on their profile/attributes and historical interactions before user_id interacted with item_id).\n(2) {{\"type\": \"Finish\", \"content\": response}}, which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput: {input}\n{scratchpad}"
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types in JSON format:\n(1) {{\"type\": \"Analyse\", \"content\": [user_id, item_id]}}, which will ask another agent (called Analyst) to help analyse the preferences or features of user_id and item_id (based on their profile/attributes and historical interactions before user_id interacted with item_id).\n(2) {{\"type\": \"Finish\", \"content\": response}}, which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput:\n{input}\n{scratchpad}"
     },
     "hint": {
         "type": "raw",
