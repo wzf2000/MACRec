@@ -10,9 +10,15 @@ from macrec.tasks.generation import GenerationTask
 from macrec.utils import NumpyEncoder, init_all_seeds
 
 class PureGenerationTask(GenerationTask):
+    @staticmethod
+    def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
+        parser = GenerationTask.parse_task_args(parser)
+        parser.add_argument('--steps', type=int, default=1, help='Number of steps')
+        return parser
+
     @property
     def running_steps(self) -> int:
-        return 1
+        return self.steps
     
     def before_generate(self) -> None:
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -39,6 +45,10 @@ class PureGenerationTask(GenerationTask):
     
     def after_generate(self) -> None:
         self.output_file.close()
+    
+    def run(self, steps: int, *args, **kwargs):
+        self.steps = steps
+        super().run(*args, **kwargs)
         
 class TestGenerationTask(PureGenerationTask):
     @staticmethod
