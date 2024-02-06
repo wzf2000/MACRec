@@ -74,10 +74,10 @@ class Reflector(Agent):
         if self.keep_reflections:
             self.reflection_input = reflection_prompt
             self.reflection_output = reflection_response
-            logger.debug(f'Reflection input length: {len(self.enc.encode(self.reflection_input))}')
-            logger.debug(f"Reflection input: {self.reflection_input}")
-            logger.debug(f'Reflection output length: {len(self.enc.encode(self.reflection_output))}')
-            logger.debug(f"Reflection output: {self.reflection_output}")
+            logger.trace(f'Reflection input length: {len(self.enc.encode(self.reflection_input))}')
+            logger.trace(f"Reflection input: {self.reflection_input}")
+            logger.trace(f'Reflection output length: {len(self.enc.encode(self.reflection_output))}')
+            self.log(f"**Reflection**: {self.reflection_output}")
         return format_step(reflection_response)
 
     def forward(self, input: str, scratchpad: str, *args, **kwargs) -> str:

@@ -10,9 +10,9 @@ class AnalyseSystem(ReActSystem):
     def supported_tasks() -> list[str]:
         return ['rp', 'sr', 'gen']
     
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.analyst = Analyst(config_path=self.config['analyst'], prompts=self.prompts)
+    def init(self, *args, **kwargs) -> None:
+        super().init(*args, **kwargs)
+        self.analyst = Analyst(config_path=self.config['analyst'], prompts=self.prompts, web_demo=self.web_demo, system=self)
         self.manager_kwargs['max_step'] = self.max_step
         
     def act(self) -> tuple[str, Any]:
@@ -24,7 +24,7 @@ class AnalyseSystem(ReActSystem):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
         return action_type, argument
         
     def execute(self, action_type: str, argument: Any):
@@ -49,6 +49,6 @@ class AnalyseSystem(ReActSystem):
                 observation = self.analyst(user_id=user_id, item_id=item_id)
             self.scratchpad += f'\nObservation: {observation}'
             
-            logger.debug(self.scratchpad.split('\n')[-1])
+            self.log(f'**Observation**: {observation}', agent=self.manager)
         else:
             super().execute(action_type, argument)

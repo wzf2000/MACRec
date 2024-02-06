@@ -13,10 +13,11 @@ class ReActSystem(System):
     def supported_tasks() -> list[str]:
         return ['qa', 'rp', 'sr', 'gen']
     
-    def __init__(self, *args, **kwargs) -> None:
-        """Initialize the ReAct system."""
-        super().__init__(*args, **kwargs)
-        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts)
+    def init(self, *args, **kwargs) -> None:
+        """
+        Initialize the ReAct system.
+        """
+        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts, web_demo=self.web_demo, system=self)
         self.max_step: int = self.config.get('max_step', 6)
         self.manager_kwargs = dict()
     
@@ -36,8 +37,9 @@ class ReActSystem(System):
         # Think
         logger.debug(f'Step {self.step_n}:')
         self.scratchpad += f'\nThought {self.step_n}:'
-        self.scratchpad += ' ' + self.manager(input=self.input, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        thought = self.manager(input=self.input, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
+        self.scratchpad += ' ' + thought
+        self.log(f'**Thought {self.step_n}**: {thought}', agent=self.manager)
         
     def act(self) -> tuple[str, Any]:
         # Act
@@ -49,7 +51,7 @@ class ReActSystem(System):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
         return action_type, argument
     
     def execute(self, action_type: str, argument: Any):
@@ -62,17 +64,17 @@ class ReActSystem(System):
                 'answer': self.answer,
                 'message': 'Invalid Action type or format.'
             }
-        self.scratchpad += f'\nObservation: '
         if not parse_result['valid']:
             assert "message" in parse_result, "Invalid parse result."
-            self.scratchpad += f'{parse_result["message"]} Valid Action examples are {self.manager.valid_action_example}.'
+            observation = f'{parse_result["message"]} Valid Action examples are {self.manager.valid_action_example}.'
         elif action_type.lower() == 'finish':
-            self.finish(parse_result['answer'])
-            logger.debug(f'Answer: {self.answer}')
+            observation = self.finish(parse_result['answer'])
         else:
             raise ValueError(f'Invalid action type: {action_type}')
         
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.scratchpad += f'\nObservation: {observation}'
+        
+        self.log(f'**Observation**: {observation}', agent=self.manager)
     
     def step(self):
         self.think()

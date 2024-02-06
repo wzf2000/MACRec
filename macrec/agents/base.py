@@ -1,22 +1,43 @@
 import json
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from loguru import logger
+from typing import Any, Optional, TYPE_CHECKING
 
 from macrec.llms import BaseLLM, AnyOpenAILLM, OpenSourceLLM
 from macrec.tools import TOOL_MAP, Tool
 from macrec.utils import run_once, format_history
 
+if TYPE_CHECKING:
+    from macrec.system import System
+
 class Agent(ABC):
     """
     The base class of agents. We use the `forward` function to get the agent output. Use `get_LLM` to get the base large language model for the agent.
     """
-    def __init__(self, prompts: dict = dict(), *args, **kwargs) -> None:
+    def __init__(self, prompts: dict = dict(), web_demo: bool = False, system: Optional['System'] = None, *args, **kwargs) -> None:
         """Initialize the agent.
         
         Args:
             `prompts` (`dict`, optional): A dictionary of prompts for the agent. Defaults to `dict()`.
+            `web_demo` (`bool`, optional): Whether the agent is used in a web demo. Defaults to `False`.
+            `system` (`Optional[System]`): The system that the agent belongs to. Defaults to `None`.
         """
+        self.system = system
         self.prompts = prompts
+        self.web_demo = web_demo
+        if self.web_demo:
+            assert self.system is not None, 'System not found.'
+        
+    def log(self, message: str) -> None:
+        """Log the message.
+        
+        Args:
+            `message` (`str`): The message to log.
+        """
+        if self.web_demo:
+            self.system.log(message, agent=self)
+        else:
+            logger.debug(message)
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)
@@ -57,7 +78,7 @@ class ToolAgent(Agent):
     The base class of agents that require tools. We use the `forward` function to get the agent output. Use `required_tools` to specify the required tools for the agent.
     """
     def __init__(self, prompts: dict = dict(), *args, **kwargs) -> None:
-        super().__init__(prompts, *args, **kwargs)
+        super().__init__(prompts=prompts, *args, **kwargs)
         self.tools: dict[str, Tool] = {}
         self._history = []
         self.max_turns: int = 6

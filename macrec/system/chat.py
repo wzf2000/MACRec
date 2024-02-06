@@ -10,11 +10,10 @@ class ChatSystem(System):
     def supported_tasks() -> list[str]:
         return ['chat']
     
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts)
-        self.searcher = Searcher(config_path=self.config['searcher'], prompts=self.prompts)
-        self.interpreter = Interpreter(config_path=self.config['interpreter'], prompts=self.prompts)
+    def init(self, *args, **kwargs) -> None:
+        self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.searcher = Searcher(config_path=self.config['searcher'], prompts=self.prompts, web_demo=self.web_demo, system=self)
+        self.interpreter = Interpreter(config_path=self.config['interpreter'], prompts=self.prompts, web_demo=self.web_demo, system=self)
         self.max_step: int = self.config.get('max_step', 6)
         self.manager_kwargs = {
             "max_step": self.max_step,
@@ -45,8 +44,9 @@ class ChatSystem(System):
         # Think
         logger.debug(f'Step {self.step_n}:')
         self.scratchpad += f'\nThought {self.step_n}:'
-        self.scratchpad += ' ' + self.manager(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        thought = self.manager(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
+        self.scratchpad += ' ' + thought
+        self.log(f'**Thought {self.step_n}**: {thought}', agent=self.manager)
         
     def act(self) -> tuple[str, Any]:
         # Act
@@ -57,22 +57,21 @@ class ChatSystem(System):
         action = self.manager(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
         return action_type, argument
 
     def execute(self, action_type: str, argument: Any):
         # Execute
-        self.scratchpad += f'\nObservation: '
         if action_type.lower() == 'finish':
-            self.finish(argument)
-            logger.debug(f'Response: {self.answer}')
+            observation = self.finish(argument)
         elif action_type.lower() == 'search':
             search_result = self.searcher(requirements=argument)
-            self.scratchpad += f'Search result: {search_result}'
+            observation = f'Search result: {search_result}'
         else:
-            self.scratchpad += f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
+            observation = f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
+        self.scratchpad += f'\nObservation: {observation}'
         
-        logger.debug(self.scratchpad.split('\n')[-1])
+        self.log(f'**Observation**: {observation}', agent=self.manager)
     
     def step(self) -> None:
         self.think()

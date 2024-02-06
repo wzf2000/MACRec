@@ -66,7 +66,7 @@ class Analyst(ToolAgent):
         return command
     
     def command(self, command: str) -> None:
-        logger.debug(f'Command: {command}')
+        self.log(f'**Command**: {command}')
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'userinfo':
             try:
@@ -128,7 +128,7 @@ class Analyst(ToolAgent):
             observation = self.finish(results=argument)
         else:
             observation = f'Unknown command type: {action_type}.'
-        logger.debug(f'Observation: {observation}')
+        self.log(f'**Observation**: {observation}')
         turn = {
             'command': command,
             'observation': observation,

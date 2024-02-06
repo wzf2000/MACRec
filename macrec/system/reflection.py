@@ -9,15 +9,12 @@ class ReflectionSystem(ReActSystem):
     """
     The system with a manager and a reflector, which can perform multiple actions in sequence. The system will stop when the agent finishes or the maximum number of actions is reached or the agent is over limit of the context. And the system will reflect the last trial if it thinks the last trial is incorrect.
     """
-    def __init__(self, *args, **kwargs) -> None:
-        """Initialize the reflection system.
-        
-        Args:
-            `keep_reflections` (`bool`, optional): Whether to keep the input and output of reflections for the reflector. Defaults to `True`.
-            `reflection_strategy` (`str`, optional): The reflection strategy. Defaults to `reflection`.
+    def init(self, *args, **kwargs) -> None:
         """
-        super().__init__(*args, **kwargs)
-        self.reflector = Reflector(config_path=self.config['reflector'], prompts=self.prompts)
+        Initialize the reflection system.
+        """
+        super().init(*args, **kwargs)
+        self.reflector = Reflector(config_path=self.config['reflector'], prompts=self.prompts, web_demo=self.web_demo, system=self)
         self.manager_kwargs['reflections'] = ''
         
     def reset(self, remove_reflections: bool = False, *args, **kwargs) -> None:
@@ -34,7 +31,7 @@ class ReflectionSystem(ReActSystem):
                 reflection_json = json.loads(self.reflector.reflections[-1])
                 if 'correctness' in reflection_json and reflection_json['correctness'] == True:
                     # don't forward if the last reflection is correct
-                    logger.debug(f"Last reflection is correct, don't forward")
+                    self.log(f"**Last reflection is correct, don't forward**", agent=self.reflector)
                     return self.answer
         else:
             self.reflected = False

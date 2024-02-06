@@ -1,8 +1,11 @@
+import streamlit as st
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
+from loguru import logger
 from langchain.prompts import PromptTemplate
 
-from macrec.utils import is_correct, init_answer, read_json, read_prompts
+from macrec.agents import Agent
+from macrec.utils import is_correct, init_answer, read_json, read_prompts, get_avatar
 
 class System(ABC):
     """
@@ -51,13 +54,14 @@ class System(ABC):
         else:
             raise NotImplementedError
     
-    def __init__(self, task: str, config_path: str, leak: bool = False, *args, **kwargs) -> None:
+    def __init__(self, task: str, config_path: str, leak: bool = False, web_demo: bool = False, *args, **kwargs) -> None:
         """Initialize the system.
         
         Args:
             `task` (`str`): The task for the system to perform.
             `config_path` (`str`): The path to the config file of the system.
             `leak` (`bool`, optional): Whether to leak the ground truth answer to the system during inference. Defaults to `False`.
+            `web_demo` (`bool`, optional): Whether to run the system in web demo mode. Defaults to `False`.
         """
         self.task = task
         assert self.task in self.supported_tasks()
@@ -70,8 +74,35 @@ class System(ABC):
             if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
                 self.prompts[prompt_name] = prompt_template.partial(task_type=self.task_type)
         self.leak = leak
+        self.web_demo = web_demo
         self.kwargs = kwargs
+        self.init(*args, **kwargs)
         self.reset()
+    
+    def log(self, message: str, agent: Optional[Agent] = None) -> None:
+        """Log the message.
+        
+        Args:
+            `message` (`str`): The message to log.
+        """
+        logger.debug(message)
+        if self.web_demo:
+            if agent is None:
+                role = 'Assistant'
+            else:
+                role = agent.__class__.__name__
+            final_message = f'{get_avatar(role)}:blue[**{role}**]: {message}'
+            self.web_log.append(final_message)
+            st.markdown(f'> {final_message}')
+    
+    @abstractmethod
+    def init(self, *args, **kwargs) -> None:
+        """Initialize the system.
+        
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        """
+        raise NotImplementedError("System.init() not implemented")
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)
@@ -98,17 +129,20 @@ class System(ABC):
     def is_correct(self) -> bool:
         return is_correct(task=self.task, answer=self.answer, gt_answer=self.gt_answer)
     
-    def finish(self, answer: Any) -> None:
+    def finish(self, answer: Any) -> str:
         self.answer = answer
         if not self.leak:
-            self.scratchpad += f'The answer you give (may be INCORRECT): {self.answer}'
+            observation = f'The answer you give (may be INCORRECT): {self.answer}'
         elif self.is_correct():
-            self.scratchpad += 'Answer is CORRECT'
+            observation = 'Answer is CORRECT'
         else: 
-            self.scratchpad += 'Answer is INCORRECT'
+            observation = 'Answer is INCORRECT'
         self.finished = True
+        return observation
 
     def reset(self, *args, **kwargs) -> None:
         self.scratchpad: str = ''
         self.finished: bool = False
         self.answer = init_answer(type=self.task)
+        if self.web_demo:
+            self.web_log = []

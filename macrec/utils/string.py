@@ -71,3 +71,24 @@ def str2list(s: str) -> list[int]:
         `list[int]`: A list of integers. For example, `[1, 2, 3]`.
     """
     return [int(i) for i in s.split(',')]
+
+def get_avatar(agent_type: str) -> str:
+    """Get the avatar of the agent.
+    
+    Args:
+        `agent_type` (`str`): The type of the agent.
+    Returns:
+        `str`: The avatar of the agent.
+    """
+    if 'manager' in agent_type.lower():
+        return '👩‍💼'
+    elif 'reflector' in agent_type.lower():
+        return '👩‍🔬'
+    elif 'searcher' in agent_type.lower():
+        return '🔍'
+    elif 'interpreter' in agent_type.lower():
+        return '👩‍🏫'
+    elif 'analyst' in agent_type.lower():
+        return '👩‍💻'
+    else:
+        return '🤖'
