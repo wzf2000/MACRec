@@ -104,7 +104,7 @@ def gen_page(system: System, task: str, dataset: str):
         st.markdown('##### Data Prompt:')
         st.markdown(f'```\n{system_input}\n```')
     if reset_data:
-        system.set_data(input=system_input, context='', gt_answer=gt_answer)
+        system.set_data(input=system_input, context='', gt_answer=gt_answer, data_sample=data_sample)
         system.reset(clear=True)
         st.session_state.chat_history = []
     for chat in st.session_state.chat_history:
@@ -129,8 +129,7 @@ def gen_page(system: System, task: str, dataset: str):
         if task == 'rp':
             add_chat_message('assistant', f'**Answer**: `{answer}`, Ground Truth: `{gt_answer}`')
         elif task == 'sr':
-            answer = str(answer)
-            answer = answer.replace(str(gt_answer), f'**{gt_answer}**')
+            answer = [f'{item_id}' if item_id != gt_answer else f'**{item_id}**' for item_id in answer]
             add_chat_message('assistant', f'**Answer**: `{answer}`, Ground Truth: `{gt_answer}`')
         elif task == 'gen':
             add_chat_message('assistant', f'**Answer**: `{answer}`')
@@ -188,7 +187,8 @@ def task_config(task: str, system_type: type):
         system = get_system(system_type, os.path.join(config_dir, config_file), task, dataset)
         st.session_state.system = system
         st.session_state.chat_history = []
-        del st.session_state.data_sample
+        if 'data_sample' in st.session_state:
+            del st.session_state.data_sample
     else:
         system = st.session_state.system
     if 'chat_history' not in st.session_state:

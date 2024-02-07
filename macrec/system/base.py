@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 from abc import ABC, abstractmethod
 from typing import Any, Optional
@@ -118,10 +119,11 @@ class System(ABC):
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)
     
-    def set_data(self, input: str, context: str, gt_answer: Any) -> None:
+    def set_data(self, input: str, context: str, gt_answer: Any, data_sample: Optional[pd.Series] = None) -> None:
         self.input: str = input
         self.context: str = context
         self.gt_answer = gt_answer
+        self.data_sample = data_sample
     
     @abstractmethod
     def forward(self, *args, **kwargs) -> Any:

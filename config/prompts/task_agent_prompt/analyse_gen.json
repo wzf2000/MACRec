@@ -1,10 +1,10 @@
 {
     "valid_action_example": {
         "type": "raw",
-        "content": "Finish[The user likes popular movies...]\nAnalyse[524, 955]"
+        "content": "Finish[The user likes popular movies...]\nAnalyse[user, 524]\nAnalyse[item, 955]"
     },
     "valid_action_example_json": {
         "type": "raw",
-        "content": "`{\"type\": \"finish\", \"content\": \"The user likes popular movies...\"}`\n`{\"type\": \"analyse\", \"content\": [524, 955]}`"
+        "content": "`{\"type\": \"finish\", \"content\": \"The user likes popular movies...\"}`\n`{\"type\": \"analyse\", \"content\": [\"user\", 524]}`\n`{\"type\": \"analyse\", \"content\": [\"item\", 955]}`"
     }
 }

@@ -32,7 +32,7 @@ class GenerationTask(Task):
             self.system_kwargs['n_candidate'] = self.n_candidate # Add n_candidate to system_kwargs by data sample
         return df
     
-    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
+    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str, pd.Series]]:
         data_prompt = self.system.prompts[f'data_prompt']
         if self.task == 'rp':
             return [(data_prompt.format(
@@ -41,7 +41,7 @@ class GenerationTask(Task):
                 history=df['history'][i],
                 target_item_id=df['item_id'][i],
                 target_item_attributes=df['target_item_attributes'][i]
-            ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+            ), df['rating'][i], df.iloc[i]) for i in tqdm(range(len(df)), desc="Loading data")]
         elif self.task == 'sr':
             candidate_example: str = df['candidate_item_attributes'][0]
             self.n_candidate = len(candidate_example.split('\n'))
@@ -50,7 +50,7 @@ class GenerationTask(Task):
                 user_profile=df['user_profile'][i],
                 history=df['history'][i],
                 candidate_item_attributes=df['candidate_item_attributes'][i]
-            ), df['item_id'][i]) for i in tqdm(range(len(df)), desc="Loading data") if df['rating'][i] >= 4]
+            ), df['item_id'][i], df.iloc[i]) for i in tqdm(range(len(df)), desc="Loading data") if df['rating'][i] >= 4]
         elif self.task == 'gen':
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
@@ -59,7 +59,7 @@ class GenerationTask(Task):
                 target_item_id=df['item_id'][i],
                 target_item_attributes=df['target_item_attributes'][i],
                 rating=df['rating'][i]
-            ), df['rating'][i]) for i in tqdm(range(len(df)), desc="Loading data")]
+            ), df['rating'][i], df.iloc[i]) for i in tqdm(range(len(df)), desc="Loading data")]
         else:
             raise NotImplementedError
         
@@ -131,12 +131,12 @@ class GenerationTask(Task):
         """
         raise NotImplementedError
     
-    def generate(self, data: list[tuple[str, int | float | str]], steps: int = 2):
+    def generate(self, data: list[tuple[str, int | float | str, pd.Series]], steps: int = 2):
         self.before_generate()
         with tqdm(total=len(data)) as pbar:
-            for test_data, gt_answer in data:
+            for test_data, gt_answer, data_sample in data:
                 record = dict()
-                self.system.set_data(input=test_data, context="", gt_answer=gt_answer)
+                self.system.set_data(input=test_data, context="", gt_answer=gt_answer, data_sample=data_sample)
                 self.system.reset(clear=True)
                 for i in range(steps):
                     logger.debug(f'===================================Running step {i}...===================================')

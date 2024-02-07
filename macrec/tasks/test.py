@@ -14,7 +14,7 @@ class TestTask(EvaluateTask):
         parser.add_argument('--offset', type=int, default=0, help='Offset of samples, only works when random is False')
         return parser
 
-    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
+    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str, pd.Series]]:
         data = super().prompt_data(df)
         if self.random:
             sample_idx = np.random.choice(len(data), self.samples, replace=False)

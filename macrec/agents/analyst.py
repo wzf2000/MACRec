@@ -44,6 +44,13 @@ class Analyst(ToolAgent):
             return self.prompts['analyst_examples_json']
         else:
             return self.prompts['analyst_examples']
+        
+    @property
+    def analyst_fewshot(self) -> str:
+        if self.json_mode:
+            return self.prompts['analyst_fewshot_json']
+        else:
+            return self.prompts['analyst_fewshot']
     
     @property
     def hint(self) -> str:
@@ -54,6 +61,7 @@ class Analyst(ToolAgent):
     def _build_analyst_prompt(self, **kwargs) -> str:
         return self.analyst_prompt.format(
             examples=self.analyst_examples,
+            fewshot=self.analyst_fewshot,
             history=self.history,
             max_step=self.max_turns,
             hint=self.hint if len(self._history) + 1 >= self.max_turns else '',
@@ -83,47 +91,45 @@ class Analyst(ToolAgent):
         elif action_type.lower() == 'userhistory':
             valid = True
             if self.json_mode:
-                if not isinstance(argument, list) or len(argument) != 3:
-                    observation = f"Invalid user id and item id and retrieval number: {argument}"
+                if not isinstance(argument, list) or len(argument) != 2:
+                    observation = f"Invalid user id and retrieval number: {argument}"
                     valid = False
                 else:
-                    query_user_id, query_item_id, k = argument
-                    if not isinstance(query_user_id, int) or not isinstance(query_item_id, int) or not isinstance(k, int):
-                        observation = f"Invalid user id and item id and retrieval number: {argument}"
+                    query_user_id, k = argument
+                    if not isinstance(query_user_id, int) or not isinstance(k, int):
+                        observation = f"Invalid user id and retrieval number: {argument}"
                         valid = False
             else:
                 try:
-                    query_user_id, query_item_id, k = argument.split(',')
+                    query_user_id, k = argument.split(',')
                     query_user_id = int(query_user_id)
-                    query_item_id = int(query_item_id)
                     k = int(k)
                 except ValueError or TypeError:
-                    observation = f"Invalid user id and item id and retrieval number: {argument}"
+                    observation = f"Invalid user id and retrieval number: {argument}"
                     valid = False
             if valid:
-                observation = self.interaction_retriever.user_retrieve(user_id=query_user_id, item_id=query_item_id, k=k)
+                observation = self.interaction_retriever.user_retrieve(user_id=query_user_id, k=k)
         elif action_type.lower() == 'itemhistory':
             valid = True
             if self.json_mode:
-                if not isinstance(argument, list) or len(argument) != 3:
-                    observation = f"Invalid user id and item id and retrieval number: {argument}"
+                if not isinstance(argument, list) or len(argument) != 2:
+                    observation = f"Invalid item id and retrieval number: {argument}"
                     valid = False
                 else:
-                    query_user_id, query_item_id, k = argument
-                    if not isinstance(query_user_id, int) or not isinstance(query_item_id, int) or not isinstance(k, int):
-                        observation = f"Invalid user id and item id and retrieval number: {argument}"
+                    query_item_id, k = argument
+                    if not isinstance(query_item_id, int) or not isinstance(k, int):
+                        observation = f"Invalid item id and retrieval number: {argument}"
                         valid = False
             else:
                 try:
-                    query_user_id, query_item_id, k = argument.split(',')
-                    query_user_id = int(query_user_id)
+                    query_item_id, k = argument.split(',')
                     query_item_id = int(query_item_id)
                     k = int(k)
                 except ValueError or TypeError:
-                    observation = f"Invalid user id and item id and retrieval number: {argument}"
+                    observation = f"Invalid item id and retrieval number: {argument}"
                     valid = False
             if valid:
-                observation = self.interaction_retriever.item_retrieve(user_id=query_user_id, item_id=query_item_id, k=k)
+                observation = self.interaction_retriever.item_retrieve(item_id=query_item_id, k=k)
         elif action_type.lower() == 'finish':
             observation = self.finish(results=argument)
         else:
@@ -135,9 +141,13 @@ class Analyst(ToolAgent):
         }
         self._history.append(turn)
         
-    def forward(self, user_id: int, item_id: int, *args: Any, **kwargs: Any) -> Any:
+    def forward(self, id: int, analyse_type: str, *args: Any, **kwargs: Any) -> Any:
+        assert self.system.data_sample is not None, "Data sample is not provided."
+        assert 'user_id' in self.system.data_sample, "User id is not provided."
+        assert 'item_id' in self.system.data_sample, "Item id is not provided."
+        self.interaction_retriever.reset(user_id=self.system.data_sample['user_id'], item_id=self.system.data_sample['item_id'])
         while not self.is_finished():
-            command = self._prompt_analyst(user_id=user_id, item_id=item_id)
+            command = self._prompt_analyst(id=id, analyse_type=analyse_type)
             self.command(command)
         if not self.finished:
             return "Analyst did not return any result."

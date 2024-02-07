@@ -32,28 +32,39 @@ class AnalyseSystem(ReActSystem):
             valid = True
             if self.manager.json_mode:
                 if not isinstance(argument, list) or len(argument) != 2:
-                    observation = "The argument of the action 'analyse' should be a list with two elements: user_id and item_id."
+                    observation = "The argument of the action 'Analyse' should be a list with two elements: analyse type (user or item) and id."
                     valid = False
                 else:
-                    user_id, item_id = argument
-                    if (isinstance(user_id, str) and 'user_' in user_id) or (isinstance(item_id, str) and 'item_' in item_id):
-                        observation = f"Invalid user id and item id: {argument}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                    analyse_type, id = argument
+                    if (isinstance(id, str) and 'user_' in id) or (isinstance(id, str) and 'item_' in id):
+                        observation = f"Invalid id: {id}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
                         valid = False
-                    elif not isinstance(user_id, int) or not isinstance(item_id, int):
-                        observation = f"Invalid user id and item id: {argument}"
+                    elif analyse_type.lower() not in ['user', 'item']:
+                        observation = f"Invalid analyse type: {analyse_type}. It should be either 'user' or 'item'."
+                        valid = False
+                    elif not isinstance(id, int):
+                        observation = f"Invalid id: {id}. It should be an integer."
                         valid = False
             else:
-                try:
-                    user_id, item_id = map(int, argument.split(','))
-                except ValueError or TypeError:
-                    user_id, item_id = argument.split(',')
-                    if 'user_' in user_id or 'item_' in item_id:
-                        observation = f"Invalid user id and item id: {argument}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
-                    else:
-                        observation = f"Invalid user id and item id: {argument}"
+                if len(argument.split(',')) != 2:
+                    observation = "The argument of the action 'Analyse' should be a string with two elements separated by a comma: analyse type (user or item) and id."
                     valid = False
+                else:
+                    analyse_type, id = argument.split(',')
+                    if 'user_' in id or 'item_' in id:
+                        observation = f"Invalid id: {id}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                        valid = False
+                    elif analyse_type.lower() not in ['user', 'item']:
+                        observation = f"Invalid analyse type: {analyse_type}. It should be either 'user' or 'item'."
+                        valid = False
+                    else:
+                        try:
+                            id = int(id)
+                        except ValueError or TypeError:
+                            observation = f"Invalid id: {id}. The id should be an integer."
+                            valid = False
             if valid:
-                observation = self.analyst(user_id=user_id, item_id=item_id)
+                observation = self.analyst(analyse_type=analyse_type, id=id)
             self.scratchpad += f'\nObservation: {observation}'
             
             self.log(f'**Observation**: {observation}', agent=self.manager)

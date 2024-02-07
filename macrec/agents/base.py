@@ -125,6 +125,7 @@ class ToolAgent(Agent):
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         self.validate_tools()
+        self.reset()
         return self.forward(*args, **kwargs)
     
     def reset(self) -> None:

@@ -49,7 +49,7 @@ class FeedbackTask(GenerationTask, RewardTask):
     def after_generate(self) -> None:
         self.feedback_file_writer.close()
         
-    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str]]:
+    def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str, pd.Series]]:
         data = super().prompt_data(df)
         # sample data
         sample_idx = np.random.choice(len(data), self.samples, replace=False)
