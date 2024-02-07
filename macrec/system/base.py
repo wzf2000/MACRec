@@ -6,7 +6,7 @@ from loguru import logger
 from langchain.prompts import PromptTemplate
 
 from macrec.agents import Agent
-from macrec.utils import is_correct, init_answer, read_json, read_prompts, get_avatar
+from macrec.utils import is_correct, init_answer, read_json, read_prompts, get_avatar, get_color
 
 class System(ABC):
     """
@@ -103,8 +103,10 @@ class System(ABC):
                 role = 'Assistant'
             else:
                 role = agent.__class__.__name__
-            final_message = f'{get_avatar(role)}:blue[**{role}**]: {message}'
+            final_message = f'{get_avatar(role)}:{get_color(role)}[**{role}**]: {message}'
             self.web_log.append(final_message)
+            if 'manager' not in role.lower() and 'assistant' not in role.lower():
+                final_message = '- ' + final_message
             st.markdown(f'> {final_message}')
     
     @abstractmethod
