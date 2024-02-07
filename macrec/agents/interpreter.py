@@ -71,7 +71,7 @@ class Interpreter(ToolAgent):
     def forward(self, input: str, *args, **kwargs) -> str:
         tokens = input.split()
         if len(tokens) > 100:
-            truncated_input = ' '.join(tokens[:100]) + '...'
+            truncated_input = '...' + ' '.join(tokens[-100:])
         else:
             truncated_input = input
         while not self.is_finished():
