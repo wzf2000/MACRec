@@ -101,9 +101,9 @@ class System(ABC):
             else:
                 role = agent.__class__.__name__
             final_message = f'{get_avatar(role)}:{get_color(role)}[**{role}**]: {message}'
-            self.web_log.append(final_message)
             if 'manager' not in role.lower() and 'assistant' not in role.lower():
                 final_message = '- ' + final_message
+            self.web_log.append(final_message)
             st.markdown(f'> {final_message}')
     
     @abstractmethod
