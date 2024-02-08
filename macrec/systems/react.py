@@ -51,11 +51,12 @@ class ReActSystem(System):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
+        # self.log(f'**Action {self.step_n}**: {action if not self.manager.json_mode else "`" + action + "`"}', agent=self.manager)
         return action_type, argument
     
     def execute(self, action_type: str, argument: Any):
         # Execute
+        log_head = ''
         if action_type.lower() == 'finish':
             parse_result = self._parse_answer(argument)
         else:
@@ -69,12 +70,14 @@ class ReActSystem(System):
             observation = f'{parse_result["message"]} Valid Action examples are {self.manager.valid_action_example}.'
         elif action_type.lower() == 'finish':
             observation = self.finish(parse_result['answer'])
+            log_head = ':violet[Finish with answer]:\n- '
         else:
             raise ValueError(f'Invalid action type: {action_type}')
         
         self.scratchpad += f'\nObservation: {observation}'
         
-        self.log(f'**Observation**: {observation}', agent=self.manager)
+        # self.log(f'**Observation**: {observation}', agent=self.manager)
+        self.log(f'{log_head}{observation}', agent=self.manager)
     
     def step(self):
         self.think()

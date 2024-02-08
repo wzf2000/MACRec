@@ -109,15 +109,17 @@ class CollaborationSystem(System):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
+        # self.log(f'**Action {self.step_n}**: {action if not self.manager.json_mode else "`" + action + "`"}', agent=self.manager)
         return action_type, argument
     
     def execute(self, action_type: str, argument: Any):
         # Execute
+        log_head = ''
         if action_type.lower() == 'finish':
             parse_result = self._parse_answer(argument)
             if parse_result['valid']:
                 observation = self.finish(parse_result['answer'])
+                log_head = ':violet[Finish with answer]:\n- '
             else:
                 assert "message" in parse_result, "Invalid parse result."
                 observation = f'{parse_result["message"]} Valid Action examples are {self.manager.valid_action_example}.'
@@ -126,22 +128,26 @@ class CollaborationSystem(System):
                 observation = 'Analyst is not configured. Cannot execute the action "Analyse".'
             else:
                 observation = self.analyst.invoke(argument=argument, json_mode=self.manager.json_mode)
+                log_head = f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]\n- '
         elif action_type.lower() == 'search':
             if self.searcher is None:
                 observation = 'Searcher is not configured. Cannot execute the action "Search".'
             else:
                 observation = self.searcher.invoke(argument=argument, json_mode=self.manager.json_mode)
+                log_head = f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]\n- '
         elif action_type.lower() == 'interpret':
             if self.interpreter is None:
                 observation = 'Interpreter is not configured. Cannot execute the action "Interpret".'
             else:
                 observation = self.interpreter.invoke(argument=argument, json_mode=self.manager.json_mode)
+                log_head = f':violet[Calling] :red[Interpreter] :violet[with] :blue[{argument}]:violet[...]\n- '
         else:
             observation = 'Invalid Action type or format. Valid Action examples are {self.manager.valid_action_example}.'
         
         self.scratchpad += f'\nObservation: {observation}'
         
-        self.log(f'**Observation**: {observation}', agent=self.manager)
+        # self.log(f'**Observation**: {observation}', agent=self.manager)
+        self.log(f'{log_head}{observation}', agent=self.manager)
     
     def step(self):
         self.think()
@@ -162,7 +168,7 @@ class CollaborationSystem(System):
             reflection_json = json.loads(self.reflector.reflections[-1])
             if 'correctness' in reflection_json and reflection_json['correctness'] == True:
                 # don't forward if the last reflection is correct
-                self.log(f"**Last reflection is correct, don't forward**", agent=self.reflector)
+                self.log(f":red[**Last reflection is correct, don't forward**]", agent=self.reflector)
                 return True
         return False
     

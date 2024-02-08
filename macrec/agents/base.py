@@ -25,6 +25,7 @@ class Agent(ABC):
             `system` (`Optional[System]`): The system that the agent belongs to. Defaults to `None`.
             `dataset` (`Optional[str]`): The dataset that the agent is used on. Defaults to `None`.
         """
+        self.json_mode: bool
         self.system = system
         if prompt_config is not None:
             prompts = read_prompts(prompt_config)
@@ -164,7 +165,7 @@ class ToolAgent(Agent):
     def finish(self, results: Any) -> str:
         self.results = results
         self.finished = True
-        return f'Finished with the results: {str(results)}'
+        return str(self.results)
         
     def is_finished(self) -> bool:
         return self.finished or len(self._history) >= self.max_turns

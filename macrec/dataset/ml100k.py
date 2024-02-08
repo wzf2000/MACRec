@@ -46,7 +46,7 @@ def process_user_data(user_df: pd.DataFrame) -> pd.DataFrame:
     # set a user profile column to be a string contain all the user information with a template
     input_variables = user_df.columns.to_list()
     template = PromptTemplate(
-        template='Age: {age}\nGender:{gender}\nOccupation: {occupation}',
+        template='Age: {age}\nGender: {gender}\nOccupation: {occupation}',
         input_variables=input_variables,
     )
     user_df['user_profile'] = user_df[input_variables].apply(lambda x: template.format(**x), axis=1)

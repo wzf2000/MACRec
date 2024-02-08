@@ -55,23 +55,31 @@ class Searcher(ToolAgent):
         return command
     
     def command(self, command: str) -> None:
-        self.log(f'**Command**: {command}')
+        # self.log(f'**Command**: {command if not self.json_mode else "`" + command + "`"}')
+        log_head = ''
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'search':
             observation = self.retriever.search(query=argument)
+            log_head = ':violet[Search for] :red[{argument}]:violet[...]\n- '
         elif action_type.lower() == 'lookup':
             if self.json_mode:
                 title, term = argument
             else:
-                title, term = argument.split(',')
-                title = title.strip()
-                term = term.strip()
-            observation = self.retriever.lookup(title=title, term=term)
+                try:
+                    title, term = argument.split(',')
+                    title = title.strip()
+                    term = term.strip()
+                    observation = self.retriever.lookup(title=title, term=term)
+                    log_head = f':violet[Lookup for] :red[{term}] :violet[in document] :red[{title}]:violet[...]\n- '
+                except:
+                    observation = f'Invalid argument format: {argument}. Must be in the format "title, term".'
         elif action_type.lower() == 'finish':
             observation = self.finish(results=argument)
+            log_head = ':violet[Finish with results]:\n- '
         else:
             observation = f'Unknown command type: {action_type}.'
-        self.log(f'**Observation**: {observation}')
+        # self.log(f'**Observation**: {observation}')
+        self.log(f'{log_head}{observation}')
         turn = {
             'command': command,
             'observation': observation,

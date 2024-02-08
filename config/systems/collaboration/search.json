@@ -11,5 +11,5 @@
     },
     "agent_prompt": "config/prompts/manager_prompt/search.json",
     "data_prompt": "config/prompts/data_prompt/{task}.json",
-    "max_step": 1
+    "max_step": 10
 }

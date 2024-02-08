@@ -77,7 +77,10 @@ class Reflector(Agent):
             logger.trace(f'Reflection input length: {len(self.enc.encode(self.reflection_input))}')
             logger.trace(f"Reflection input: {self.reflection_input}")
             logger.trace(f'Reflection output length: {len(self.enc.encode(self.reflection_output))}')
-            self.log(f"**Reflection**: {self.reflection_output}")
+            if self.json_mode:
+                self.log(f"[:violet[Reflection]]:\n\n`{self.reflection_output}`")
+            else:
+                self.log(f"[:violet[Reflection]]:\n\n  {self.reflection_output}")
         return format_step(reflection_response)
 
     def forward(self, input: str, scratchpad: str, *args, **kwargs) -> str:

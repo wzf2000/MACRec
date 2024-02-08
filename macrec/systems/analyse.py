@@ -24,14 +24,16 @@ class AnalyseSystem(ReActSystem):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
+        # self.log(f'**Action {self.step_n}**: {action if not self.manager.json_mode else "`" + action + "`"}', agent=self.manager)
         return action_type, argument
         
     def execute(self, action_type: str, argument: Any):
         if action_type.lower() == 'analyse':
             observation = self.analyst.invoke(argument=argument, json_mode=self.manager.json_mode)
+            log_head = f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]\n- '
             self.scratchpad += f'\nObservation: {observation}'
             
-            self.log(f'**Observation**: {observation}', agent=self.manager)
+            # self.log(f'**Observation**: {observation}', agent=self.manager)
+            self.log(f'{log_head}{observation}', agent=self.manager)
         else:
             super().execute(action_type, argument)

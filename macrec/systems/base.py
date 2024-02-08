@@ -93,6 +93,7 @@ class System(ABC):
         
         Args:
             `message` (`str`): The message to log.
+            `agent` (`Agent`, optional): The agent to log the message. Defaults to `None`.
         """
         logger.debug(message)
         if self.web_demo:
@@ -102,9 +103,11 @@ class System(ABC):
                 role = agent.__class__.__name__
             final_message = f'{get_avatar(role)}:{get_color(role)}[**{role}**]: {message}'
             if 'manager' not in role.lower() and 'assistant' not in role.lower():
-                final_message = '- ' + final_message
+                messages = final_message.split('\n')
+                messages = [f'- {messages[0]}'] + [f'  {message}' for message in messages[1:]]
+                final_message = '\n'.join(messages)
             self.web_log.append(final_message)
-            st.markdown(f'> {final_message}')
+            st.markdown(f'{final_message}')
     
     @abstractmethod
     def init(self, *args, **kwargs) -> None:

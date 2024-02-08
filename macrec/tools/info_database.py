@@ -25,11 +25,11 @@ class InfoDatabase(Tool):
             return f'User {user_id} not found in user info database.'
         assert len(info) == 1, f'Multiple entries found for user {user_id}.'
         if 'user_profile' in self._user_info.columns:
-            return info['user_profile'].values[0]
+            return info['user_profile'].values[0].replace('\n', '; ')
         else:
             columns = self._user_info.columns
             columns = columns.drop('user_id')
-            profile = '\n'.join([f'{column}: {info[column].values[0]}' for column in columns])
+            profile = '; '.join([f'{column}: {info[column].values[0]}' for column in columns])
             return f'User {user_id} Profile:\n{profile}'
     
     def item_info(self, item_id: int) -> str:
@@ -40,9 +40,9 @@ class InfoDatabase(Tool):
             return f'Item {item_id} not found in item info database.'
         assert len(info) == 1, f'Multiple entries found for item {item_id}.'
         if 'item_attributes' in self._item_info.columns:
-            return info['item_attributes'].values[0]
+            return info['item_attributes'].values[0].replace('\n', '; ')
         else:
             columns = self._item_info.columns
             columns = columns.drop('item_id')
-            attributes = ', '.join([f'{column}: {info[column].values[0]}' for column in columns])
+            attributes = '; '.join([f'{column}: {info[column].values[0]}' for column in columns])
             return f'Item {item_id} Attributes:\n{attributes}'

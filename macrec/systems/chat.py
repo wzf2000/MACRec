@@ -58,20 +58,24 @@ class ChatSystem(System):
         action = self.manager(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        self.log(f'**Action {self.step_n}**: {action}', agent=self.manager)
+        # self.log(f'**Action {self.step_n}**: {action if not self.manager.json_mode else "`" + action + "`"}', agent=self.manager)
         return action_type, argument
 
     def execute(self, action_type: str, argument: Any):
         # Execute
+        log_header = ''
         if action_type.lower() == 'finish':
             observation = self.finish(argument)
+            log_head = ':violet[Finish with results]:\n- '
         elif action_type.lower() == 'search':
             observation = self.searcher.invoke(argument=argument, json_mode=self.manager.json_mode)
+            log_head = f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]\n- '
         else:
             observation = f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
         self.scratchpad += f'\nObservation: {observation}'
         
-        self.log(f'**Observation**: {observation}', agent=self.manager)
+        # self.log(f'**Observation**: {observation}', agent=self.manager)
+        self.log(f'{log_head}{observation}', agent=self.manager)
     
     def step(self) -> None:
         self.think()

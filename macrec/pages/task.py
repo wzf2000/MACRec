@@ -16,7 +16,7 @@ def chat_page(system: ChatSystem):
         elif isinstance(chat['message'], list):
             with st.chat_message(chat['role']):
                 for message in chat['message']:
-                    st.markdown(f'> {message}')
+                    st.markdown(f'{message}')
         else:
             raise ValueError
     logger.debug('Initialization complete!')
@@ -113,7 +113,7 @@ def gen_page(system: System, task: str, dataset: str):
         elif isinstance(chat['message'], list):
             with st.chat_message(chat['role']):
                 for message in chat['message']:
-                    st.markdown(f'> {message}')
+                    st.markdown(f'{message}')
         else:
             raise ValueError
     if st.button('Start one round'):

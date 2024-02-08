@@ -74,18 +74,21 @@ class Analyst(ToolAgent):
         return command
     
     def command(self, command: str) -> None:
-        self.log(f'**Command**: {command}')
+        # self.log(f'**Command**: {command if not self.json_mode else "`" + command + "`"}')
+        log_head = ''
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'userinfo':
             try:
                 query_user_id = int(argument)
                 observation = self.info_retriever.user_info(user_id=query_user_id)
+                log_head = f':violet[Look up UserInfo of user] :red[{query_user_id}]:violet[...]\n- '
             except ValueError or TypeError:
                 observation = f"Invalid user id: {argument}"
         elif action_type.lower() == 'iteminfo':
             try:
                 query_item_id = int(argument)
                 observation = self.info_retriever.item_info(item_id=query_item_id)
+                log_head = f':violet[Look up ItemInfo of item] :red[{query_item_id}]:violet[...]\n- '
             except ValueError or TypeError:
                 observation = f"Invalid item id: {argument}"
         elif action_type.lower() == 'userhistory':
@@ -109,6 +112,7 @@ class Analyst(ToolAgent):
                     valid = False
             if valid:
                 observation = self.interaction_retriever.user_retrieve(user_id=query_user_id, k=k)
+                log_head = f':violet[Look up UserHistory of user] :red[{query_user_id}] :violet[with at most] :red[{k}] :violet[items...]\n- '
         elif action_type.lower() == 'itemhistory':
             valid = True
             if self.json_mode:
@@ -130,11 +134,14 @@ class Analyst(ToolAgent):
                     valid = False
             if valid:
                 observation = self.interaction_retriever.item_retrieve(item_id=query_item_id, k=k)
+                log_head = f':violet[Look up ItemHistory of item] :red[{query_item_id}] :violet[with at most] :red[{k}] :violet[users...]\n- '
         elif action_type.lower() == 'finish':
             observation = self.finish(results=argument)
+            log_head = ':violet[Finish with results]:\n- '
         else:
             observation = f'Unknown command type: {action_type}.'
-        self.log(f'**Observation**: {observation}')
+        # self.log(f'**Observation**: {observation}')
+        self.log(f'{log_head}{observation}')
         turn = {
             'command': command,
             'observation': observation,
