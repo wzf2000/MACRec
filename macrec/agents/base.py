@@ -8,7 +8,7 @@ from macrec.tools import TOOL_MAP, Tool
 from macrec.utils import run_once, format_history
 
 if TYPE_CHECKING:
-    from macrec.system import System
+    from macrec.systems import System
 
 class Agent(ABC):
     """

@@ -1,7 +1,7 @@
 from typing import Any
 from loguru import logger
 
-from macrec.system.base import System
+from macrec.systems.base import System
 from macrec.agents import Manager, Searcher, Interpreter
 from macrec.utils import format_chat_history, parse_action
 

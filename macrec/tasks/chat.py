@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 from macrec.tasks.base import Task
-from macrec.system import ChatSystem
+from macrec.systems import ChatSystem
 from macrec.utils import init_openai_api, read_json
 
 class ChatTask(Task):

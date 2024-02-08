@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 
 from macrec.tasks.base import Task
 from macrec.utils import init_openai_api, read_json
-from macrec.system import ReActSystem, ReflectionSystem, AnalyseSystem
+from macrec.systems import ReActSystem, ReflectionSystem, AnalyseSystem
 
 class GenerationTask(Task):
     @staticmethod

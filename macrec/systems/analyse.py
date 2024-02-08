@@ -1,7 +1,7 @@
 from typing import Any
 from loguru import logger
 
-from macrec.system.react import ReActSystem
+from macrec.systems.react import ReActSystem
 from macrec.agents import Analyst
 from macrec.utils import parse_action
 

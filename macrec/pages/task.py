@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 from loguru import logger
 
-from macrec.system import *
+from macrec.systems import *
 from macrec.utils import task2name, system2dir, add_chat_message
 
 def get_system(system_type: type, config_path: str, task: str, dataset: str) -> System:
