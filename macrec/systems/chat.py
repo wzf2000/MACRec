@@ -22,9 +22,10 @@ class ChatSystem(System):
     def is_halted(self) -> bool:
         return ((self.step_n > self.max_step) or self.manager.over_limit(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, **self.manager_kwargs)) and not self.finished
         
-    def reset(self, *args, **kwargs) -> None:
+    def reset(self, clear: bool = False, *args, **kwargs) -> None:
         super().reset(*args, **kwargs)
-        self._chat_history = []
+        if clear:
+            self._chat_history = []
         self._reset_action_history()
         self.searcher.reset()
         self.interpreter.reset()
@@ -65,8 +66,7 @@ class ChatSystem(System):
         if action_type.lower() == 'finish':
             observation = self.finish(argument)
         elif action_type.lower() == 'search':
-            search_result = self.searcher(requirements=argument)
-            observation = f'Search result: {search_result}'
+            observation = self.searcher.invoke(argument=argument, json_mode=self.manager.json_mode)
         else:
             observation = f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
         self.scratchpad += f'\nObservation: {observation}'
@@ -82,7 +82,6 @@ class ChatSystem(System):
     def forward(self, user_input: str, reset: bool = True) -> str:
         if reset:
             self.reset()
-        self._reset_action_history()
         self.add_chat_history(user_input, role='user')
         self.task_prompt = self.interpreter(input=self.chat_history)
         while not self.is_finished() and not self.is_halted():

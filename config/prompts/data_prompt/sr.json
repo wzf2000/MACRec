@@ -2,5 +2,13 @@
     "data_prompt": {
         "type": "template",
         "content": "[user_id]: user_{user_id}\n[user_profile]:\n{user_profile}\n[historical interactions]:\n{history}\nAccording to user_{user_id}'s preference, please give a rank order of the following candidates (with the format [id]: attribute): \n{candidate_item_attributes}\n"
+    },
+    "finish": {
+        "type": "raw",
+        "content": "3343, 3693, 104, 1947, 10418, 8398, 2373, 3284"
+    },
+    "finish_json": {
+        "type": "raw",
+        "content": "[3343, 3693, 104, 1947, 10418, 8398, 2373, 3284]"
     }
 }

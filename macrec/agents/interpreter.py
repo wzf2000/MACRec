@@ -1,3 +1,4 @@
+from typing import Any
 from loguru import logger
 from langchain.prompts import PromptTemplate
 
@@ -80,11 +81,16 @@ class Interpreter(ToolAgent):
         if not self.finished:
             return 'Interpreter did not return any result.'
         return self.results
+    
+    def invoke(self, argument: Any, json_mode: bool) -> str:
+        if not isinstance(argument, str):
+            return f'Invalid argument type: {type(argument)}. Must be a string.'
+        return self(input=argument)
 
 if __name__ == '__main__':
     from macrec.utils import init_openai_api, read_json, read_prompts
     init_openai_api(read_json('config/api-config.json'))
-    interpreter = Interpreter(config_path='config/agents/interpreter.json', prompts=read_prompts('config/prompts/agent_prompt/react_chat.json'))
+    interpreter = Interpreter(config_path='config/agents/interpreter.json', prompts=read_prompts('config/prompts/old_system_prompt/react_chat.json'))
     while True:
         user_input = input('Input: ')
         print(interpreter(input=user_input))

@@ -1,0 +1,27 @@
+{
+    "agents": {
+        "Manager": {
+            "action_config_path": "config/agents/manager_action.json",
+            "thought_config_path": "config/agents/manager_thought.json"
+        },
+        "Reflector": {
+            "config_path": "config/agents/reflector_api.json",
+            "prompt_config": "config/prompts/agent_prompt/reflector.json"
+        },
+        "Analyst": {
+            "config_path": "config/agents/analyst.json",
+            "prompt_config": "config/prompts/agent_prompt/analyst.json"
+        },
+        "Searcher": {
+            "config_path": "config/agents/searcher.json",
+            "prompt_config": "config/prompts/agent_prompt/searcher.json"
+        },
+        "Interpreter": {
+            "config_path": "config/agents/interpreter.json",
+            "prompt_config": "config/prompts/agent_prompt/interpreter.json"
+        }
+    },
+    "agent_prompt": "config/prompts/manager_prompt/reflect_analyse_search_interpret.json",
+    "data_prompt": "config/prompts/data_prompt/{task}.json",
+    "max_step": 10
+}

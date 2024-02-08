@@ -1,0 +1,30 @@
+{
+    "analyst_prompt": {
+        "type": "template",
+        "content": "I want you to act as an analyst and help me analyze the given {analyse_type} {id} for the {task_type} task. You can use 5 type of commands to do this:\n(1) UserInfo[id], which returns the information of the user with the given id.\n(2) ItemInfo[id], which returns the information of the item with the given id.\n(3) UserHistory[id, k], which returns the interaction history of user id before (at most k interactions will be returned).\n(4) ItemHistory[id, k], which returns the interaction history of item id before (at most k interactions will be returned).\n(5) Finish[result], which finishes the task and returns the analyze result.\nYou can take at most {max_step} steps.\nValid command examples:\n{examples}\nHere are some examples:\n{fewshot}\n(END OF EXAMPLES)\n\nRemember the {analyse_type} id is {id}.\n\n{history}\n\n{hint}\nCommand: "
+    },
+    "analyst_prompt_json": {
+        "type": "template",
+        "content": "I want you to act as an analyst and help me analyze the given {analyse_type} {id} for the {task_type} task. You can use 5 type of commands to do this in JSON format:\n(1) {{\"type\": \"UserInfo\", \"content\": id}}, which returns the information of the user with the given id.\n(2) {{\"type\": \"ItemInfo\", \"content\": id}}, which returns the information of the item with the given id.\n(3) {{\"type\": \"UserHistory\", \"content\": [id, k]}}, which returns the interaction history of user id before (at most k interactions will be returned).\n(4) {{\"type\": \"ItemHistory\", \"content\": [id, k]}}, which returns the interaction history of item id before (at most k interactions will be returned).\n(5) {{\"type\": \"Finish\", \"content\": result}}, which finishes the task and returns the analyze result.\nYou can take at most {max_step} steps.\nValid command examples:\n{examples}\nHere are some examples:\n{fewshot}\n(END OF EXAMPLES)\n\nRemember the {analyse_type} id is {id}.\n\n{history}\n\n{hint}\nCommand: "
+    },
+    "analyst_examples": {
+        "type": "raw",
+        "content": "UserInfo[123]\nItemInfo[456]\nUserHistory[123, 3]\nItemHistory[456, 3]\nFinish[The user 123 has a preference to the anime genre.]"
+    },
+    "analyst_examples_json": {
+        "type": "raw",
+        "content": "{{\"type\": \"UserInfo\", \"content\": 123}}\n{{\"type\": \"ItemInfo\", \"content\": 456}}\n{{\"type\": \"UserHistory\", \"content\": [123, 3]}\n{{\"type\": \"ItemHistory\", \"content\": [456, 3]}}\n{{\"type\": \"Finish\", \"content\": \"The user 123 has a preference to the anime genre.\"}}"
+    },
+    "analyst_fewshot": {
+        "type": "raw",
+        "content": "Suppose you are analysing the user 123:\nUserInfo[123]\nUserHistory[123, 3] (suppose get a item list [23, 45, 67])\nItemInfo[23]\nItemInfo[45]\nItemHistory[67, 3] (suppose get a user list [34, 56, 78])\nUserInfo[56]\nUserInfo[78]\nFinish[The user 123 has a preference to the anime genre.]"
+    },
+    "analyst_fewshot_json": {
+        "type": "raw",
+        "content": "Suppose you are analysing the user 123:\n{{\"type\": \"UserInfo\", \"content\": 123}}\n{{\"type\": \"UserHistory\", \"content\": [123, 3]}} (suppose get a item list [23, 45, 67])\n{{\"type\": \"ItemInfo\", \"content\": 23}}\n{{\"type\": \"ItemInfo\", \"content\": 45}}\n{{\"type\": \"ItemHistory\", \"content\": [67, 3]}} (suppose get a user list [34, 56, 78])\n{{\"type\": \"UserInfo\", \"content\": 56}}\n{{\"type\": \"UserInfo\", \"content\": 78}}\n{{\"type\": \"Finish\", \"content\": \"The user 123 has a preference to the anime genre.\"}}"
+    },
+    "analyst_hint": {
+        "type": "raw",
+        "content": "This is the final step. You should use Finish command to finish the task."
+    }
+}

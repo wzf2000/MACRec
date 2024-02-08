@@ -1,0 +1,22 @@
+{
+    "manager_prompt": {
+        "type": "template",
+        "content": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. `Finish[answer]` returns the answer and finishes the task.{examples}\nInput:\n{input}\n{scratchpad}"
+    },
+    "manager_prompt_json": {
+        "type": "template",
+        "content": "Solve a {task_type} task by having a Thought, then Finish with your answer. Thought can reason about the current situation. Actions should be described in JSON format. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.{examples}\nInput:\n{input}\n{scratchpad}"
+    },
+    "hint": {
+        "type": "raw",
+        "content": "This is the final step. You should use Finish Action to finish the task."
+    },
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[{finish}]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "{\"type\": \"finish\", \"content\": {finish}}"
+    }
+}

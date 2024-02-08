@@ -1,1 +1,10 @@
-{}
+{
+    "finish": {
+        "type": "raw",
+        "content": "Hello! How can I assist you today?"
+    },
+    "finish_json": {
+        "type": "raw",
+        "content": "\"Hello! How can I assist you today?\""
+    }
+}

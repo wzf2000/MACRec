@@ -1,0 +1,15 @@
+{
+    "agents": {
+        "Manager": {
+            "action_config_path": "config/agents/manager_action.json",
+            "thought_config_path": "config/agents/manager_thought.json"
+        },
+        "Reflector": {
+            "config_path": "config/agents/reflector_api.json",
+            "prompt_config": "config/prompts/agent_prompt/reflector.json"
+        }
+    },
+    "agent_prompt": "config/prompts/manager_prompt/reflect.json",
+    "data_prompt": "config/prompts/data_prompt/{task}.json",
+    "max_step": 1
+}

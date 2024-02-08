@@ -120,7 +120,6 @@ def gen_page(system: System, task: str, dataset: str):
         with st.chat_message('assistant'):
             title = f'#### System running round {len(st.session_state.chat_history) // 2 + 1}'
             st.markdown(title)
-            system.clear_web_log()
             answer = system()
             st.session_state.chat_history.append({
                 'role': 'assistant',
@@ -179,7 +178,6 @@ def task_config(task: str, system_type: type):
         logger.debug(f'New system')
         renew = True
     elif dataset != st.session_state.system.manager.dataset:
-        print(st.session_state.system.manager.dataset)
         logger.debug(f'Change dataset: {dataset}')
         st.session_state.dataset = dataset
         renew = True

@@ -1,0 +1,22 @@
+{
+    "manager_prompt": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation, and Action can be just one type: \n(1) `Finish[answer]`, which returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput:\n{input}{scratchpad}"
+    },
+    "manager_prompt_json": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Actions should be described in JSON format. `{{\"type\": \"finish\", \"content\": answer}}` returns the answer and finishes the task.\n{examples}\n{reflections}\n\nInput:\n{input}{scratchpad}"
+    },
+    "hint": {
+        "type": "raw",
+        "content": "This is the final step. You should use Finish Action to finish the task."
+    },
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[{finish}]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "{\"type\": \"finish\", \"content\": {finish}}"
+    }
+}

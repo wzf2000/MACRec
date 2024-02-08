@@ -1,10 +1,11 @@
 import tiktoken
+from loguru import logger
 from transformers import AutoTokenizer
 from langchain.prompts import PromptTemplate
 
 from macrec.agents.base import Agent
-from macrec.utils import format_step
 from macrec.llms import AnyOpenAILLM
+from macrec.utils import format_step, run_once
 
 class Manager(Agent):
     """
@@ -44,9 +45,9 @@ class Manager(Agent):
     @property
     def valid_action_example(self) -> str:
         if self.json_mode:
-            return self.prompts['valid_action_example_json']
+            return self.prompts['valid_action_example_json'].replace('{finish}', self.prompts['finish_json'])
         else:
-            return self.prompts['valid_action_example']
+            return self.prompts['valid_action_example'].replace('{finish}', self.prompts['finish'])
     
     @property
     def fewshot_examples(self) -> str:
@@ -62,6 +63,10 @@ class Manager(Agent):
         else:
             return ''
         
+    @run_once
+    def _log_prompt(self, prompt: str) -> None:
+        logger.debug(f'Manager Prompt: {prompt}')
+        
     def _build_manager_prompt(self, **kwargs) -> str:
         return self.manager_prompt.format(
             examples=self.fewshot_examples,
@@ -70,6 +75,7 @@ class Manager(Agent):
         
     def _prompt_thought(self, **kwargs) -> str:
         thought_prompt = self._build_manager_prompt(**kwargs)
+        self._log_prompt(thought_prompt)
         thought_response = self.thought_llm(thought_prompt)
         return format_step(thought_response)
     

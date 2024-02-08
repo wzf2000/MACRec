@@ -2,5 +2,13 @@
     "data_prompt": {
         "type": "template",
         "content": "[user_id]: user_{user_id}\n[user_profile]:\n{user_profile}\nWhy did user_{user_id} give item_{target_item_id} with attributes {target_item_attributes} a rating of {rating} (1 being lowest and 5 being highest)?"
+    },
+    "finish": {
+        "type": "raw",
+        "content": "The user likes popular movies..."
+    },
+    "finish_json": {
+        "type": "raw",
+        "content": "\"The user likes popular movies...\""
     }
 }

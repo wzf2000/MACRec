@@ -1,3 +1,4 @@
+from typing import Any
 from loguru import logger
 from langchain.prompts import PromptTemplate
 
@@ -83,7 +84,12 @@ class Searcher(ToolAgent):
             self.command(command)
         if not self.finished:
             return 'Searcher did not return any result.'
-        return self.results
+        return f'Search result: {self.results}'
+    
+    def invoke(self, argument: Any, json_mode: bool) -> str:
+        if not isinstance(argument, str):
+            return f'Invalid argument type: {type(argument)}. Must be a string.'
+        return self(requirements=argument)
 
 if __name__ == '__main__':
     from macrec.utils import init_openai_api, read_json, read_prompts

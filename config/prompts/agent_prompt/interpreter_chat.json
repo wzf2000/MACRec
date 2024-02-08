@@ -1,0 +1,18 @@
+{
+    "interpreter_prompt": {
+        "type": "template",
+        "content": "I want you to act as an prompt interpreter. I will give you the conversation history between the system and the user, and you should give a consise and clear prompt for the system to generate the appropriate response. You can use 2 type of commands to do this:\n(1) Summarize[], which will give you a summary of the user's input by some text summarization tools.\n(2) Finish[prompt], which returns the prompt you generated and finishes the task.\nValid command examples:\n{examples}\n(END OF EXAMPLES)\n\nThe last 100 words of the user's input are:\n{input}\n\n{history}\n\nCommand: "
+    },
+    "interpreter_prompt_json": {
+        "type": "template",
+        "content": "I want you to act as an prompt interpreter. I will give you the conversation history between the system and the user, and you should give a consise and clear prompt for the system to generate the appropriate response. You can use 2 type of commands in JSON format to do this:\n(1) {{\"type\": \"Summarize\", \"content\": \"\"}}, which will give you a summary of the user's input by some text summarization tools.\n(2) {{\"type\": \"Finish\", \"content\": prompt}}, which returns the prompt you generated and finishes the task.\nValid command examples:\n{examples}\n(END OF EXAMPLES)\n\nThe last 100 words of the conversation history:\n{input}\n\n{history}\n\nCommand: "
+    },
+    "interpreter_examples": {
+        "type": "raw",
+        "content": "Summarize[]\nFinish[Please tell me the weather in New York City.]"
+    },
+    "interpreter_examples_json": {
+        "type": "raw",
+        "content": "{\"type\": \"Summarize\", \"content\": \"\"}\n{\"type\": \"Finish\", \"content\": \"Please tell me the weather in New York City.\"}"
+    }
+}

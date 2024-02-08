@@ -1,0 +1,22 @@
+{
+    "manager_prompt": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types:\n(1) Search[requirements], which will ask another agent (called Searcher) to help search given the requirements.\n(2) Finish[response], which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput:\n{input}\n{scratchpad}"
+    },
+    "manager_prompt_json": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types in JSON format:\n(1) {{\"type\": \"Search\", \"content\": requirements}}, which will ask another agent (called Searcher) to help search given the requirements.\n(2) {{\"type\": \"Finish\", \"content\": response}}, which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n\nInput:\n{input}\n{scratchpad}"
+    },
+    "hint": {
+        "type": "raw",
+        "content": "This is the final step. You should use Finish Action to finish the task."
+    },
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[{finish}]\nSearch[Movies similar to Schindler's list]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "{\"type\": \"finish\", \"content\": {finish}}\n{\"type\": \"search\", \"content\": \"Movies similar to Schindler's list\"}"
+    }
+}

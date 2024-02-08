@@ -1,0 +1,22 @@
+{
+    "manager_prompt": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types:\n(1) Analyse[user/item, id], which will ask another agent (called Analyst) to help analyse the preferences or features of user id or item id.\n(2) Finish[response], which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n{reflections}\n\nInput:\n{input}\n{scratchpad}"
+    },
+    "manager_prompt_json": {
+        "type": "template",
+        "content": "Solve a {task_type} task with interleaving Thought, Action, Observation steps. Thought can reason about the current situation. Action can be 2 types in JSON format:\n(1) {{\"type\": \"Analyse\", \"content\": [\"user/item\", id]}}, which will ask another agent (called Analyst) to help analyse the preferences or features of user id or item id.\n(2) {{\"type\": \"Finish\", \"content\": response}}, which finishes the task and returns the response to the user.\nYou can take at most {max_step} steps.\n{examples}\n{reflections}\n\nInput:\n{input}\n{scratchpad}"
+    },
+    "hint": {
+        "type": "raw",
+        "content": "This is the final step. You should use Finish Action to finish the task."
+    },
+    "valid_action_example": {
+        "type": "raw",
+        "content": "Finish[{finish}]\nAnalyse[user, 524]\nAnalyse[item, 955]"
+    },
+    "valid_action_example_json": {
+        "type": "raw",
+        "content": "{\"type\": \"finish\", \"content\": {finish}}\n{\"type\": \"analyse\", \"content\": [\"user\", 524]}\n{\"type\": \"analyse\", \"content\": [\"item\", 955]}"
+    }
+}

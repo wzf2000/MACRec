@@ -3,7 +3,7 @@
     "manager_thought": "config/agents/manager_thought.json",
     "interpreter": "config/agents/interpreter.json",
     "searcher": "config/agents/searcher.json",
-    "agent_prompt": "config/prompts/agent_prompt/react_chat.json",
+    "agent_prompt": "config/prompts/old_system_prompt/react_chat.json",
     "data_prompt": "config/prompts/data_prompt/{task}.json",
     "task_agent_prompt": "config/prompts/task_agent_prompt/searcher_{task}.json"
 }

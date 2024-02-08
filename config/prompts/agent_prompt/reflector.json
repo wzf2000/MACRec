@@ -1,0 +1,26 @@
+{
+    "reflect_prompt": {
+        "type": "template",
+        "content": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using Finish[<answer>] or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences.  \n{examples}\nPrevious trial:\nInput:\n{input}{scratchpad}\n\nReflection:"
+    },
+    "reflect_prompt_json": {
+        "type": "template",
+        "content": "You are an advanced reasoning agent that can improve based on self refection. You will be given a previous reasoning trial in which you were given a task to complete. Firstly, you should determine if the given answer is correct. Then, provide reasons for your judgement. Possible reasons for failure may be guessing the wrong answer using `{{\"type\": \"finish\", \"content\": answer}}` or using a wrong format for action. In a few sentences, discover the potential problems in your previous reasoning trial and devise a new, concise, high level plan that aims to mitigate the same failure. Use complete sentences in reasoning. Reflections should be described in JSON format.\nPrevious trial:\nInput:\n{input}{scratchpad}\n\nValid reflection example:\n{examples}\n\nReflection:"
+    },
+    "reflect_examples_json": {
+        "type": "raw",
+        "content": "`{\"correctness\": false, \"reason\": \"The potential problem ...\"}`\n`{\"correctness\": true, \"reason\": \"There is no problem with the agent's plan ...\"}`"
+    },
+    "reflection_header": {
+        "type": "raw",
+        "content": "You have attempted to complete a following task before. The following reflection(s) give a new plan to complete the task in the same way you did previously. Use them to improve your strategy of correctly completing the given task.\n"
+    },
+    "last_trial_header": {
+        "type": "raw",
+        "content": "You have attempted to complete the following task before. Below is the last trial you attempted to complete the task.\n"
+    },
+    "reflection_last_trial_header": {
+        "type": "raw",
+        "content": "The following reflection(s) give a new plan to complete the task in the same way you did previously. Use them to improve your strategy of correctly completing the given task.\n"
+    }
+}

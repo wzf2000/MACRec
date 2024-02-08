@@ -2,10 +2,11 @@ import json
 from abc import ABC, abstractmethod
 from loguru import logger
 from typing import Any, Optional, TYPE_CHECKING
+from langchain.prompts import PromptTemplate
 
 from macrec.llms import BaseLLM, AnyOpenAILLM, OpenSourceLLM
 from macrec.tools import TOOL_MAP, Tool
-from macrec.utils import run_once, format_history
+from macrec.utils import run_once, format_history, read_prompts
 
 if TYPE_CHECKING:
     from macrec.systems import System
@@ -14,17 +15,24 @@ class Agent(ABC):
     """
     The base class of agents. We use the `forward` function to get the agent output. Use `get_LLM` to get the base large language model for the agent.
     """
-    def __init__(self, prompts: dict = dict(), web_demo: bool = False, system: Optional['System'] = None, dataset: Optional[str] = None, *args, **kwargs) -> None:
+    def __init__(self, prompts: dict = dict(), prompt_config: Optional[str] = None, web_demo: bool = False, system: Optional['System'] = None, dataset: Optional[str] = None, *args, **kwargs) -> None:
         """Initialize the agent.
         
         Args:
-            `prompts` (`dict`, optional): A dictionary of prompts for the agent. Defaults to `dict()`.
+            `prompts` (`dict`, optional): A dictionary of prompts for the agent. Will be read from the prompt config file if `prompt_config` is not `None`. Defaults to `dict()`.
+            `prompt_config` (`Optional[str]`): The path to the prompt config file. Defaults to `None`.
             `web_demo` (`bool`, optional): Whether the agent is used in a web demo. Defaults to `False`.
             `system` (`Optional[System]`): The system that the agent belongs to. Defaults to `None`.
             `dataset` (`Optional[str]`): The dataset that the agent is used on. Defaults to `None`.
         """
         self.system = system
+        if prompt_config is not None:
+            prompts = read_prompts(prompt_config)
         self.prompts = prompts
+        if self.system is not None:
+            for prompt_name, prompt_template in self.prompts.items():
+                if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
+                    self.prompts[prompt_name] = prompt_template.partial(task_type=self.system.task_type)
         self.web_demo = web_demo
         self.dataset = dataset
         if self.web_demo:
@@ -127,6 +135,20 @@ class ToolAgent(Agent):
         self.validate_tools()
         self.reset()
         return self.forward(*args, **kwargs)
+    
+    @abstractmethod
+    def invoke(self, argument: Any, json_mode: bool) -> str:
+        """Invoke the agent with the argument.
+        
+        Args:
+            `argument` (`Any`): The argument for the agent.
+            `json_mode` (`bool`): Whether the argument is in JSON mode.
+        Raises:
+            `NotImplementedError`: Should be implemented in subclasses.
+        Returns:
+            `str`: The observation of the invoking process.
+        """
+        raise NotImplementedError("ToolAgent.invoke() not implemented")
     
     def reset(self) -> None:
         self._history = []

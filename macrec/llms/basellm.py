@@ -5,6 +5,7 @@ class BaseLLM(ABC):
         self.model_name: str
         self.max_tokens: int
         self.max_context_length: int
+        self.json_mode: bool
         
     @property
     def tokens_limit(self) -> int:

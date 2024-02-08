@@ -141,7 +141,7 @@ class Analyst(ToolAgent):
         }
         self._history.append(turn)
         
-    def forward(self, id: int, analyse_type: str, *args: Any, **kwargs: Any) -> Any:
+    def forward(self, id: int, analyse_type: str, *args: Any, **kwargs: Any) -> str:
         assert self.system.data_sample is not None, "Data sample is not provided."
         assert 'user_id' in self.system.data_sample, "User id is not provided."
         assert 'item_id' in self.system.data_sample, "Item id is not provided."
@@ -153,11 +153,47 @@ class Analyst(ToolAgent):
             return "Analyst did not return any result."
         return self.results
     
+    def invoke(self, argument: Any, json_mode: bool) -> str:
+        if json_mode:
+            if not isinstance(argument, list) or len(argument) != 2:
+                observation = "The argument of the action 'Analyse' should be a list with two elements: analyse type (user or item) and id."
+                return observation
+            else:
+                analyse_type, id = argument
+                if (isinstance(id, str) and 'user_' in id) or (isinstance(id, str) and 'item_' in id):
+                    observation = f"Invalid id: {id}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                    return observation
+                elif analyse_type.lower() not in ['user', 'item']:
+                    observation = f"Invalid analyse type: {analyse_type}. It should be either 'user' or 'item'."
+                    return observation
+                elif not isinstance(id, int):
+                    observation = f"Invalid id: {id}. It should be an integer."
+                    return observation
+        else:
+            if len(argument.split(',')) != 2:
+                observation = "The argument of the action 'Analyse' should be a string with two elements separated by a comma: analyse type (user or item) and id."
+                return observation
+            else:
+                analyse_type, id = argument.split(',')
+                if 'user_' in id or 'item_' in id:
+                    observation = f"Invalid id: {id}. Don't use the prefix 'user_' or 'item_'. Just use the id number only, e.g., 1, 2, 3, ..."
+                    return observation
+                elif analyse_type.lower() not in ['user', 'item']:
+                    observation = f"Invalid analyse type: {analyse_type}. It should be either 'user' or 'item'."
+                    return observation
+                else:
+                    try:
+                        id = int(id)
+                    except ValueError or TypeError:
+                        observation = f"Invalid id: {id}. The id should be an integer."
+                        return observation
+        return self(analyse_type=analyse_type, id=id)
+    
 if __name__ == '__main__':
     from langchain.prompts import PromptTemplate
     from macrec.utils import init_openai_api, read_json, read_prompts
     init_openai_api(read_json('config/api-config.json'))
-    prompts = read_prompts('config/prompts/agent_prompt/react_analyst.json')
+    prompts = read_prompts('config/prompts/old_system_prompt/react_analyst.json')
     for prompt_name, prompt_template in prompts.items():
         if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
             prompts[prompt_name] = prompt_template.partial(task_type='rating prediction')

@@ -1,0 +1,11 @@
+{
+    "agents": {
+        "Manager": {
+            "action_config_path": "config/agents/manager_action.json",
+            "thought_config_path": "config/agents/manager_thought.json"
+        }
+    },
+    "agent_prompt": "config/prompts/manager_prompt/single.json",
+    "data_prompt": "config/prompts/data_prompt/{task}.json",
+    "max_step": 1
+}

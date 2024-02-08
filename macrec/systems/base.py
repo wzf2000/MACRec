@@ -80,9 +80,6 @@ class System(ABC):
         self.prompts.update(read_prompts(self.config['data_prompt'].format(task=self.task)))
         if 'task_agent_prompt' in self.config:
             self.prompts.update(read_prompts(self.config['task_agent_prompt'].format(task=self.task)))
-        for prompt_name, prompt_template in self.prompts.items():
-            if isinstance(prompt_template, PromptTemplate) and 'task_type' in prompt_template.input_variables:
-                self.prompts[prompt_name] = prompt_template.partial(task_type=self.task_type)
         self.agent_kwargs['prompts'] = self.prompts
         self.leak = leak
         self.web_demo = web_demo
@@ -119,6 +116,7 @@ class System(ABC):
         raise NotImplementedError("System.init() not implemented")
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        self.clear_web_log()
         return self.forward(*args, **kwargs)
     
     def set_data(self, input: str, context: str, gt_answer: Any, data_sample: Optional[pd.Series] = None) -> None:
