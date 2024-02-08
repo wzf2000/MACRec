@@ -23,6 +23,8 @@ class CollaborationSystem(System):
         }
         if self.reflector is not None:
             self.manager_kwargs['reflections'] = ''
+        if self.interpreter is not None:
+            self.manager_kwargs['task_prompt'] = ''
     
     def init_agents(self, agents: dict[str, dict]) -> None:
         self.agents: dict[str, Agent] = dict()
@@ -127,20 +129,23 @@ class CollaborationSystem(System):
             if self.analyst is None:
                 observation = 'Analyst is not configured. Cannot execute the action "Analyse".'
             else:
+                self.log(f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]', agent=self.manager, logging=False)
                 observation = self.analyst.invoke(argument=argument, json_mode=self.manager.json_mode)
-                log_head = f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]\n- '
+                log_head = f':violet[Response from] :red[Analyst] :violet[with] :blue[{argument}]:violet[:]\n- '
         elif action_type.lower() == 'search':
             if self.searcher is None:
                 observation = 'Searcher is not configured. Cannot execute the action "Search".'
             else:
+                self.log(f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]', agent=self.manager, logging=False)
                 observation = self.searcher.invoke(argument=argument, json_mode=self.manager.json_mode)
-                log_head = f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]\n- '
+                log_head = f':violet[Response from] :red[Searcher] :violet[with] :blue[{argument}]:violet[:]\n- '
         elif action_type.lower() == 'interpret':
             if self.interpreter is None:
                 observation = 'Interpreter is not configured. Cannot execute the action "Interpret".'
             else:
+                self.log(f':violet[Calling] :red[Interpreter] :violet[with] :blue[{argument}]:violet[...]', agent=self.manager, logging=False)
                 observation = self.interpreter.invoke(argument=argument, json_mode=self.manager.json_mode)
-                log_head = f':violet[Calling] :red[Interpreter] :violet[with] :blue[{argument}]:violet[...]\n- '
+                log_head = f':violet[Response from] :red[Interpreter] :violet[with] :blue[{argument}]:violet[:]\n- '
         else:
             observation = 'Invalid Action type or format. Valid Action examples are {self.manager.valid_action_example}.'
         
@@ -177,6 +182,9 @@ class CollaborationSystem(System):
         if self.task == 'chat':
             assert self.interpreter is not None, 'Interpreter is required for chat task.'
             self.manager_kwargs['task_prompt'] = self.interpreter(input=self.chat_history)
+        else:
+            if self.interpreter is not None:
+                self.manager_kwargs['task_prompt'] = self.interpreter(input=self.input)
         
     def forward(self, user_input: Optional[str] = None, reset: bool = True) -> Any:
         if self.reflect():

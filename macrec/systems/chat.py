@@ -68,8 +68,9 @@ class ChatSystem(System):
             observation = self.finish(argument)
             log_head = ':violet[Finish with results]:\n- '
         elif action_type.lower() == 'search':
+            self.log(f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]', agent=self.manager, logging=False)
             observation = self.searcher.invoke(argument=argument, json_mode=self.manager.json_mode)
-            log_head = f':violet[Calling] :red[Searcher] :violet[with] :blue[{argument}]:violet[...]\n- '
+            log_head = f':violet[Response from] :red[Searcher] :violet[with] :blue[{argument}]:violet[:]\n- '
         else:
             observation = f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
         self.scratchpad += f'\nObservation: {observation}'

@@ -29,8 +29,9 @@ class AnalyseSystem(ReActSystem):
         
     def execute(self, action_type: str, argument: Any):
         if action_type.lower() == 'analyse':
+            self.log(f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]', agent=self.manager, logging=False)
             observation = self.analyst.invoke(argument=argument, json_mode=self.manager.json_mode)
-            log_head = f':violet[Calling] :red[Analyst] :violet[with] :blue[{argument}]:violet[...]\n- '
+            log_head = f':violet[Response from] :red[Analyst] :violet[with] :blue[{argument}]:violet[:]\n- '
             self.scratchpad += f'\nObservation: {observation}'
             
             logger.debug(f'Observation: {observation}')
