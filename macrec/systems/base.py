@@ -86,16 +86,18 @@ class System(ABC):
         self.agent_kwargs['web_demo'] = web_demo
         self.kwargs = kwargs
         self.init(*args, **kwargs)
-        self.reset()
+        self.reset(clear=True)
     
-    def log(self, message: str, agent: Optional[Agent] = None) -> None:
+    def log(self, message: str, agent: Optional[Agent] = None, logging: bool = True) -> None:
         """Log the message.
         
         Args:
             `message` (`str`): The message to log.
             `agent` (`Agent`, optional): The agent to log the message. Defaults to `None`.
+            `logging` (`bool`, optional): Whether to use the `logger` to log the message. Defaults to `True`.
         """
-        logger.debug(message)
+        if logging:
+            logger.debug(message)
         if self.web_demo:
             if agent is None:
                 role = 'Assistant'

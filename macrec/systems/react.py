@@ -51,7 +51,7 @@ class ReActSystem(System):
         action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
-        # self.log(f'**Action {self.step_n}**: {action if not self.manager.json_mode else "`" + action + "`"}', agent=self.manager)
+        logger.debug(f'Action {self.step_n}: {action}')
         return action_type, argument
     
     def execute(self, action_type: str, argument: Any):
@@ -76,8 +76,8 @@ class ReActSystem(System):
         
         self.scratchpad += f'\nObservation: {observation}'
         
-        # self.log(f'**Observation**: {observation}', agent=self.manager)
-        self.log(f'{log_head}{observation}', agent=self.manager)
+        logger.debug(f'Observation: {observation}')
+        self.log(f'{log_head}{observation}', agent=self.manager, logging=False)
     
     def step(self):
         self.think()

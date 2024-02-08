@@ -54,7 +54,7 @@ class Interpreter(ToolAgent):
         return command
     
     def command(self, command: str, input: str) -> None:
-        # self.log(f'**Command**: {command if not self.json_mode else "`" + command + "`"}')
+        logger.debug(f'Command: {command}')
         log_head = ''
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'summarize':
@@ -65,8 +65,8 @@ class Interpreter(ToolAgent):
             log_head = ':violet[Finish with results]:\n- '
         else:
             observation = f'Unknown command type: {action_type}.'
-        # self.log(f'**Observation**: {observation}')
-        self.log(f'{log_head}{observation}')
+        logger.debug(f'Observation: {observation}')
+        self.observation(observation, log_head)
         turn = {
             'command': command,
             'observation': observation,

@@ -31,7 +31,8 @@ class ReflectionSystem(ReActSystem):
                 reflection_json = json.loads(self.reflector.reflections[-1])
                 if 'correctness' in reflection_json and reflection_json['correctness'] == True:
                     # don't forward if the last reflection is correct
-                    self.log(f":red[**Last reflection is correct, don't forward**]", agent=self.reflector)
+                    logger.debug(f"Last reflection is correct, don't forward")
+                    self.log(f":red[**Last reflection is correct, don't forward**]", agent=self.reflector, logging=False)
                     return self.answer
         else:
             self.reflected = False

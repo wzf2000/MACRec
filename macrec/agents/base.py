@@ -39,16 +39,17 @@ class Agent(ABC):
         if self.web_demo:
             assert self.system is not None, 'System not found.'
         
-    def log(self, message: str) -> None:
+    def observation(self, message: str, log_head: str = '') -> None:
         """Log the message.
         
         Args:
             `message` (`str`): The message to log.
+            `log_head` (`str`): The log head. Defaults to `''`.
         """
         if self.web_demo:
-            self.system.log(message, agent=self)
+            self.system.log(log_head + message, agent=self)
         else:
-            logger.debug(message)
+            logger.debug(f'Observation: {message}')
     
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         return self.forward(*args, **kwargs)

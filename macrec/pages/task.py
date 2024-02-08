@@ -23,11 +23,11 @@ def chat_page(system: ChatSystem):
     if prompt := st.chat_input():
         add_chat_message('user', prompt)
         with st.chat_message('assistant'):
-            st.markdown('# System is running...')
+            st.markdown('#### System is running...')
             response = system(prompt)
             st.session_state.chat_history.append({
                 'role': 'assistant',
-                'message': ['# System is running...'] + system.web_log
+                'message': ['#### System is running...'] + system.web_log
             })
         add_chat_message('assistant', response)
         st.rerun()
