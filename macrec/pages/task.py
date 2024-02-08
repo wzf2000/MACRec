@@ -185,6 +185,10 @@ def task_config(task: str, system_type: type):
         renew = True
     if renew:
         system = get_system(system_type, os.path.join(config_dir, config_file), task, dataset)
+        st.session_state.system_type = system_type.__name__
+        st.session_state.task = task
+        st.session_state.config_file = config_file
+        st.session_state.dataset = dataset
         st.session_state.system = system
         st.session_state.chat_history = []
         if 'data_sample' in st.session_state:
