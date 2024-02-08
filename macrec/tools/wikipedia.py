@@ -35,7 +35,7 @@ class Wikipedia(RetrievalTool):
         
     def search(self, query: str) -> str:
         results = self.retriever.get_relevant_documents(query=query)
-        return f'Found {len(results)} documents. Their titles and summaries are: {self._format_documents(results)}'
+        return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
     
     def lookup(self, title: str, term: str) -> str:
         if title not in self.cache:

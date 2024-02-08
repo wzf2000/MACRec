@@ -41,11 +41,19 @@ class Searcher(ToolAgent):
         else:
             return self.prompts['searcher_examples']
     
+    @property
+    def hint(self) -> str:
+        if 'searcher_hint' not in self.prompts:
+            return ''
+        return self.prompts['searcher_hint']
+    
     def _build_searcher_prompt(self, **kwargs) -> str:
         return self.searcher_prompt.format(
             examples=self.searcher_examples,
             k=self.retriever.top_k,
             history=self.history,
+            max_step=self.max_turns,
+            hint=self.hint if len(self._history) + 1 >= self.max_turns else '',
             **kwargs
         )
         
@@ -60,10 +68,12 @@ class Searcher(ToolAgent):
         action_type, argument = parse_action(command, json_mode=self.json_mode)
         if action_type.lower() == 'search':
             observation = self.retriever.search(query=argument)
-            log_head = ':violet[Search for] :red[{argument}]:violet[...]\n- '
+            log_head = f':violet[Search for] :red[{argument}]:violet[...]\n- '
         elif action_type.lower() == 'lookup':
             if self.json_mode:
                 title, term = argument
+                observation = self.retriever.lookup(title=title, term=term)
+                log_head = f':violet[Lookup for] :red[{term}] :violet[in document] :red[{title}]:violet[...]\n- '
             else:
                 try:
                     title, term = argument.split(',')
