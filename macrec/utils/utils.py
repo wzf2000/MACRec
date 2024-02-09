@@ -34,6 +34,8 @@ def task2name(task: str) -> str:
         return 'Explanation Generation'
     elif task == 'chat':
         return 'Conversational Recommendation'
+    else:
+        raise ValueError(f'Task {task} is not supported.')
 
 def system2dir(system: str) -> str:
     """Convert a system name to its directory name.

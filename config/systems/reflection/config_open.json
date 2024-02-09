@@ -1,4 +1,9 @@
 {
+    "supported_tasks": [
+        "rp",
+        "sr",
+        "gen"
+    ],
     "manager_action": "config/agents/manager_action.json",
     "manager_thought": "config/agents/manager_thought.json",
     "reflector": "config/agents/reflector_vicuna.json",

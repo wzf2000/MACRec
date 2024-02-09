@@ -11,7 +11,7 @@ class ReActSystem(System):
     """
     @staticmethod
     def supported_tasks() -> list[str]:
-        return ['qa', 'rp', 'sr', 'gen']
+        return ['rp', 'sr', 'gen']
     
     def init(self, *args, **kwargs) -> None:
         """

@@ -1,4 +1,9 @@
 {
+    "supported_tasks": [
+        "rp",
+        "sr",
+        "gen"
+    ],
     "agents": {
         "Manager": {
             "action_config_path": "config/agents/manager_action.json",

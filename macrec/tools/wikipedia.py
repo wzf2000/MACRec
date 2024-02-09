@@ -36,7 +36,10 @@ class Wikipedia(RetrievalTool):
     def search(self, query: str) -> str:
         try:
             results = self.retriever.get_relevant_documents(query=query)
-            return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
+            if len(results) == 0:
+                return f'No documents found for query {query}.'
+            else:
+                return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
         except Exception as e:
             return f'Error occurred during search: {e}'
     

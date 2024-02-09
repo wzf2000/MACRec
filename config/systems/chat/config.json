@@ -1,4 +1,7 @@
 {
+    "supported_tasks": [
+        "chat"
+    ],
     "manager_action": "config/agents/manager_action.json",
     "manager_thought": "config/agents/manager_thought.json",
     "interpreter": "config/agents/interpreter.json",

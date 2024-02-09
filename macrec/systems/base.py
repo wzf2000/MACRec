@@ -68,6 +68,8 @@ class System(ABC):
         self.task = task
         assert self.task in self.supported_tasks()
         self.config = read_json(config_path)
+        if 'supported_tasks' in self.config:
+            assert isinstance(self.config['supported_tasks'], list) and self.task in self.config['supported_tasks'], f'Task {self.task} is not supported by the system.'
         self.agent_kwargs = {
             'system': self,
         }

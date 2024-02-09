@@ -1,5 +1,7 @@
 {
-    
+    "supported_tasks": [
+        "chat"
+    ],
     "agents": {
         "Manager": {
             "action_config_path": "config/agents/manager_action.json",
