@@ -57,7 +57,7 @@ def get_system(system_type: type[System], config_path: str, task: str, dataset: 
     return system_type(config_path=config_path, task=task, leak=False, web_demo=True, dataset=dataset)
 
 def task_config(task: str, system_type: type[System], config_path: str) -> None:
-    st.markdown(f'## {system_type.__name__} for {task2name(task)}')
+    st.markdown(f'## `{system_type.__name__}` for {task2name(task)}')
     checking = check_config(config_path)
     if not checking:
         st.error(f'This config file requires OpenSource models, which are not supported in this machine (without cuda toolkit).')

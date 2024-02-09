@@ -5,6 +5,8 @@ from macrec.pages.task import task_config
 from macrec.systems import *
 from macrec.utils import task2name, init_openai_api, read_json, system2dir, read_json
 
+all_tasks = ['rp', 'sr', 'gen', 'chat']
+
 def demo():
     init_openai_api(read_json('config/api-config.json'))
     st.set_page_config(
@@ -24,5 +26,8 @@ def demo():
     supported_tasks = config['supported_tasks']
     supported_tasks = [task for task in supported_tasks if task in system_type.supported_tasks()]
     # choose a task
-    task = st.sidebar.radio('Choose a task', supported_tasks, format_func=task2name)
+    task = st.sidebar.radio('Choose a task', all_tasks, format_func=task2name)
+    if task not in supported_tasks:
+        st.error(f'The task {task2name(task)} is not supported by the system `{system_type.__name__}` with the config file `{config_file}`.')
+        return
     task_config(task=task, system_type=system_type, config_path=os.path.join(config_dir, config_file))
