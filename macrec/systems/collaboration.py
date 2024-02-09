@@ -87,18 +87,18 @@ class CollaborationSystem(System):
         return format_chat_history(self._chat_history)
     
     def is_halted(self) -> bool:
-        return ((self.step_n > self.max_step) or self.manager.over_limit(input=self.input, scratchpad=self.scratchpad, **self.manager_kwargs)) and not self.finished
+        return ((self.step_n > self.max_step) or self.manager.over_limit(scratchpad=self.scratchpad, **self.manager_kwargs)) and not self.finished
         
     def _parse_answer(self, answer: Any = None) -> dict[str, Any]:
         if answer is None:
             answer = self.answer
-        return parse_answer(type=self.task, answer=answer, gt_answer=self.gt_answer, json_mode=self.manager.json_mode, **self.kwargs)
+        return parse_answer(type=self.task, answer=answer, gt_answer=self.gt_answer if self.task != 'chat' else '', json_mode=self.manager.json_mode, **self.kwargs)
 
     def think(self):
         # Think
         logger.debug(f'Step {self.step_n}:')
         self.scratchpad += f'\nThought {self.step_n}:'
-        thought = self.manager(input=self.input, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
+        thought = self.manager(scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
         self.scratchpad += ' ' + thought
         self.log(f'**Thought {self.step_n}**: {thought}', agent=self.manager)
     
@@ -108,7 +108,7 @@ class CollaborationSystem(System):
             self.scratchpad += f'\nHint: {self.manager.hint}'
         self.scratchpad += f'\nValid action example: {self.manager.valid_action_example}:'
         self.scratchpad += f'\nAction {self.step_n}:'
-        action = self.manager(input=self.input, scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
+        action = self.manager(scratchpad=self.scratchpad, stage='action', **self.manager_kwargs)
         self.scratchpad += ' ' + action
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
         logger.debug(f'Action {self.step_n}: {action}')
@@ -187,6 +187,10 @@ class CollaborationSystem(System):
                 self.manager_kwargs['task_prompt'] = self.interpreter(input=self.input)
         
     def forward(self, user_input: Optional[str] = None, reset: bool = True) -> Any:
+        if self.task == 'chat':
+            self.manager_kwargs['history'] = self.chat_history
+        else:
+            self.manager_kwargs['input'] = self.input
         if self.reflect():
             return self.answer
         if reset:

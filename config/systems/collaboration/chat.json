@@ -1,0 +1,20 @@
+{
+    
+    "agents": {
+        "Manager": {
+            "action_config_path": "config/agents/manager_action.json",
+            "thought_config_path": "config/agents/manager_thought.json"
+        },
+        "Searcher": {
+            "config_path": "config/agents/searcher.json",
+            "prompt_config": "config/prompts/agent_prompt/searcher.json"
+        },
+        "Interpreter": {
+            "config_path": "config/agents/interpreter.json",
+            "prompt_config": "config/prompts/agent_prompt/interpreter_chat.json"
+        }
+    },
+    "agent_prompt": "config/prompts/manager_prompt/chat.json",
+    "data_prompt": "config/prompts/data_prompt/{task}.json",
+    "max_step": 10
+}

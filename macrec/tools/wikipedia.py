@@ -34,8 +34,11 @@ class Wikipedia(RetrievalTool):
         return ', '.join([f'{title} ({summary})' for title, summary in zip(titles, summary)])
         
     def search(self, query: str) -> str:
-        results = self.retriever.get_relevant_documents(query=query)
-        return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
+        try:
+            results = self.retriever.get_relevant_documents(query=query)
+            return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
+        except Exception as e:
+            return f'Error occurred during search: {e}'
     
     def lookup(self, title: str, term: str) -> str:
         if title not in self.cache:
