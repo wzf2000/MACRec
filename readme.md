@@ -4,7 +4,7 @@ The video demo is available at [Video Demo](https://cloud.tsinghua.edu.cn/f/bb41
 
 **A demo of using MACRec**:
 
-<video src="https://cloud.tsinghua.edu.cn/seafhttp/files/74631c19-93a3-4b50-a01f-2733df9d00f4/macrec.mp4"></video>
+https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36a7bb1b
 
 ![framework](./assets/MAC-workflow.png)
 
