@@ -2,6 +2,10 @@
 
 The video demo is available at [Video Demo](https://cloud.tsinghua.edu.cn/f/bb41245e81f744fcbd4c/?dl=1).
 
+**A demo of using MACRec**:
+
+<video src="https://cloud.tsinghua.edu.cn/seafhttp/files/74631c19-93a3-4b50-a01f-2733df9d00f4/macrec.mp4"></video>
+
 ![framework](./assets/MAC-workflow.png)
 
 ### File structure
