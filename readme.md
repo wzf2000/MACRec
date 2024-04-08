@@ -1,5 +1,8 @@
 ## MACRec: a Multi-Agent Collaboration Framework for Recommendation
 
+This repository contains the offical implementation of our SIGIR 2024 demo paper:
+- [Wang, Zhefan, et al. "Multi-Agent Collaboration Framework for Recommender Systems." arXiv preprint arXiv:2402.15235 (2024).](https://arxiv.org/abs/2304.07450)
+
 The video demo is available at [Video Demo](https://cloud.tsinghua.edu.cn/f/bb41245e81f744fcbd4c/?dl=1).
 
 **A demo of using MACRec**:
@@ -100,3 +103,14 @@ streamlit run web_demo.py
 Then open the browser and visit `http://localhost:8501/` to use the web demo.
 
 Please note that the systems utilizing open-source LLMs or other language models may require a significant amount of memory. These systems have been disabled on machines without CUDA support.
+
+### Citation
+If you find our work useful, please do not save your star and cite our work:
+```
+@article{wang2024multi,
+  title={Multi-Agent Collaboration Framework for Recommender Systems},
+  author={Wang, Zhefan and Yu, Yuanqing and Zheng, Wendi and Ma, Weizhi and Zhang, Min},
+  journal={arXiv preprint arXiv:2402.15235},
+  year={2024}
+}
+```
