@@ -27,21 +27,21 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
     - `pages/`: The web demo pages are defined here.
     - `rl/`: The datasets and reward function for the RLHF are defined here.
     - `systems/`: The multi-agent system classes are defined here.
-        - `analyse.py`: The system with a *Manager* and an *Analyst*. Do not support the `chat` task.
         - `base.py`: The base system class.
-        - `chat.py`: The system with a *Manager*, a *Searcher*, and a *Task Interpreter*. Only support the `chat` task.
-        - `collaboration.py`: The collaboration system class. **We recommend to use this class for most of the tasks.** Support all the tasks and all the agents.
-        - `react.py`: The system with a single *Manager*. Do not support the `chat` task.
-        - `reflection.py`: The system with a *Manager* and a *Reflector*. Do not support the `chat` task.
-    - `tasks/`: For external function call (e.g. main.py).
+        - `collaboration.py`: The collaboration system class. **We recommend to use this class for most of the tasks.**
+        - `analyse.py`: ***(Deprecated)*** The system with a *Manager* and an *Analyst*. Do not support the `chat` task.
+        - `chat.py`: ***(Deprecated)*** The system with a *Manager*, a *Searcher*, and a *Task Interpreter*. Only support the `chat` task.** Support all the tasks and all the agents.
+        - `react.py`: ***(Deprecated)*** The system with a single *Manager*. Do not support the `chat` task.
+        - `reflection.py`: ***(Deprecated)*** The system with a *Manager* and a *Reflector*. Do not support the `chat` task.
+    - `tasks/`: For external function call (e.g. main.py). **Note needs to be distinguished from recommended tasks.**
         - `base.py`: The base task class.
         - `calculate.py`: The task for calculating the metrics.
         - `chat.py`: The task for chat with the `ChatSystem`.
-        - `evaluate.py`: The task for evaluating the system on the rating prediction or sequence recommendation tasks. The task is inherited from `generation.py`.
+        - **`evaluate.py`**: The task for evaluating the system on the rating prediction or sequence recommendation tasks. The task is inherited from `generation.py`.
         - `feedback.py`: The task for selecting the feedback for the *Reflector*. The task is inherited from `generation.py`.
         - `generation.py`: The basic task for generating the answers from a dataset.
         - `preprocess.py`: The task for preprocessing the dataset.
-        - `pure_generation.py`: The task for generating the answers from a dataset without any evaluation. The task is inherited from `generation.py`.
+        - **`pure_generation.py`**: The task for generating the answers from a dataset without any evaluation. The task is inherited from `generation.py`.
         - `reward_update.py`: The task for calculating the reward function for the RLHF.
         - `rlhf.py`: The task for training the *Reflector* with the PPO algorithm.
         - `sample.py`: The task for sampling from the dataset.
@@ -54,8 +54,8 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
         - `agent_prompt/`: The prompts for each agent.
         - `data_prompt/`: The prompts used to prepare the input data for each task.
         - `manager_prompt/`: The prompts for the *Manager* in the `CollaborationSystem` with different configurations.
-        - `old_system_prompt/`: The prompts for other systems' agents.
-        - `task_agent_prompt/`: The task-specific prompts for agents in other systems.
+        - `old_system_prompt/`: ***(Deprecated)*** The prompts for other systems' agents.
+        - `task_agent_prompt/`: ***(Deprecated)*** The task-specific prompts for agents in other systems.
     - `systems/`: The configuration for each system. Every system has a configuration folder.
     - `tools/`: The configuration for each tool.
     - `training/`: Some configuration for the PPO or other RL algorithms training.
@@ -90,6 +90,11 @@ python main.py -m $task_name --verbose $verbose $extra_args
 ```
 
 Then `main.py` will run the `${task_name}Task` defined in `macrec/tasks/*.py`.
+
+E.g., to evaluate the sequence recommendation task in MovieLens-100k dataset for the `CollaborationSystem` with *Reflector*, *Analyst*, and *Searcher*, just run:
+```shell
+python main.py --main Evaluate --data_file data/ml-100k/test.csv --system collaboration --system_config config/systems/collaboration/reflect_analyse_search.json --task sr
+```
 
 You can refer the `scripts/` folder for some useful scripts.
 
