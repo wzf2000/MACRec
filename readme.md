@@ -1,7 +1,7 @@
 ## MACRec: a Multi-Agent Collaboration Framework for Recommendation
 
-This repository contains the offical implementation of our SIGIR 2024 demo paper:
-- [Wang, Zhefan, et al. "Multi-Agent Collaboration Framework for Recommender Systems." arXiv preprint arXiv:2402.15235 (2024).](https://arxiv.org/abs/2304.07450)
+This repository contains the official implementation of our SIGIR 2024 demo paper:
+- [Wang, Zhefan, et al. "Multi-Agent Collaboration Framework for Recommender Systems." arXiv preprint arXiv:2402.15235 (2024).](https://arxiv.org/abs/2402.15235)
 
 The video demo is available at [Video Demo](https://cloud.tsinghua.edu.cn/f/bb41245e81f744fcbd4c/?dl=1).
 
@@ -13,30 +13,30 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
 
 ### File structure
 
-- `macrec/`: The source foleder.
-    - `agents/`: All agent classes defined here.
+- `macrec/`: The source folder.
+    - `agents/`: All agent classes are defined here.
         - `analyst.py`: The *Analyst* agent class.
         - `base.py`: The base agent class and base tool agent class.
         - `interpreter.py`: The *Task Interpreter* agent class.
         - `manager.py`: The *Manager* agent class.
         - `reflector.py`: The *Reflector* agent class.
         - `searcher.py`: The *Searcher* agent class.
-    - `dataset/`: All dataset preprocessing method.
+    - `dataset/`: All dataset preprocessing methods.
     - `evaluation/`: The basic evaluation method, including the ranking metrics and the rating metrics.
     - `llms/`: The wrapper for LLMs (both API and open source LLMs).
     - `pages/`: The web demo pages are defined here.
     - `rl/`: The datasets and reward function for the RLHF are defined here.
     - `systems/`: The multi-agent system classes are defined here.
         - `base.py`: The base system class.
-        - `collaboration.py`: The collaboration system class. **We recommend to use this class for most of the tasks.**
+        - `collaboration.py`: The collaboration system class. **We recommend using this class for most of the tasks.**
         - `analyse.py`: ***(Deprecated)*** The system with a *Manager* and an *Analyst*. Do not support the `chat` task.
         - `chat.py`: ***(Deprecated)*** The system with a *Manager*, a *Searcher*, and a *Task Interpreter*. Only support the `chat` task.** Support all the tasks and all the agents.
         - `react.py`: ***(Deprecated)*** The system with a single *Manager*. Do not support the `chat` task.
         - `reflection.py`: ***(Deprecated)*** The system with a *Manager* and a *Reflector*. Do not support the `chat` task.
-    - `tasks/`: For external function call (e.g. main.py). **Note needs to be distinguished from recommended tasks.**
+    - `tasks/`: For external function calls (e.g. main.py). **Note needs to be distinguished from recommended tasks.**
         - `base.py`: The base task class.
         - `calculate.py`: The task for calculating the metrics.
-        - `chat.py`: The task for chat with the `ChatSystem`.
+        - `chat.py`: The task for chatting with the `ChatSystem`.
         - **`evaluate.py`**: The task for evaluating the system on the rating prediction or sequence recommendation tasks. The task is inherited from `generation.py`.
         - `feedback.py`: The task for selecting the feedback for the *Reflector*. The task is inherited from `generation.py`.
         - `generation.py`: The basic task for generating the answers from a dataset.
@@ -45,7 +45,7 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
         - `reward_update.py`: The task for calculating the reward function for the RLHF.
         - `rlhf.py`: The task for training the *Reflector* with the PPO algorithm.
         - `sample.py`: The task for sampling from the dataset.
-        - `test.py`: The task for evaluate the system on few-shot data samples. The task is inherited from `evaluate.py`.
+        - `test.py`: The task for evaluating the system on few-shot data samples. The task is inherited from `evaluate.py`.
     - `utils/`: Some useful functions are defined here.
 - `config/`: The config folder.
     - `api-config.json`: Used for OpenAI-like APIs' configuration. We give an example for the configuration, named `api-config-example.json`.
@@ -60,7 +60,7 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
     - `tools/`: The configuration for each tool.
     - `training/`: Some configuration for the PPO or other RL algorithms training.
 - `ckpts/`: The checkpoint folder for PPO training.
-- `data/`: The dataset folder which contain both the raw and preprocessed data.
+- `data/`: The dataset folder which contains both the raw and preprocessed data.
 - `log/`: The log folder.
 - `run/`: The evaluation result folder.
 - `scripts/`: Some useful scripts.
@@ -96,7 +96,7 @@ E.g., to evaluate the sequence recommendation task in MovieLens-100k dataset for
 python main.py --main Evaluate --data_file data/ml-100k/test.csv --system collaboration --system_config config/systems/collaboration/reflect_analyse_search.json --task sr
 ```
 
-You can refer the `scripts/` folder for some useful scripts.
+You can refer to the `scripts/` folder for some useful scripts.
 
 ### Run with the web demo
 
