@@ -30,7 +30,7 @@ https://github.com/wzf2000/MACRec/assets/27494406/0acb4718-5f07-41fd-a06b-d9fb36
         - `base.py`: The base system class.
         - `collaboration.py`: The collaboration system class. **We recommend using this class for most of the tasks.**
         - `analyse.py`: ***(Deprecated)*** The system with a *Manager* and an *Analyst*. Do not support the `chat` task.
-        - `chat.py`: ***(Deprecated)*** The system with a *Manager*, a *Searcher*, and a *Task Interpreter*. Only support the `chat` task.** Support all the tasks and all the agents.
+        - `chat.py`: ***(Deprecated)*** The system with a *Manager*, a *Searcher*, and a *Task Interpreter*. Only support the `chat` task.
         - `react.py`: ***(Deprecated)*** The system with a single *Manager*. Do not support the `chat` task.
         - `reflection.py`: ***(Deprecated)*** The system with a *Manager* and a *Reflector*. Do not support the `chat` task.
     - `tasks/`: For external function calls (e.g. main.py). **Note needs to be distinguished from recommended tasks.**
