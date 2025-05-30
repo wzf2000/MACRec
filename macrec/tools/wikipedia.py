@@ -11,10 +11,10 @@ class Wikipedia(RetrievalTool):
         language: str = self.config.get('language', 'en')
         self.retriever = WikipediaRetriever(top_k_results=self.top_k, doc_content_chars_max=max_doc_length, lang=language)
         self.cache = {}
-    
+
     def reset(self) -> None:
         self.cache = {}
-        
+
     def _format_documents(self, documents: list[Document]) -> str:
         titles = []
         summary = []
@@ -32,7 +32,7 @@ class Wikipedia(RetrievalTool):
                 summary_content = ' '.join(summary_content.split()[:20]) + '...'
             summary.append(summary_content)
         return ', '.join([f'{title} ({summary})' for title, summary in zip(titles, summary)])
-        
+
     def search(self, query: str) -> str:
         try:
             results = self.retriever.get_relevant_documents(query=query)
@@ -42,7 +42,7 @@ class Wikipedia(RetrievalTool):
                 return f'Found {len(results)} documents. Their titles and summaries are (with the format title (summary)): {self._format_documents(results)}'
         except Exception as e:
             return f'Error occurred during search: {e}'
-    
+
     def lookup(self, title: str, term: str) -> str:
         if title not in self.cache:
             return 'No title found in search results.'

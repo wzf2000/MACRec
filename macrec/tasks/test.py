@@ -20,9 +20,9 @@ class TestTask(EvaluateTask):
             sample_idx = np.random.choice(len(data), self.samples, replace=False)
             data = [data[i] for i in sample_idx]
         else:
-            data = data[self.offset : self.offset + self.samples]
+            data = data[self.offset: self.offset + self.samples]
         return data
-    
+
     def run(self, random: bool, samples: int, offset: int, *args, **kwargs):
         self.sampled = True
         self.random = random

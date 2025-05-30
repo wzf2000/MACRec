@@ -6,7 +6,7 @@ from typing import Any
 
 def parse_action(action: str, json_mode: bool = False) -> tuple[str, Any]:
     """Parse agent action.
-    
+
     Args:
         `action` (`str`): Agent action in string format.
         `json_mode` (`bool`, optional): Whether the action is in JSON format. Defaults to `False`.
@@ -17,25 +17,25 @@ def parse_action(action: str, json_mode: bool = False) -> tuple[str, Any]:
         try:
             json_action = json.loads(action)
             return json_action['type'], json_action['content']
-        except:
+        except Exception:
             return 'Invalid', None
     else:
         pattern = r'^(\w+)\[(.*)\]$'
         match = re.match(pattern, action)
-        
+
         if match:
             action_type = match.group(1)
             argument = match.group(2)
             return action_type, argument
         else:
             return 'Invalid', None
-    
+
 def parse_raw_answer(answer: str, *args, **kwargs) -> dict[str, bool | str]:
     return {
         'valid': True,
         'answer': answer
     }
-    
+
 def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *args, **kwargs) -> dict[str, float | str]:
     try:
         answer = float(answer)
@@ -61,7 +61,7 @@ def parse_rating_answer(answer: str | int | float, json_mode: bool = False, *arg
         'valid': True,
         'answer': answer
     }
-    
+
 def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, json_mode: bool = False, *args, **kwargs) -> dict[str, bool | list[int]]:
     if not json_mode:
         candidates = answer.split(',')
@@ -118,7 +118,7 @@ def parse_ranking_answer(answer: str | Any, gt_answer: int, n_candidate: int, js
 
 def parse_answer(type: str, *args, **kwargs) -> dict[str, Any]:
     """Parse answer.
-    
+
     Args:
         `type` (`str`): Task type. Other arguments are passed to the corresponding parsing function.
     Raises:
@@ -137,7 +137,7 @@ def parse_answer(type: str, *args, **kwargs) -> dict[str, Any]:
 
 def init_answer(type: str) -> Any:
     """Initialize answer.
-    
+
     Args:
         `type` (`str`): Task type.
     Raises:

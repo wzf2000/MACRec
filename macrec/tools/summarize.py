@@ -12,9 +12,9 @@ class TextSummarizer(Tool):
         self.generate_kwargs: dict = get_rm(self.config, 'generate_kwargs', {})
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_path, model_max_length=self.model_max_length)
         self.pipe: SummarizationPipeline = pipeline('summarization', model=self.model_path, tokenizer=self.tokenizer, **self.config)
-    
+
     def reset(self) -> None:
         pass
-    
+
     def summarize(self, text: str) -> str:
         return f"Summarized text: {self.pipe(text, **self.generate_kwargs)[0]['summary_text']}"

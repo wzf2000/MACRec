@@ -19,7 +19,7 @@ class OfflinePPODataset(Dataset):
 
     def __len__(self):
         return len(self.prompts)
-    
+
     def __getitem__(self, index):
         prompt = self.prompts[index]
         response = self.reponses[index]

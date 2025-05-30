@@ -19,7 +19,7 @@ class PureGenerationTask(GenerationTask):
     @property
     def running_steps(self) -> int:
         return self.steps
-    
+
     def before_generate(self) -> None:
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         dataset = os.path.basename(os.path.dirname(self.args.data_file))
@@ -34,22 +34,22 @@ class PureGenerationTask(GenerationTask):
         }
         output_file_name = '_'.join([f'{k}={v}' for k, v in output_args.items()]) + '.jsonl'
         self.output_file = jsonlines.open(os.path.join(run_dir, output_file_name), mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode, flush=True)
-    
+
     def after_step(self, answer: Any, gt_answer: int | float | str, step: int, record: dict) -> None:
         record[f'Answer_{step}'] = answer
-    
+
     def after_iteration(self, answer: Any, gt_answer: int | float | str, record: dict, pbar: tqdm) -> None:
         record['Answer_GT'] = gt_answer
         self.output_file.write(record)
         pbar.set_description(f'Answer: {answer}, Ground Truth: {gt_answer}')
-    
+
     def after_generate(self) -> None:
         self.output_file.close()
-    
+
     def run(self, steps: int, *args, **kwargs):
         self.steps = steps
         super().run(*args, **kwargs)
-        
+
 class TestGenerationTask(PureGenerationTask):
     @staticmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
@@ -65,9 +65,9 @@ class TestGenerationTask(PureGenerationTask):
             sample_idx = np.random.choice(len(data), self.samples, replace=False)
             data = [data[i] for i in sample_idx]
         else:
-            data = data[self.offset : self.offset + self.samples]
+            data = data[self.offset: self.offset + self.samples]
         return data
-    
+
     def run(self, random: bool, samples: int, offset: int, *args, **kwargs):
         self.sampled = True
         self.random = random

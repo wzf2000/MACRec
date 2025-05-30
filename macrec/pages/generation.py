@@ -10,7 +10,7 @@ def read_data(file_path: str):
     return pd.read_csv(file_path)
 
 def gen_page(system: System, task: str, dataset: str):
-    data = read_data(os.path.join('data', dataset, f'test.csv'))
+    data = read_data(os.path.join('data', dataset, 'test.csv'))
     max_his = 5 if task == 'sr' else 10
     data['history'] = data['history'].apply(lambda x: '\n'.join(x.split('\n')[-max_his:]))
     length = len(data)
@@ -23,21 +23,21 @@ def gen_page(system: System, task: str, dataset: str):
         st.session_state.data_sample = f'{dataset}_{index}'
         reset_data = True
     data_sample = data.iloc[index]
-    data_prompt = system.prompts[f'data_prompt']
+    data_prompt = system.prompts['data_prompt']
     with st.expander('Data Sample', expanded=True):
         st.markdown(f'#### Data Sample: {index + 1} / {length}')
         st.markdown(f'##### User ID: {data_sample["user_id"]}')
         st.markdown(f'##### Item ID: {data_sample["item_id"]}')
-        st.markdown(f'##### User Profile:')
+        st.markdown('##### User Profile:')
         st.markdown(f'```\n{data_sample["user_profile"]}\n```')
-        st.markdown(f'##### History:')
+        st.markdown('##### History:')
         data_sample_history = data_sample['history'].split('\n')
         data_sample_history_ids = eval(data_sample['history_item_id'])
         data_sample_history = [f'{i + 1}. item_{data_sample_history_ids[i]}: {line}' for i, line in enumerate(data_sample_history)]
         data_sample_history = '\n'.join(data_sample_history)
         st.markdown(f'```\n{data_sample_history}\n```')
         if task == 'rp':
-            st.markdown(f'##### Target Item Attributes:')
+            st.markdown('##### Target Item Attributes:')
             st.markdown(f'```\n{data_sample["target_item_attributes"]}\n```')
             st.markdown(f'##### Ground Truth Rating: {data_sample["rating"]}')
             system_input = data_prompt.format(
@@ -49,7 +49,7 @@ def gen_page(system: System, task: str, dataset: str):
             )
             gt_answer = data_sample['rating']
         elif task == 'sr':
-            st.markdown(f'##### Candidate Item Attributes:')
+            st.markdown('##### Candidate Item Attributes:')
             data_sample_candidates = data_sample['candidate_item_attributes'].split('\n')
             system.kwargs['n_candidate'] = len(data_sample_candidates)
             data_sample_candidates = [f'{i + 1}. item_{line}' for i, line in enumerate(data_sample_candidates)]

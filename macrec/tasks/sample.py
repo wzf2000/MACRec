@@ -14,7 +14,7 @@ class SampleTask(Task):
         parser.add_argument('--samples', type=int, default=1000, help='Number of samples')
         # parser.add_argument('--offset', type=int, default=0, help='Offset of samples, only works when random is False')
         return parser
-    
+
     def sample_data(self, data_dir: str, *args, **kwargs):
         data = pd.read_csv(data_dir)
         if self.random:
@@ -22,8 +22,8 @@ class SampleTask(Task):
         else:
             raise NotImplementedError
         return data
-    
-    def run(self, data_dir: str, output_dir:str, random: bool, samples: int, *args, **kwargs):
+
+    def run(self, data_dir: str, output_dir: str, random: bool, samples: int, *args, **kwargs):
         self.random = random
         if self.random:
             init_all_seeds(2024)
@@ -31,6 +31,6 @@ class SampleTask(Task):
         # self.offset = offset
         sampled_data = self.sample_data(data_dir)
         sampled_data.to_csv(output_dir)
-        
+
 if __name__ == '__main__':
     SampleTask().launch()

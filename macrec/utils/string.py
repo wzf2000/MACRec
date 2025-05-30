@@ -2,17 +2,17 @@
 
 def format_step(step: str) -> str:
     """Format a step prompt. Remove leading and trailing whitespaces and newlines, and replace newlines with spaces.
-    
+
     Args:
         `step` (`str`): A step prompt in string format.
     Returns:
         `str`: The formatted step prompt.
     """
     return step.strip('\n').strip().replace('\n', '')
-    
+
 def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
     """Format the last attempt reflection prompt of a trial. Remove leading and trailing whitespaces and newlines of `scratchpad`, and replace newlines with spaces. Add `header` to the beginning of the prompt.
-    
+
     Args:
         `input` (`str`): The input of the last attempt.
         `scratchpad` (`str`): The scratchpad of the last attempt.
@@ -24,7 +24,7 @@ def format_last_attempt(input: str, scratchpad: str, header: str) -> str:
 
 def format_reflections(reflections: list[str], header: str) -> str:
     """Format reflections prompt. Remove leading and trailing whitespaces and newlines of each reflection, and replace newlines with spaces. Add `header` to the beginning of the prompt.
-    
+
     Args:
         `reflections` (`list[str]`): A list of former reflections.
         `header` (`str`): The reflections header.
@@ -38,7 +38,7 @@ def format_reflections(reflections: list[str], header: str) -> str:
 
 def format_history(history: list[dict]) -> str:
     """Format history prompt. Add a newline between each turn in `history`.
-    
+
     Args:
         `history` (`list[dict]`): A list of turns in the history. Each turn is a dictionary with keys `command` and `observation`.
     Returns:
@@ -48,10 +48,10 @@ def format_history(history: list[dict]) -> str:
         return ''
     else:
         return '\n' + '\n'.join([f"Command: {turn['command']}\nObservation: {turn['observation']}\n" for turn in history]) + '\n'
-    
+
 def format_chat_history(history: list[tuple[str, str]]) -> str:
     """Format chat history prompt. Add a newline between each turn in `history`.
-    
+
     Args:
         `history` (`list[tuple[str, str]]`): A list of turns in the chat history. Each turn is a tuple with the first element being the chat record and the second element being the role.
     Returns:
@@ -64,7 +64,7 @@ def format_chat_history(history: list[tuple[str, str]]) -> str:
 
 def str2list(s: str) -> list[int]:
     """Convert a string to a list of integers.
-    
+
     Args:
         `s` (`str`): A string of integers separated by commas. For example, `'1,2,3'`.
     Returns:
@@ -74,7 +74,7 @@ def str2list(s: str) -> list[int]:
 
 def get_avatar(agent_type: str) -> str:
     """Get the avatar of the agent.
-    
+
     Args:
         `agent_type` (`str`): The type of the agent.
     Returns:

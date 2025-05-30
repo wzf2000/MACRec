@@ -17,7 +17,7 @@ class EvaluateTask(GenerationTask):
         parser.add_argument('--steps', type=int, default=2, help='Number of steps')
         parser.add_argument('--topks', type=str2list, default=[1, 3, 5], help='Top-Ks for ranking task')
         return parser
-        
+
     def get_metrics(self, topks: list[int] = [1, 3, 5]):
         if self.task == 'rp':
             self.metrics = MetricDict({
@@ -36,7 +36,7 @@ class EvaluateTask(GenerationTask):
             })
         else:
             raise NotImplementedError
-    
+
     def update_evaluation(self, answer: float | int | str, gt_answer: float | int | str) -> str:
         valid = self.system.finished
         logger.debug(f'Answer: {answer}, Ground Truth: {gt_answer}')
@@ -50,11 +50,11 @@ class EvaluateTask(GenerationTask):
                 'answer': answer,
                 'label': gt_answer,
             }, prefix='true')
-    
+
     @property
     def running_steps(self):
         return self.steps
-    
+
     def before_generate(self) -> None:
         self.get_metrics(self.topks)
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -71,24 +71,24 @@ class EvaluateTask(GenerationTask):
         }
         output_file_name = '_'.join([f'{k}={v}' for k, v in output_args.items()]) + '.jsonl'
         self.output_file = jsonlines.open(os.path.join(run_dir, output_file_name), mode="w", dumps=NumpyEncoder(ensure_ascii=False).encode, flush=True)
-        
+
     def after_step(self, answer: Any, gt_answer: int | float | str, step: int, record: dict) -> None:
         record[f'Answer_{step}'] = answer
         if hasattr(self.system, 'reflected') and self.system.reflected and self.system.reflector.keep_reflections:
             assert isinstance(self.system, ReflectionSystem)
             logger.trace(f"Reflection input: {self.system.reflector.reflection_input}")
             logger.trace(f"Reflection output: {self.system.reflector.reflection_output}")
-    
+
     def after_iteration(self, answer: Any, gt_answer: int | float | str, record: dict, pbar: tqdm) -> None:
         record['Answer_GT'] = gt_answer
         self.output_file.write(record)
         pbar.set_description(self.update_evaluation(answer, gt_answer))
-    
+
     def after_generate(self) -> None:
         self.output_file.close()
         logger.success("===================================Evaluation Report===================================")
         self.metrics.report()
-    
+
     def run(self, steps: int, topks: list[int], *args, **kwargs):
         assert kwargs['task'] == 'rp' or kwargs['task'] == 'sr', "Only support ranking and rating tasks."
         self.steps = steps

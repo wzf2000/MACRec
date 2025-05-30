@@ -3,7 +3,7 @@ import streamlit as st
 
 from macrec.pages.task import task_config
 from macrec.systems import *
-from macrec.utils import task2name, init_openai_api, read_json, system2dir, read_json
+from macrec.utils import task2name, init_openai_api, system2dir, read_json
 
 all_tasks = ['rp', 'sr', 'gen', 'chat']
 

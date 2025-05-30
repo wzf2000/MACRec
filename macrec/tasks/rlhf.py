@@ -11,7 +11,7 @@ from transformers import AutoTokenizer
 from macrec.tasks.base import Task
 from macrec.rl import OfflinePPODataset
 from macrec.utils import collator
-        
+
 class RLHFTrainingTask(Task):
     @staticmethod
     def parse_task_args(parser: ArgumentParser):
@@ -20,7 +20,7 @@ class RLHFTrainingTask(Task):
         parser.add_argument('--data_file', type=str, help='Path to the data file')
         parser.add_argument('--epochs', type=int, help='Number of epochs to train')
         return parser
-    
+
     def train(self, epochs: int = 1):
         base_dir = os.path.join('ckpts/', str(int(time.time())))
         os.makedirs(base_dir, exist_ok=True)
@@ -31,7 +31,7 @@ class RLHFTrainingTask(Task):
                 stats = self.trainer.step(query_tensors, response_tensors, rewards)
                 self.trainer.log_stats(stats, batch, rewards, columns_to_log=["query", "response"])
             self.trainer.save_pretrained(os.path.join(base_dir, f'epoch-{epoch}'))
-    
+
     def get_jsonl_dataset(self, path: str):
         prompts, responses, rewards = [], [], []
         with open(path, 'r') as f:
@@ -50,7 +50,7 @@ class RLHFTrainingTask(Task):
             model_path = config.get('model_path', 'lmsys/vicuna-7b-v1.5-16k')
         self.model_path = model_path
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        
+
         if epochs is None:
             epochs = config.get('epochs', 1)
 
@@ -64,7 +64,7 @@ class RLHFTrainingTask(Task):
                 raise NotImplementedError
         else:
             data_kwargs = config.get('data_kwargs', {})
-        
+
         data_type = data_kwargs.get('type', 'jsonl')
         if data_type == 'jsonl':
             path = data_kwargs.get('path', None)
@@ -73,7 +73,7 @@ class RLHFTrainingTask(Task):
             raise NotImplementedError
 
         from trl import AutoModelForCausalLMWithValueHead, PPOConfig, PPOTrainer
-        
+
         ppo_kwargs = config.get('ppo_kwargs', {})
         ppo_config = PPOConfig(**ppo_kwargs)
 
@@ -85,5 +85,5 @@ class RLHFTrainingTask(Task):
         self.model = AutoModelForCausalLMWithValueHead.from_pretrained(model_path, device_map=device_map, peft_config=peft_config, torch_dtype=torch.bfloat16)
 
         self.trainer = PPOTrainer(ppo_config, self.model, tokenizer=self.tokenizer, dataset=dataset, data_collator=collator)
-        
+
         self.train(epochs=epochs)

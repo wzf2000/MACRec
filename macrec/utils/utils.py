@@ -5,7 +5,7 @@ T = TypeVar('T')
 
 def get_rm(d: dict, key: str, value: T) -> T:
     """Get and remove a key from a dictionary.
-    
+
     Args:
         `d` (`dict`): The dictionary.
         `key` (`str`): The key to get and remove.
@@ -20,7 +20,7 @@ def get_rm(d: dict, key: str, value: T) -> T:
 
 def task2name(task: str) -> str:
     """Convert a task abbreviation to its full name.
-    
+
     Args:
         `task` (`str`): The task abbreviation.
     Returns:
@@ -30,7 +30,7 @@ def task2name(task: str) -> str:
         return 'Rating Prediction'
     elif task == 'sr':
         return 'Sequential Recommendation'
-    elif task =='gen':
+    elif task == 'gen':
         return 'Explanation Generation'
     elif task == 'chat':
         return 'Conversational Recommendation'
@@ -39,7 +39,7 @@ def task2name(task: str) -> str:
 
 def system2dir(system: str) -> str:
     """Convert a system name to its directory name.
-    
+
     Args:
         `system` (`str`): The system name.
     Returns:

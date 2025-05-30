@@ -17,7 +17,7 @@ class ChatTask(Task):
             return ChatSystem(config_path=config_path, task='chat')
         else:
             raise NotImplementedError
-    
+
     def run(self, api_config: str, system: str, system_config: str, *args, **kwargs) -> None:
         init_openai_api(read_json(api_config))
         self.system = self.get_system(system, system_config)

@@ -15,49 +15,49 @@ class Analyst(ToolAgent):
         self.analyst = self.get_LLM(config=config)
         self.json_mode = self.analyst.json_mode
         self.reset()
-    
+
     @staticmethod
     def required_tools() -> dict[str, type]:
         return {
             'info_retriever': InfoDatabase,
             'interaction_retriever': InteractionRetriever,
         }
-    
+
     @property
     def info_retriever(self) -> InfoDatabase:
         return self.tools['info_retriever']
-    
+
     @property
     def interaction_retriever(self) -> InteractionRetriever:
         return self.tools['interaction_retriever']
-    
+
     @property
     def analyst_prompt(self) -> str:
         if self.json_mode:
             return self.prompts['analyst_prompt_json']
         else:
             return self.prompts['analyst_prompt']
-        
+
     @property
     def analyst_examples(self) -> str:
         if self.json_mode:
             return self.prompts['analyst_examples_json']
         else:
             return self.prompts['analyst_examples']
-        
+
     @property
     def analyst_fewshot(self) -> str:
         if self.json_mode:
             return self.prompts['analyst_fewshot_json']
         else:
             return self.prompts['analyst_fewshot']
-    
+
     @property
     def hint(self) -> str:
         if 'analyst_hint' not in self.prompts:
             return ''
         return self.prompts['analyst_hint']
-    
+
     def _build_analyst_prompt(self, **kwargs) -> str:
         return self.analyst_prompt.format(
             examples=self.analyst_examples,
@@ -67,12 +67,12 @@ class Analyst(ToolAgent):
             hint=self.hint if len(self._history) + 1 >= self.max_turns else '',
             **kwargs
         )
-        
+
     def _prompt_analyst(self, **kwargs) -> str:
         analyst_prompt = self._build_analyst_prompt(**kwargs)
         command = self.analyst(analyst_prompt)
         return command
-    
+
     def command(self, command: str) -> None:
         logger.debug(f'Command: {command}')
         log_head = ''
@@ -147,7 +147,7 @@ class Analyst(ToolAgent):
             'observation': observation,
         }
         self._history.append(turn)
-        
+
     def forward(self, id: int, analyse_type: str, *args: Any, **kwargs: Any) -> str:
         assert self.system.data_sample is not None, "Data sample is not provided."
         assert 'user_id' in self.system.data_sample, "User id is not provided."
@@ -159,7 +159,7 @@ class Analyst(ToolAgent):
         if not self.finished:
             return "Analyst did not return any result."
         return self.results
-    
+
     def invoke(self, argument: Any, json_mode: bool) -> str:
         if json_mode:
             if not isinstance(argument, list) or len(argument) != 2:
@@ -195,10 +195,10 @@ class Analyst(ToolAgent):
                         observation = f"Invalid id: {id}. The id should be an integer."
                         return observation
         return self(analyse_type=analyse_type, id=id)
-    
+
 if __name__ == '__main__':
     from langchain.prompts import PromptTemplate
-    from macrec.utils import init_openai_api, read_json, read_prompts
+    from macrec.utils import init_openai_api, read_prompts
     init_openai_api(read_json('config/api-config.json'))
     prompts = read_prompts('config/prompts/old_system_prompt/react_analyst.json')
     for prompt_name, prompt_template in prompts.items():

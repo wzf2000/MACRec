@@ -13,7 +13,7 @@ class CalculateTask(Task):
         parser.add_argument('--k', type=str2list, default=[1, 3, 5], help='K for ranking task')
         parser.add_argument('--run_data_file', type=str, help='Path of run data file')
         return parser
-    
+
     def get_metrics(self, k: list[int] = [1, 3, 5]):
         if self.task == 'rp':
             self.metrics = MetricDict({
@@ -56,7 +56,7 @@ class CalculateTask(Task):
         #         'answer': answer,
         #         'label': gt_answer,
         #     }, prefix='true')
-    
+
     def report(self):
         logger.success("===================================Evaluation Report===================================")
         self.metrics.report()
@@ -69,6 +69,6 @@ class CalculateTask(Task):
                 # self.update_evaluation(answer=obj['Answer_0'], gt_answer=obj['Answer_GT'])
                 self.update_evaluation(answer=obj['Answer_1'], gt_answer=obj['Answer_GT'])
         self.report()
-        
+
 if __name__ == '__main__':
     CalculateTask().launch()

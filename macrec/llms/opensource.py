@@ -13,7 +13,7 @@ class MyJsonFormer:
     """
     def __init__(self, json_schema: dict, pipeline: Pipeline, max_new_tokens: int = 300, temperature: float = 0.9, debug: bool = False):
         """Initialize the JsonFormer formatter.
-        
+
         Args:
             `json_schema` (`dict`): The JSON schema of the output.
             `pipeline` (`Pipeline`): The pipeline of the LLM. Must be a `pipeline("text-generation")` pipeline here.
@@ -26,10 +26,10 @@ class MyJsonFormer:
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.debug = debug
-    
+
     def invoke(self, prompt: str, **kwargs: Any) -> str:
         """Invoke the JsonFormer formatter.
-        
+
         Args:
             `prompt` (`str`): The prompt to feed into the LLM.
         Returns:
@@ -51,7 +51,7 @@ class MyJsonFormer:
 class OpenSourceLLM(BaseLLM):
     def __init__(self, model_path: str = 'lmsys/vicuna-7b-v1.5-16k', device: int = 0, json_mode: bool = False, prefix: str = 'react', max_new_tokens: int = 300, do_sample: bool = True, temperature: float = 0.9, top_p: float = 1.0, *args, **kwargs):
         """Initialize the OpenSource LLM. The OpenSource LLM is a wrapper of the HuggingFace pipeline.
-        
+
         Args:
             `model_path` (`str`, optional): The path or name to the model. Defaults to `'lmsys/vicuna-7b-v1.5-16k'`.
             `device` (`int`, optional): The device to use. Set to `auto` to automatically select the device. Defaults to `0`.
@@ -79,10 +79,10 @@ class OpenSourceLLM(BaseLLM):
         self.model_name = model_path
         self.max_tokens = max_new_tokens
         self.max_context_length: int = 16384 if '16k' in model_path else 32768 if '32k' in model_path else 4096
-    
+
     def __call__(self, prompt: str, *args, **kwargs) -> str:
         """Forward pass of the OpenSource LLM. If json_mode is enabled, the output of the LLM will be formatted into JSON by `MyJsonFormer`.
-        
+
         Args:
             `prompt` (`str`): The prompt to feed into the LLM.
         Returns:

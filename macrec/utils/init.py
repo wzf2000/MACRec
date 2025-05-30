@@ -7,7 +7,7 @@ import torch
 
 def init_openai_api(api_config: dict):
     """Initialize OpenAI API.
-    
+
     Args:
         `api_config` (`dict`): OpenAI API configuration, should contain `api_base` and `api_key`.
     """
@@ -16,7 +16,7 @@ def init_openai_api(api_config: dict):
 
 def init_all_seeds(seed: int = 0) -> None:
     """Initialize all seeds.
-    
+
     Args:
         `seed` (`int`, optional): Random seed. Defaults to `0`.
     """

@@ -16,37 +16,37 @@ class Searcher(ToolAgent):
         self.searcher = self.get_LLM(config=config)
         self.json_mode = self.searcher.json_mode
         self.reset()
-    
+
     @staticmethod
     def required_tools() -> dict[str, type]:
         return {
             'retriever': Wikipedia,
         }
-    
+
     @property
     def retriever(self) -> Wikipedia:
         return self.tools['retriever']
-    
+
     @property
     def searcher_prompt(self) -> PromptTemplate:
         if self.json_mode:
             return self.prompts['searcher_prompt_json']
         else:
             return self.prompts['searcher_prompt']
-    
+
     @property
     def searcher_examples(self) -> str:
         if self.json_mode:
             return self.prompts['searcher_examples_json']
         else:
             return self.prompts['searcher_examples']
-    
+
     @property
     def hint(self) -> str:
         if 'searcher_hint' not in self.prompts:
             return ''
         return self.prompts['searcher_hint']
-    
+
     def _build_searcher_prompt(self, **kwargs) -> str:
         return self.searcher_prompt.format(
             examples=self.searcher_examples,
@@ -56,12 +56,12 @@ class Searcher(ToolAgent):
             hint=self.hint if len(self._history) + 1 >= self.max_turns else '',
             **kwargs
         )
-        
+
     def _prompt_searcher(self, **kwargs) -> str:
         searcher_prompt = self._build_searcher_prompt(**kwargs)
         command = self.searcher(searcher_prompt)
         return command
-    
+
     def command(self, command: str) -> None:
         logger.debug(f'Command: {command}')
         log_head = ''
@@ -81,7 +81,7 @@ class Searcher(ToolAgent):
                     term = term.strip()
                     observation = self.retriever.lookup(title=title, term=term)
                     log_head = f':violet[Lookup for] :red[{term}] :violet[in document] :red[{title}]:violet[...]\n- '
-                except:
+                except Exception:
                     observation = f'Invalid argument format: {argument}. Must be in the format "title, term".'
         elif action_type.lower() == 'finish':
             observation = self.finish(results=argument)
@@ -95,7 +95,7 @@ class Searcher(ToolAgent):
             'observation': observation,
         }
         self._history.append(turn)
-        
+
     def forward(self, requirements: str, *args, **kwargs) -> str:
         while not self.is_finished():
             command = self._prompt_searcher(requirements=requirements)
@@ -103,14 +103,14 @@ class Searcher(ToolAgent):
         if not self.finished:
             return 'Searcher did not return any result.'
         return f'Search result: {self.results}'
-    
+
     def invoke(self, argument: Any, json_mode: bool) -> str:
         if not isinstance(argument, str):
             return f'Invalid argument type: {type(argument)}. Must be a string.'
         return self(requirements=argument)
 
 if __name__ == '__main__':
-    from macrec.utils import init_openai_api, read_json, read_prompts
+    from macrec.utils import init_openai_api, read_prompts
     init_openai_api(read_json('config/api-config.json'))
     searcher = Searcher(config_path='config/agents/searcher.json', prompts=read_prompts('config/prompts/agent_prompt/react_search.json'))
     while True:

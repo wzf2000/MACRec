@@ -9,7 +9,7 @@ class ChatSystem(System):
     @staticmethod
     def supported_tasks() -> list[str]:
         return ['chat']
-    
+
     def init(self, *args, **kwargs) -> None:
         self.manager = Manager(thought_config_path=self.config['manager_thought'], action_config_path=self.config['manager_action'], **self.agent_kwargs)
         self.searcher = Searcher(config_path=self.config['searcher'], **self.agent_kwargs)
@@ -18,10 +18,10 @@ class ChatSystem(System):
         self.manager_kwargs = {
             "max_step": self.max_step,
         }
-    
+
     def is_halted(self) -> bool:
         return ((self.step_n > self.max_step) or self.manager.over_limit(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, **self.manager_kwargs)) and not self.finished
-        
+
     def reset(self, clear: bool = False, *args, **kwargs) -> None:
         super().reset(*args, **kwargs)
         if clear:
@@ -29,18 +29,18 @@ class ChatSystem(System):
         self._reset_action_history()
         self.searcher.reset()
         self.interpreter.reset()
-    
+
     def _reset_action_history(self) -> None:
         self.step_n: int = 1
         self.action_history = []
-    
+
     def add_chat_history(self, chat: str, role: str) -> None:
         self._chat_history.append((chat, role))
-        
+
     @property
     def chat_history(self) -> list[tuple[str, str]]:
         return format_chat_history(self._chat_history)
-    
+
     def think(self):
         # Think
         logger.debug(f'Step {self.step_n}:')
@@ -48,7 +48,7 @@ class ChatSystem(System):
         thought = self.manager(history=self.chat_history, task_prompt=self.task_prompt, scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
         self.scratchpad += ' ' + thought
         self.log(f'**Thought {self.step_n}**: {thought}', agent=self.manager)
-        
+
     def act(self) -> tuple[str, Any]:
         # Act
         self.scratchpad += f'\nValid action example: {self.manager.valid_action_example}:'
@@ -63,7 +63,7 @@ class ChatSystem(System):
 
     def execute(self, action_type: str, argument: Any):
         # Execute
-        log_header = ''
+        log_head = ''
         if action_type.lower() == 'finish':
             observation = self.finish(argument)
             log_head = ':violet[Finish with results]:\n- '
@@ -74,16 +74,16 @@ class ChatSystem(System):
         else:
             observation = f'Invalid Action type or format: {action_type}. Valid Action examples are {self.manager.valid_action_example}.'
         self.scratchpad += f'\nObservation: {observation}'
-        
+
         logger.debug(f'Observation: {observation}')
         self.log(f'{log_head}{observation}', agent=self.manager, logging=False)
-    
+
     def step(self) -> None:
         self.think()
         action_type, argument = self.act()
         self.execute(action_type, argument)
         self.step_n += 1
-    
+
     def forward(self, user_input: str, reset: bool = True) -> str:
         if reset:
             self.reset()
@@ -95,7 +95,7 @@ class ChatSystem(System):
             self.answer = "I'm sorry, I cannot continue the conversation. Please try again."
         self.add_chat_history(self.answer, role='system')
         return self.answer
-    
+
     def chat(self) -> None:
         print("Start chatting with the system. Type 'exit' or 'quit' to end the conversation.")
         while True:

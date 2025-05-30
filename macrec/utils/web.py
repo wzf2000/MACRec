@@ -3,7 +3,7 @@ from typing import Optional
 
 def add_chat_message(role: str, message: str, avatar: Optional[str] = None):
     """Add a chat message to the chat history.
-    
+
     Args:
         `role` (`str`): The role of the message.
         `message` (`str`): The message to be added.
@@ -19,7 +19,7 @@ def add_chat_message(role: str, message: str, avatar: Optional[str] = None):
 
 def get_color(agent_type: str) -> str:
     """Get the color of the agent.
-    
+
     Args:
         `agent_type` (`str`): The type of the agent.
     Returns:

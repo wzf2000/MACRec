@@ -25,7 +25,7 @@ class CollaborationSystem(System):
             self.manager_kwargs['reflections'] = ''
         if self.interpreter is not None:
             self.manager_kwargs['task_prompt'] = ''
-    
+
     def init_agents(self, agents: dict[str, dict]) -> None:
         self.agents: dict[str, Agent] = dict()
         for agent, agent_config in agents.items():
@@ -36,37 +36,37 @@ class CollaborationSystem(System):
             except KeyError:
                 raise ValueError(f'Agent {agent} is not supported.')
         assert 'Manager' in self.agents, 'Manager is required.'
-    
+
     @property
     def manager(self) -> Optional[Manager]:
         if 'Manager' not in self.agents:
             return None
         return self.agents['Manager']
-    
+
     @property
     def analyst(self) -> Optional[Analyst]:
         if 'Analyst' not in self.agents:
             return None
         return self.agents['Analyst']
-    
+
     @property
     def interpreter(self) -> Optional[Interpreter]:
         if 'Interpreter' not in self.agents:
             return None
         return self.agents['Interpreter']
-    
+
     @property
     def reflector(self) -> Optional[Reflector]:
         if 'Reflector' not in self.agents:
             return None
         return self.agents['Reflector']
-    
+
     @property
     def searcher(self) -> Optional[Searcher]:
         if 'Searcher' not in self.agents:
             raise None
         return self.agents['Searcher']
-    
+
     def reset(self, clear: bool = False, *args, **kwargs) -> None:
         super().reset(*args, **kwargs)
         self.step_n: int = 1
@@ -76,19 +76,19 @@ class CollaborationSystem(System):
                 self.reflector.reflections_str = ''
             if self.task == 'chat':
                 self._chat_history = []
-    
+
     def add_chat_history(self, chat: str, role: str) -> None:
         assert self.task == 'chat', 'Chat history is only available for chat task.'
         self._chat_history.append((chat, role))
-        
+
     @property
     def chat_history(self) -> list[tuple[str, str]]:
         assert self.task == 'chat', 'Chat history is only available for chat task.'
         return format_chat_history(self._chat_history)
-    
+
     def is_halted(self) -> bool:
         return ((self.step_n > self.max_step) or self.manager.over_limit(scratchpad=self.scratchpad, **self.manager_kwargs)) and not self.finished
-        
+
     def _parse_answer(self, answer: Any = None) -> dict[str, Any]:
         if answer is None:
             answer = self.answer
@@ -101,7 +101,7 @@ class CollaborationSystem(System):
         thought = self.manager(scratchpad=self.scratchpad, stage='thought', **self.manager_kwargs)
         self.scratchpad += ' ' + thought
         self.log(f'**Thought {self.step_n}**: {thought}', agent=self.manager)
-    
+
     def act(self) -> tuple[str, Any]:
         # Act
         if self.max_step == self.step_n:
@@ -113,7 +113,7 @@ class CollaborationSystem(System):
         action_type, argument = parse_action(action, json_mode=self.manager.json_mode)
         logger.debug(f'Action {self.step_n}: {action}')
         return action_type, argument
-    
+
     def execute(self, action_type: str, argument: Any):
         # Execute
         log_head = ''
@@ -148,18 +148,18 @@ class CollaborationSystem(System):
                 log_head = f':violet[Response from] :red[Interpreter] :violet[with] :blue[{argument}]:violet[:]\n- '
         else:
             observation = 'Invalid Action type or format. Valid Action examples are {self.manager.valid_action_example}.'
-        
+
         self.scratchpad += f'\nObservation: {observation}'
-        
+
         logger.debug(f'Observation: {observation}')
         self.log(f'{log_head}{observation}', agent=self.manager, logging=False)
-    
+
     def step(self):
         self.think()
         action_type, argument = self.act()
         self.execute(action_type, argument)
         self.step_n += 1
-    
+
     def reflect(self) -> bool:
         if (not self.is_finished() and not self.is_halted()) or self.reflector is None:
             self.reflected = False
@@ -171,13 +171,13 @@ class CollaborationSystem(System):
         self.manager_kwargs['reflections'] = self.reflector.reflections_str
         if self.reflector.json_mode:
             reflection_json = json.loads(self.reflector.reflections[-1])
-            if 'correctness' in reflection_json and reflection_json['correctness'] == True:
+            if 'correctness' in reflection_json and reflection_json['correctness']:
                 # don't forward if the last reflection is correct
-                logger.debug(f'Last reflection is correct, don\'t forward.')
-                self.log(f":red[**Last reflection is correct, don't forward**]", agent=self.reflector, logging=False)
+                logger.debug('Last reflection is correct, don\'t forward.')
+                self.log(":red[**Last reflection is correct, don't forward**]", agent=self.reflector, logging=False)
                 return True
         return False
-    
+
     def interprete(self) -> None:
         if self.task == 'chat':
             assert self.interpreter is not None, 'Interpreter is required for chat task.'
@@ -185,7 +185,7 @@ class CollaborationSystem(System):
         else:
             if self.interpreter is not None:
                 self.manager_kwargs['task_prompt'] = self.interpreter(input=self.input)
-        
+
     def forward(self, user_input: Optional[str] = None, reset: bool = True) -> Any:
         if self.task == 'chat':
             self.manager_kwargs['history'] = self.chat_history
@@ -204,7 +204,7 @@ class CollaborationSystem(System):
         if self.task == 'chat':
             self.add_chat_history(self.answer, role='system')
         return self.answer
-    
+
     def chat(self) -> None:
         assert self.task == 'chat', 'Chat task is required for chat method.'
         print("Start chatting with the system. Type 'exit' or 'quit' to end the conversation.")

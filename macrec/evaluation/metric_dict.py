@@ -6,14 +6,14 @@ class MetricDict:
     A dictionary of metrics. Use `add` to add a metric to the dictionary. Use `update` to update the metrics with the output of the model. Use `compute` to compute the metrics. Use `report` to output the metrics.
     """
     def __init__(self, metrics: dict[str, torchmetrics.Metric] = {}):
-        self.metrics: dict[str, torchmetrics.Metric]  = metrics
-        
+        self.metrics: dict[str, torchmetrics.Metric] = metrics
+
     def add(self, name: str, metric: torchmetrics.Metric):
         self.metrics[name] = metric
-    
+
     def update(self, output: dict, prefix: str = '') -> str:
         """Update the metrics with the output of the model. Only metrics with the given prefix will be updated.
-        
+
         Args:
             `output` (`dict`): The output of the model.
             `prefix` (`str`, optional): The prefix of the metric names. Defaults to `''`.
@@ -41,13 +41,13 @@ class MetricDict:
         computed = metric.compute()
         computed = next(iter(computed.values()))
         return f'{metric_name}: {computed:.4f}'
-    
+
     def compute(self):
         result = {}
         for metric_name, metric in self.metrics.items():
             result[metric_name] = metric.compute()
         return result
-    
+
     def report(self):
         result = self.compute()
         for metric_name, metric in result.items():

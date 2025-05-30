@@ -16,18 +16,18 @@ class System(ABC):
     @abstractmethod
     def supported_tasks() -> list[str]:
         """Return a list of supported tasks.
-        
+
         Raises:
             `NotImplementedError`: Should be implemented in subclasses.
         Returns:
             `list[str]`: A list of supported tasks.
         """
         raise NotImplementedError("System.supported_tasks() not implemented")
-    
+
     @property
     def task_type(self) -> str:
         """Return the type of the task. Can be inherited by subclasses to support more task types.
-        
+
         Raises:
             `NotImplementedError`: Not supported task type.
         Returns:
@@ -54,10 +54,10 @@ class System(ABC):
             return 'explanation generation'
         else:
             raise NotImplementedError
-    
+
     def __init__(self, task: str, config_path: str, leak: bool = False, web_demo: bool = False, dataset: Optional[str] = None, *args, **kwargs) -> None:
         """Initialize the system.
-        
+
         Args:
             `task` (`str`): The task for the system to perform.
             `config_path` (`str`): The path to the config file of the system.
@@ -89,10 +89,10 @@ class System(ABC):
         self.kwargs = kwargs
         self.init(*args, **kwargs)
         self.reset(clear=True)
-    
+
     def log(self, message: str, agent: Optional[Agent] = None, logging: bool = True) -> None:
         """Log the message.
-        
+
         Args:
             `message` (`str`): The message to log.
             `agent` (`Agent`, optional): The agent to log the message. Defaults to `None`.
@@ -112,54 +112,54 @@ class System(ABC):
                 final_message = '\n'.join(messages)
             self.web_log.append(final_message)
             st.markdown(f'{final_message}')
-    
+
     @abstractmethod
     def init(self, *args, **kwargs) -> None:
         """Initialize the system.
-        
+
         Raises:
             `NotImplementedError`: Should be implemented in subclasses.
         """
         raise NotImplementedError("System.init() not implemented")
-    
+
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         self.clear_web_log()
         return self.forward(*args, **kwargs)
-    
+
     def set_data(self, input: str, context: str, gt_answer: Any, data_sample: Optional[pd.Series] = None) -> None:
         self.input: str = input
         self.context: str = context
         self.gt_answer = gt_answer
         self.data_sample = data_sample
-    
+
     @abstractmethod
     def forward(self, *args, **kwargs) -> Any:
         """Forward pass of the system.
-        
+
         Raises:
             `NotImplementedError`: Should be implemented in subclasses.
         Returns:
             `Any`: The system output.
         """
         raise NotImplementedError("System.forward() not implemented")
-        
+
     def is_finished(self) -> bool:
         return self.finished
-    
+
     def is_correct(self) -> bool:
         return is_correct(task=self.task, answer=self.answer, gt_answer=self.gt_answer)
-    
+
     def finish(self, answer: Any) -> str:
         self.answer = answer
         if not self.leak:
             observation = f'The answer you give (may be INCORRECT): {self.answer}'
         elif self.is_correct():
             observation = 'Answer is CORRECT'
-        else: 
+        else:
             observation = 'Answer is INCORRECT'
         self.finished = True
         return observation
-    
+
     def clear_web_log(self) -> None:
         self.web_log = []
 

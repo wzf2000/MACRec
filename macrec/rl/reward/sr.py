@@ -11,7 +11,7 @@ class SequentialRecommendationRewardV1(DeltaReward):
             return 0
         gt_pos = action.index(gt_answer)
         return 1 / (gt_pos + 1)
-    
+
 class SequentialRecommendationReflectionReward(ReflectionReward):
     """
     The reflection reward function for sequential recommendation. The `judge` function judges whether the first candidate in the action list is the ground truth answer.
@@ -19,7 +19,7 @@ class SequentialRecommendationReflectionReward(ReflectionReward):
     def __init__(self, n_candidates: int = 8, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.n_candidates = n_candidates
-    
+
     def judge(self, action: list[int], gt_answer: int) -> bool:
         if len(action) == 0:
             return False

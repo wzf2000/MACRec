@@ -68,9 +68,11 @@ def process_item_data(item_df: pd.DataFrame) -> pd.DataFrame:
     item_df['video_release_date'] = item_df['video_release_date'].fillna('unknown')
     # set release_date to unknown if it is null
     item_df['release_date'] = item_df['release_date'].fillna('unknown')
+
     # set a genre column to be a list of genres
     def get_genre(x: pd.Series) -> list[str]:
         return '|'.join([genre for genre, value in x.items() if value == 1])
+
     item_df['genre'] = item_df[genres].apply(lambda x: get_genre(x), axis=1)
     # set a item_attributes column to be a string contain all the item information with a template
     input_variables = item_df.columns.to_list()[:3] + ['genre']
@@ -110,10 +112,10 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> tup
             for j in range(len(neg_items[i])):
                 while neg_items[i][j] in user_clicked or neg_items[i][j] in neg_items[i][:j]:
                     neg_items[i][j] = np.random.randint(1, n_items + 1)
-            assert len(set(neg_items[i])) == len(neg_items[i]) # check if there is duplicate item id
+            assert len(set(neg_items[i])) == len(neg_items[i])  # check if there is duplicate item id
         df['neg_item_id'] = neg_items.tolist()
         return df
-        
+
     def generate_dev_test(data_df: pd.DataFrame) -> tuple[list[pd.DataFrame], pd.DataFrame]:
         result_dfs = []
         for idx in range(2):
@@ -121,11 +123,11 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int = 9) -> tup
             data_df = data_df.drop(result_df.index)
             result_dfs.append(result_df)
         return result_dfs, data_df
-    
+
     data_df = negative_sample(data_df)
     leave_df = data_df.groupby('user_id').head(1)
     left_df = data_df.drop(leave_df.index)
-    
+
     [test_df, dev_df], train_df = generate_dev_test(left_df)
     train_df = pd.concat([leave_df, train_df]).sort_index()
     return train_df, dev_df, test_df
@@ -145,7 +147,7 @@ def process_data(dir: str, n_neg_items: int = 9):
     train_df, dev_df, test_df = process_interaction_data(data_df, n_neg_items)
     logger.info(f'Number of train interactions: {train_df.shape[0]}')
     dfs = append_his_info([train_df, dev_df, test_df], neg=True)
-    logger.info(f'Completed append history information to interactions')
+    logger.info('Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
         df['history'] = df['history_item_id'].apply(lambda x: item_df.loc[x]['item_attributes'].values.tolist())
@@ -157,17 +159,21 @@ def process_data(dir: str, n_neg_items: int = 9):
         df['user_profile'] = df['user_id'].apply(lambda x: user_df.loc[x]['user_profile'])
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
         # candidates id
-        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis = 1)
+        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis=1)
+
         def shuffle_list(x):
             random.shuffle(x)
             return x
-        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x)) # shuffle candidates id
+
+        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x))  # shuffle candidates id
+
         # add item attributes
         def candidate_attr(x):
             candidate_item_attributes = []
             for item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
                 candidate_item_attributes.append(f'{item_id}: {item_attributes}')
             return candidate_item_attributes
+
         df['candidate_item_attributes'] = df['candidate_item_id'].apply(lambda x: candidate_attr(x))
         df['candidate_item_attributes'] = df['candidate_item_attributes'].apply(lambda x: '\n'.join(x))
         # replace empty string with 'None'

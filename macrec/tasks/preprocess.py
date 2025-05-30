@@ -11,7 +11,7 @@ class PreprocessTask(Task):
         parser.add_argument('--dataset', type=str, required=True, choices=['ml-100k', 'amazon'], help='output file')
         parser.add_argument('--n_neg_items', type=int, default=7, help='numbers of negative items')
         return parser
-    
+
     def run(self, data_dir: str, dataset: dir, n_neg_items: int):
         init_all_seeds(2024)
         if dataset == 'ml-100k':
@@ -21,6 +21,6 @@ class PreprocessTask(Task):
             amazon_process_data(data_dir, n_neg_items)
         else:
             raise NotImplementedError
-        
+
 if __name__ == '__main__':
     PreprocessTask().launch()

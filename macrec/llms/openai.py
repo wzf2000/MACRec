@@ -7,7 +7,7 @@ from macrec.llms.basellm import BaseLLM
 class AnyOpenAILLM(BaseLLM):
     def __init__(self, model_name: str = 'gpt-3.5-turbo', json_mode: bool = False, *args, **kwargs):
         """Initialize the OpenAI LLM.
-        
+
         Args:
             `model_name` (`str`, optional): The name of the OpenAI model. Defaults to `gpt-3.5-turbo`.
             `json_mode` (`bool`, optional): Whether to use the JSON mode of the OpenAI API. Defaults to `False`.
@@ -36,10 +36,10 @@ class AnyOpenAILLM(BaseLLM):
                     }
             self.model = ChatOpenAI(model_name=model_name, *args, **kwargs)
             self.model_type = 'chat'
-    
+
     def __call__(self, prompt: str, *args, **kwargs) -> str:
         """Forward pass of the OpenAI LLM.
-        
+
         Args:
             `prompt` (`str`): The prompt to feed into the LLM.
         Returns:

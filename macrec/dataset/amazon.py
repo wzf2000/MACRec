@@ -4,15 +4,17 @@ import pandas as pd
 import numpy as np
 import gzip
 import subprocess
+from typing import Generator
 from loguru import logger
 from langchain.prompts import PromptTemplate
 
 from macrec.utils import append_his_info
 
-def parse(path: str) -> dict:
+def parse(path: str) -> Generator[dict, None, None]:
+    """Parse the gzip file at `path` and yield each entry as a dictionary."""
     g = gzip.open(path, 'rb')
-    for l in g:
-        yield eval(l)
+    for entry in g:
+        yield eval(entry)
 
 def get_df(path: str) -> pd.DataFrame:
     i = 0
@@ -84,7 +86,7 @@ def process_item_data(data_df: pd.DataFrame, meta_df: pd.DataFrame) -> pd.DataFr
         input_variables=input_variables,
     )
     item_df['item_attributes'] = item_df[input_variables].apply(lambda x: template.format(**x), axis=1)
-    
+
     return item_df
 
 def reindex(data_df: pd.DataFrame, out_df: pd.DataFrame = None) -> tuple[dict, dict]:
@@ -127,7 +129,7 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> tuple[p
             for j in range(len(neg_items[i])):
                 while neg_items[i][j] in user_clicked or neg_items[i][j] in neg_items[i][:j]:
                     neg_items[i][j] = np.random.randint(1, n_items + 1)
-            assert len(set(neg_items[i])) == len(neg_items[i]) # check if there is duplicate item id
+            assert len(set(neg_items[i])) == len(neg_items[i])  # check if there is duplicate item id
         df['neg_item_id'] = neg_items.tolist()
         return df
 
@@ -140,7 +142,7 @@ def process_interaction_data(data_df: pd.DataFrame, n_neg_items: int) -> tuple[p
         return result_dfs, data_df
 
     out_df = negative_sample(out_df)
-    
+
     leave_df = out_df.groupby('user_id').head(1)
     data_df = out_df.drop(leave_df.index)
 
@@ -164,13 +166,13 @@ def process_data(dir: str, n_neg_items: int = 9):
     logger.info(f'Number of interactions: {out_df.shape[0]}')
 
     # user_df = process_user_data(data_df)
-    logger.info(f"Number of users: {out_df['user_id'].nunique()}") 
+    logger.info(f"Number of users: {out_df['user_id'].nunique()}")
 
     item_df = process_item_data(data_df, meta_df)
     logger.info(f'Number of items: {item_df.shape[0]}')
 
     dfs = append_his_info([train_df, dev_df, test_df], summary=True, neg=True)
-    logger.info(f'Completed append history information to interactions')
+    logger.info('Completed append history information to interactions')
     for df in dfs:
         # format history by list the historical item attributes
         df['history'] = df['history_item_id'].apply(lambda x: item_df.loc[x]['item_attributes'].values.tolist())
@@ -182,23 +184,27 @@ def process_data(dir: str, n_neg_items: int = 9):
         df['user_profile'] = df['user_id'].apply(lambda x: 'unknown')
         df['target_item_attributes'] = df['item_id'].apply(lambda x: item_df.loc[x]['item_attributes'])
         # candidates id
-        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis = 1)
+        df['candidate_item_id'] = df.apply(lambda x: [x['item_id']]+x['neg_item_id'], axis=1)
+
         def shuffle_list(x):
             random.shuffle(x)
             return x
-        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x)) # shuffle candidates id
+
+        df['candidate_item_id'] = df['candidate_item_id'].apply(lambda x: shuffle_list(x))  # shuffle candidates id
+
         # add item attributes
         def candidate_attr(x):
             candidate_item_attributes = []
             for item_id, item_attributes in zip(x, item_df.loc[x]['item_attributes']):
                 candidate_item_attributes.append(f'{item_id}: {item_attributes}')
             return candidate_item_attributes
+
         df['candidate_item_attributes'] = df['candidate_item_id'].apply(lambda x: candidate_attr(x))
         df['candidate_item_attributes'] = df['candidate_item_attributes'].apply(lambda x: '\n'.join(x))
         # replace empty string with 'None'
         for col in df.columns.to_list():
             df[col] = df[col].apply(lambda x: 'None' if x == '' else x)
-    
+
     train_df = dfs[0]
     dev_df = dfs[1]
     test_df = dfs[2]

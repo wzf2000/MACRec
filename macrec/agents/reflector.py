@@ -13,7 +13,7 @@ class ReflectionStrategy(Enum):
     Reflection strategies for the `Reflector` agent. `NONE` means no reflection. `REFLEXION` is the default strategy for the `Reflector` agent, which prompts the LLM to reflect on the input and the scratchpad. `LAST_ATTEMPT` simply store the input and the scratchpad of the last attempt. `LAST_ATTEMPT_AND_REFLEXION` combines the two strategies.
     """
     NONE = 'base'
-    LAST_ATTEMPT = 'last_trial' 
+    LAST_ATTEMPT = 'last_trial'
     REFLEXION = 'reflection'
     LAST_ATTEMPT_AND_REFLEXION = 'last_trial_and_reflection'
 
@@ -23,7 +23,7 @@ class Reflector(Agent):
     """
     def __init__(self, config_path: str, *args, **kwargs) -> None:
         """Initialize the reflector agent. The reflector agent prompts the LLM to reflect on the input and the scratchpad as default.
-        
+
         Args:
             `config_path` (`str`): The path to the config file of the reflector LLM.
         """
@@ -45,14 +45,14 @@ class Reflector(Agent):
         assert self.reflection_strategy is not None, f'Unknown reflection strategy: {reflection_strategy}'
         self.reflections: list[str] = []
         self.reflections_str: str = ''
-    
+
     @property
     def reflector_prompt(self) -> PromptTemplate:
         if self.json_mode:
             return self.prompts['reflect_prompt_json']
         else:
             return self.prompts['reflect_prompt']
-        
+
     @property
     def reflect_examples(self) -> str:
         prompt_name = 'reflect_examples_json' if self.json_mode else 'reflect_examples'
@@ -60,14 +60,14 @@ class Reflector(Agent):
             return self.prompts[prompt_name]
         else:
             return ''
-    
+
     def _build_reflector_prompt(self, input: str, scratchpad: str) -> str:
         return self.reflector_prompt.format(
             examples=self.reflect_examples,
             input=input,
             scratchpad=scratchpad
         )
-    
+
     def _prompt_reflection(self, input: str, scratchpad: str) -> str:
         reflection_prompt = self._build_reflector_prompt(input, scratchpad)
         reflection_response = self.llm(reflection_prompt)

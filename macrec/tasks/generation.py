@@ -21,7 +21,7 @@ class GenerationTask(Task):
         parser.add_argument('--task', type=str, default='rp', choices=['rp', 'sr', 'gen'], help='Task name')
         parser.add_argument('--max_his', type=int, default=10, help='Max history length')
         return parser
-    
+
     def get_data(self, data_file: str, max_his: int) -> pd.DataFrame:
         df = pd.read_csv(data_file)
         df['history'] = df['history'].fillna('None')
@@ -29,11 +29,11 @@ class GenerationTask(Task):
         if self.task == 'sr':
             candidate_example: str = df['candidate_item_attributes'][0]
             self.n_candidate = len(candidate_example.split('\n'))
-            self.system_kwargs['n_candidate'] = self.n_candidate # Add n_candidate to system_kwargs by data sample
+            self.system_kwargs['n_candidate'] = self.n_candidate  # Add n_candidate to system_kwargs by data sample
         return df
-    
+
     def prompt_data(self, df: pd.DataFrame) -> list[tuple[str, int | float | str, pd.Series]]:
-        data_prompt = self.system.prompts[f'data_prompt']
+        data_prompt = self.system.prompts['data_prompt']
         if self.task == 'rp':
             return [(data_prompt.format(
                 user_id=df['user_id'][i],
@@ -62,7 +62,7 @@ class GenerationTask(Task):
             ), df['rating'][i], df.iloc[i]) for i in tqdm(range(len(df)), desc="Loading data")]
         else:
             raise NotImplementedError
-        
+
     def get_system(self, system: str, system_config: str):
         if system == 'react':
             self.system = ReActSystem(config_path=system_config, **self.system_kwargs)
@@ -74,32 +74,32 @@ class GenerationTask(Task):
             self.system = CollaborationSystem(config_path=system_config, **self.system_kwargs)
         else:
             raise NotImplementedError
-        
+
     @property
     @abstractmethod
     def running_steps(self) -> int:
         """Return the steps to run for each trial.
-        
+
         Raises:
             `NotImplementedError`: Subclasses should implement this method.
         Returns:
             `int`: The steps to run for each trial.
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def before_generate(self) -> None:
         """The process to run before generating.
-        
+
         Raises:
             `NotImplementedError`: Subclasses should implement this method.
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def after_step(self, answer: Any, gt_answer: int | float | str, step: int, record: dict) -> None:
         """The process to run after each system step during one trial.
-        
+
         Args:
             `answer` (`Any`): The answer given by the system.
             `gt_answer` (`int | float | str`): The ground truth answer.
@@ -109,11 +109,11 @@ class GenerationTask(Task):
             `NotImplementedError`: Subclasses should implement this method.
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def after_iteration(self, answer: Any, gt_answer: int | float | str, record: dict, pbar: tqdm) -> None:
         """The process to run after each trial.
-        
+
         Args:
             `answer` (`Any`): The final answer given by the system.
             `gt_answer` (`int | float | str`): The ground truth answer.
@@ -123,16 +123,16 @@ class GenerationTask(Task):
             `NotImplementedError`: Subclasses should implement this method.
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def after_generate(self) -> None:
         """The process to run after generating.
-        
+
         Raises:
             `NotImplementedError`: Subclasses should implement this method.
         """
         raise NotImplementedError
-    
+
     def generate(self, data: list[tuple[str, int | float | str, pd.Series]], steps: int = 2):
         self.before_generate()
         with tqdm(total=len(data)) as pbar:
@@ -146,7 +146,7 @@ class GenerationTask(Task):
                 self.after_iteration(answer=self.system.answer, gt_answer=gt_answer, record=record, pbar=pbar)
                 pbar.update(1)
         self.after_generate()
-    
+
     def run(self, api_config: str, dataset: str, data_file: str, system: str, system_config: str, task: str, max_his: int):
         if dataset == 'None':
             dataset = os.path.basename(os.path.dirname(data_file))

@@ -101,7 +101,7 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, (np.bool_)):
             return bool(obj)
 
-        elif isinstance(obj, (np.void)): 
+        elif isinstance(obj, (np.void)):
             return None
 
         return json.JSONEncoder.default(self, obj)

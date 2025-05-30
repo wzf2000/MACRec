@@ -7,7 +7,7 @@ from typing import Any
 def normalize_answer(s: str) -> str:
     def remove_articles(text: str) -> str:
         return re.sub(r"\b(a|an|the)\b", " ", text)
-    
+
     def white_space_fix(text: str) -> str:
         return " ".join(text.split())
 
@@ -22,7 +22,7 @@ def normalize_answer(s: str) -> str:
 
 def EM(answer: str, key: str) -> bool:
     """Exact match.
-    
+
     Args:
         `answer` (`str`): The answer to be checked.
         `key` (`str`): The ground truth answer.
@@ -36,7 +36,7 @@ def is_correct_qa(answer: str, gt_answer: str) -> bool:
         return EM(answer, gt_answer)
     else:
         return EM(str(answer), gt_answer)
-    
+
 def is_correct_rp(answer: float, gt_answer: float) -> bool:
     return answer == gt_answer
 
@@ -47,7 +47,7 @@ def is_correct_sr(answer: list[int], gt_answer: int) -> bool:
 
 def is_correct(task: str, answer: Any, gt_answer: Any) -> bool:
     """Check whether the answer is correct.
-    
+
     Args:
         `task` (`str`): Task type.
         `answer` (`Any`): The answer to be checked.

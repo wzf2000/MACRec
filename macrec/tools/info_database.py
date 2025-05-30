@@ -13,10 +13,10 @@ class InfoDatabase(Tool):
         if item_info_path is not None:
             self._item_info = pd.read_csv(item_info_path, sep=',')
             assert 'item_id' in self._item_info.columns, 'item_id column not found in item_info.'
-        
+
     def reset(self, *args, **kwargs) -> None:
         pass
-    
+
     def user_info(self, user_id: int) -> str:
         if not hasattr(self, '_user_info'):
             return 'User info database not available.'
@@ -31,7 +31,7 @@ class InfoDatabase(Tool):
             columns = columns.drop('user_id')
             profile = '; '.join([f'{column}: {info[column].values[0]}' for column in columns])
             return f'User {user_id} Profile:\n{profile}'
-    
+
     def item_info(self, item_id: int) -> str:
         if not hasattr(self, '_item_info'):
             return 'Item info database not available.'

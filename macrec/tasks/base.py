@@ -10,7 +10,7 @@ class Task(ABC):
     @abstractmethod
     def parse_task_args(parser: ArgumentParser) -> ArgumentParser:
         """Parse task arguments.
-        
+
         Args:
             `parser` (`ArgumentParser`): An `ArgumentParser` object to parse arguments.
         Raises:
@@ -19,7 +19,7 @@ class Task(ABC):
             `ArgumentParser`: The `ArgumentParser` object with arguments added.
         """
         raise NotImplementedError
-    
+
     def __getattr__(self, __name: str) -> Any:
         # return none if attribute not exists
         if __name not in self.__dict__:
@@ -29,15 +29,15 @@ class Task(ABC):
     @abstractmethod
     def run(self, *args, **kwargs):
         """The running pipeline of the task.
-        
+
         Raises:
             `NotImplementedError`: Should be implemented in subclasses.
         """
         raise NotImplementedError
-    
+
     def launch(self) -> Any:
         """Launch the task. Parse the arguments with `parse_task_args` and run the task with `run`. The parsed arguments are stored in `self.args` and passed to the `run` method.
-        
+
         Returns:
             `Any`: The return value of the `run` method.
         """
@@ -48,7 +48,7 @@ class Task(ABC):
         # log the arguments
         logger.success(args)
         return self.run(**vars(args))
-    
+
 class RewardTask(Task):
     def get_reward_model(self, reward_version: str) -> Reward:
         if self.task == 'rp':

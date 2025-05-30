@@ -2,10 +2,10 @@ from typing import Callable
 
 def run_once(func: Callable) -> Callable:
     """A decorator to run a function only once.
-    
+
     Args:
         `func` (`Callable`): The function to be decorated.
-    
+
     Returns:
         `Callable`: The decorated function.
     """

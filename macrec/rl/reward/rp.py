@@ -12,17 +12,17 @@ class RatingPredictionRewardV1(DeltaReward):
         self.invalid = invalid
         self.lower = lower
         self.upper = upper
-        
+
     def get_rating(self, action: float) -> float:
         if action < self.lower or action > self.upper:
             return self.invalid
         return action
-        
+
     def action_reward(self, action: float, gt_answer: float) -> float:
         assert self.lower <= gt_answer <= self.upper, f"Ground truth answer rating {gt_answer} is not in range [{self.lower}, {self.upper}]"
         action_rating = self.get_rating(action)
         return -(gt_answer - action_rating) ** 2
-    
+
 class RatingPredictionRewardV2(Reward):
     """
     The reward function v2 for rating prediction. The reward is modified from the reward function v1, paying more attention to the invalid actions, and unchanged actions after reflection. See `reward` function for more details.
@@ -35,19 +35,19 @@ class RatingPredictionRewardV2(Reward):
         self.lower = lower
         self.upper = upper
         self.eta = eta
-        
+
     def check_valid(self, action: float) -> tuple[bool, float]:
         if action < self.lower or action > self.upper:
             return False, self.invalid
         return True, action
-        
+
     def action_reward(self, action: float, gt_answer: float) -> float:
         assert self.lower <= gt_answer <= self.upper, f"Ground truth answer rating {gt_answer} is not in range [{self.lower}, {self.upper}]"
         valid, action_rating = self.check_valid(action)
         if not valid:
             return self.invalid
         return -(gt_answer - action_rating) ** 2
-    
+
     def reward(self, action1: float, action2: float, gt_answer: float, *args, **kwargs) -> float:
         valid1, _ = self.check_valid(action1)
         valid2, _ = self.check_valid(action2)
@@ -62,7 +62,7 @@ class RatingPredictionRewardV2(Reward):
                 return action2_reward - action1_reward
         original_reward = action2_reward - action1_reward
         return original_reward + np.exp(-np.abs(original_reward) * self.eta) * (self.alpha + action2_reward)
-    
+
 class RatingPredictionReflectionReward(ReflectionReward):
     """
     The reflection reward function for rating prediction. The `judge` function simply checks whether the action is equal to the ground truth answer rating.
@@ -71,7 +71,7 @@ class RatingPredictionReflectionReward(ReflectionReward):
         super().__init__(*args, **kwargs)
         self.lower = lower
         self.upper = upper
-    
+
     def judge(self, action: float, gt_answer: float) -> bool:
         assert self.lower <= gt_answer <= self.upper, f"Ground truth answer rating {gt_answer} is not in range [{self.lower}, {self.upper}]"
         return action == gt_answer

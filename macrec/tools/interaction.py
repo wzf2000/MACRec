@@ -13,7 +13,7 @@ class InteractionRetriever(Tool):
         assert 'item_id' in self.data.columns, 'item_id not found in data.'
         self.user_history = None
         self.item_history = None
-    
+
     def reset(self, user_id: Optional[int] = None, item_id: Optional[int] = None, *args, **kwargs) -> None:
         if user_id is not None and item_id is not None:
             data_sample = self.data[(self.data['user_id'] == user_id) & (self.data['item_id'] == item_id)]
@@ -31,7 +31,7 @@ class InteractionRetriever(Tool):
             self.user_rating = None
             self.item_history = None
             self.item_rating = None
-    
+
     def user_retrieve(self, user_id: int, k: int, *args, **kwargs) -> str:
         if self.user_history is None:
             raise ValueError('User history not found. Please reset the user_id and item_id.')

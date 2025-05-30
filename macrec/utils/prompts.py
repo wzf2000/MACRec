@@ -6,7 +6,7 @@ from langchain.prompts import PromptTemplate
 
 def read_prompts(config_file: str) -> dict[str, PromptTemplate | str]:
     """Read prompt templates from config file.
-    
+
     Args:
         `config_file` (`str`): Path to the prompts' config file.
     Returns:

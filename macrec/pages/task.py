@@ -34,7 +34,7 @@ def scan_dict(config: dict) -> bool:
             if not scan_list(config[key]):
                 return False
     return True
-        
+
 def check_json(config_path: str) -> bool:
     config = read_json(config_path)
     if 'model_type' in config and config['model_type'] == 'opensource':
@@ -60,7 +60,7 @@ def task_config(task: str, system_type: type[System], config_path: str) -> None:
     st.markdown(f'## `{system_type.__name__}` for {task2name(task)}')
     checking = check_config(config_path)
     if not checking:
-        st.error(f'This config file requires OpenSource models, which are not supported in this machine (without cuda toolkit).')
+        st.error('This config file requires OpenSource models, which are not supported in this machine (without cuda toolkit).')
         return
     dataset = st.selectbox('Choose a dataset', ['ml-100k', 'Beauty']) if task != 'chat' else 'chat'
     renew = False
@@ -97,7 +97,7 @@ def task_config(task: str, system_type: type[System], config_path: str) -> None:
         st.session_state.dataset = dataset
         renew = True
     elif 'system' not in st.session_state:
-        logger.debug(f'New system')
+        logger.debug('New system')
         renew = True
     elif dataset != st.session_state.system.manager.dataset:
         logger.debug(f'Change dataset: {dataset}')
