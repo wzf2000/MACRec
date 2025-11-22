@@ -40,5 +40,7 @@ eval_args:
     mode: full
 train_neg_sample_args: ~
 
+eval_step: 5
+
 # model
 embedding_size: 64
